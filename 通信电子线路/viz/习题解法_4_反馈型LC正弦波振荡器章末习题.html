@@ -1,0 +1,2864 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>习题解法 第 4 章 · 反馈型LC正弦波振荡器章末习题</title>
+<style>
+
+:root{
+  --ink:#1a1a1a; --mut:#6b6b6b; --line:#1f1f1f; --soft:#e9ecef;
+  --blue:#1a46b5; --red:#c02020; --green:#0d7a3c; --amber:#c07a00; --violet:#7a3fb0;
+  --bg:#fbfbf9; --card:#fff; --bd:#d8d8d2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC","Source Han Sans SC",sans-serif;
+  line-height:1.75;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px}
+header{background:linear-gradient(135deg,#12233f,#2a4a7d);color:#fff;padding:52px 0 44px;margin-bottom:36px}
+header .wrap{padding-bottom:0}
+.kicker{font-size:13px;letter-spacing:.22em;opacity:.72;margin:0 0 10px}
+h1{font-size:34px;margin:0 0 12px;line-height:1.3;font-weight:700}
+.sub{font-size:16px;opacity:.85;max-width:860px;margin:0}
+.meta{margin-top:22px;font-size:13px;opacity:.7;display:flex;gap:22px;flex-wrap:wrap}
+h2{font-size:23px;margin:52px 0 6px;padding-bottom:10px;border-bottom:2px solid var(--ink);font-weight:700}
+h2 .num{color:var(--blue);margin-right:10px}
+h3{font-size:17px;margin:28px 0 10px;color:#234}
+h4{font-size:15px;margin:18px 0 8px;color:#333}
+p{margin:10px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px 24px;margin:18px 0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card.pad0{padding:14px 18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid21{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.grid12{display:grid;grid-template-columns:1fr 2fr;gap:20px}
+@media(max-width:900px){.grid2,.grid3,.grid21,.grid12{grid-template-columns:1fr}}
+svg{width:100%;height:auto;display:block;background:#fff;border-radius:6px}
+.cap{font-size:13px;color:var(--mut);text-align:center;margin-top:8px}
+svg text{font-family:"Microsoft YaHei",sans-serif}
+.badge{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;background:#eef2f8;color:#234;margin-right:6px}
+.formula{background:#f6f7f5;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;
+  font-family:"Cambria Math","Times New Roman",serif;font-size:17px;overflow-x:auto}
+.formula .no{float:right;color:var(--mut);font-size:14px;font-family:"Microsoft YaHei",sans-serif}
+.ctrls{display:flex;flex-wrap:wrap;gap:22px;background:#f2f4f7;border:1px solid var(--bd);
+  border-radius:8px;padding:16px 20px;margin:16px 0}
+.ctrl{flex:1 1 200px}
+.ctrl label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.ctrl .row{display:flex;align-items:center;gap:10px}
+.ctrl input[type=range]{flex:1;accent-color:var(--blue);height:20px}
+.ctrl .val{font-family:Consolas,monospace;font-size:14px;font-weight:700;color:var(--blue);min-width:70px;text-align:right}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:16px 0}
+.ro{background:#fff;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:6px;padding:10px 14px}
+.ro .k{font-size:12px;color:var(--mut)}
+.ro .v{font-family:Consolas,monospace;font-size:19px;font-weight:700;color:var(--ink)}
+.ro.g{border-left-color:var(--green)} .ro.g .v{color:var(--green)}
+.ro.r{border-left-color:var(--red)} .ro.r .v{color:var(--red)}
+.ro.a{border-left-color:var(--amber)} .ro.a .v{color:var(--amber)}
+.ro.v{border-left-color:var(--violet)} .ro.v .v{color:var(--violet)}
+canvas{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--bd);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th,td{border:1px solid var(--bd);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:#f2f4f7;font-weight:700}
+td.n{font-family:Consolas,monospace;white-space:nowrap}
+ul,ol{padding-left:24px}li{margin:7px 0}
+.hl{background:#fff6d8;padding:1px 4px;border-radius:3px;font-weight:600}
+.warn{background:#fff4f4;border-left:3px solid var(--red);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.steps{display:grid;gap:9px;margin:14px 0}
+.st{background:#f7f9fc;border-left:3px solid var(--blue);padding:10px 15px;border-radius:0 6px 6px 0;font-size:14.5px}
+.st b{color:var(--blue);margin-right:6px}
+.mono{font-family:Consolas,"Microsoft YaHei",monospace;background:#eef2f8;color:#12306e;
+      padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px;font-size:14px}
+.note{background:#f4f8ff;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.sym{font-size:14px;margin:12px 0}
+.sym td:first-child{width:130px}
+.why{display:block;margin-top:8px;font-size:13.5px;color:#444;line-height:1.72}
+.why::before{content:"↳ ";color:var(--amber);font-weight:700}
+.live{background:#fffaf0;border:1px dashed var(--amber);border-radius:8px;padding:13px 18px;margin:16px 0;font-size:14.5px}
+.live b{color:#9a5c00}
+.kv{font-family:Consolas,monospace;background:#eef2f8;color:#12306e;padding:1px 7px;border-radius:4px;font-size:14px}
+.eqno{color:var(--mut);font-size:12.5px;margin-left:6px;white-space:nowrap}
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);font-size:13px;color:var(--mut)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:8px 0 2px;align-items:center}
+.legend i{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:6px}
+button{font-family:inherit;font-size:14px;padding:7px 16px;border:1px solid var(--bd);background:#fff;
+  border-radius:6px;cursor:pointer;margin-right:8px}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btns{margin:12px 0 4px}
+.ex{background:#fffdf2;border:1px solid #e3d9a8;border-left:4px solid var(--amber);border-radius:8px;
+  padding:16px 20px;margin:18px 0}
+.ex .ttl{font-weight:700;color:#8a5c00;margin-bottom:6px}
+.ex .ans{background:#fff;border:1px solid #e8e2c8;border-radius:6px;padding:10px 14px;margin-top:10px;font-size:14.5px}
+.figno{font-size:12.5px;color:var(--mut);float:right;font-family:"Microsoft YaHei",sans-serif}
+.tag{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:4px;background:#eef2f8;color:#234;
+  border:1px solid #d5dcea;font-family:"Microsoft YaHei",sans-serif}
+.subh{font-size:15.5px;font-weight:700;color:#234;margin:20px 0 8px;padding-left:9px;border-left:4px solid var(--blue)}
+.small{font-size:13.5px;color:#555}
+.center{text-align:center}
+.irow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.irow .tag{margin-right:2px}
+
+</style>
+</head><body>
+<script>
+/* ---------------- 基础 SVG 工具（本页的交互面板与少量图形用） ---------------- */
+var SVGNS='http://www.w3.org/2000/svg';
+var $=function(id){return document.getElementById(id);};
+</script>
+
+<!-- ==================== 课程电路标准库（内嵌，勿手改） ==================== -->
+<script>
+/* CourseCircuit v1.18 — 元件外形、明确引脚、正交连线、端口覆盖与网络连通审计。
+ * 源码由 inject_34.py 内嵌到独立HTML，不依赖外部运行时文件。
+ *
+ * 版本沿革
+ *   v1.0  初版（3.4 原理页试点）
+ *   v1.1  按 AGENTS.md《SVG 电路元件与逐图接线核验标准》补 6 项实证缺口
+ *        （见 scratch/audit_lib/lib_probe.js 的边界评审）
+ *   v1.2  修 v1.1 的两处实现缺陷 + 补「接地即公共端」语义 + 故障注入开关
+ *   v1.3  补课程实际用到但此前未覆盖的三个器件：
+ *        恒流源 currentSource()、交流信号源 acSource()、二极管 diode()
+ *        （规则：未覆盖的器件须先扩充、测试后再复用）
+ *   v1.4  修 acSource() 极性标记的方向缺陷：旧写法用元件局部坐标画，
+ *        水平放置时「−」变成一根竖杠（读作 | 而非 −）。
+ *        改为**世界坐标**绘制：a 端画「+」十字、b 端画「−」横杠；
+ *        并新增 o.polarity===false，让页面按教材把 +/− 标在圈外。
+ *   v1.5  为「题 5.14 图的环形调制器」补三项能力（教材原图需要，先扩充再复用）：
+ *        a) two() 支持**斜置**二端元件（o.angled:true 才允许）：教材 5.14 图的 VD₃/VD₄
+ *           画在 45° 对角支路上。斜置只改姿态不改形状（电阻矩形随轴向旋转）。
+ *        b) wire() 支持**斜线**导线（o.diag:true 才允许）：同上。
+ *        c) 新增 hop()：**非连接交叉（跳线/跨线桥）**。教材 5.14 图里 u₁(t) 水平线与
+ *           两条 45° 对角支路交于**同一点**且**不相连**（若相连则变压器原边短路）。
+ *           hop() 返回跨越弧的采样点并登记保护圆，audit() 在保护圆内不再报
+ *           「异网交叉」，从而把「不相连」显式表达出来而不是靠画图约定。
+ *   v1.6  补 currentSource() 的**教材画法**（o.style:'book'）：
+ *        第 2 章题 2.5 / 2.12 图与答案册「图题 2.5」用的是「圆圈内一条垂直于轴线的横线 +
+ *        圈外引线上的实心三角箭头」，与圈+内箭头的通用画法不同；
+ *        o.dir=+1（默认）表示电流由 a 指向 b，箭头落在 a 侧引线上、尖端朝向圆圈。
+ *   v1.7  ① currentSource(style:'book') 增 o.tip='away'：**尖端背离圆圈**
+ *        （教材题 2.12 图的 i_g 即此画法 —— 箭头在上端引线上、尖端朝上；
+ *          而题 2.5 图的 i_g 尖端朝下、朝向圆圈，两者方向相反，必须能分别表达）。
+ *      ② transistor() 增 o.flip='down'：**共基级画法**（基极横杠在下、发射极引线向左上、
+ *        集电极引线向右上），教材题 2.17 图的 VT₂ 即此画法；
+ *        同时增 o.labelAt=[x,y,anchor] 与 o.label===false（元件名位置可调 / 不画元件名）。
+ *   v1.8  补两个第 4 章题图用到的教材器件（未覆盖的器件须先扩充、测试后再复用）：
+ *        ① crystal()：**石英晶体符号**（教材第 4 章题 4.10 图、答案册「图题 4.10」同款）——
+ *           沿轴向依次是「极板 + 中间矩形 + 极板」。与通用画法不同，不能拿电容假借。
+ *        ② ind() 增 o.core：**铁芯电感**（教材题 4.10 图的 ZL 在线圈旁画一条铁芯线）。
+ *           o.core=true 时在元件**左侧**画一条与线圈等长的平行线；o.coreSide=1 画在右侧；
+ *           o.core 可直接给偏移量（像素）。不传 o.core 时画法与 v1.7 完全一致。
+ *   v1.9  补 polarityDot()：**同名端标记**（教材互感耦合线圈的「●」，见第 4 章题 4.3 图
+ *        与答案册《图题 4.3 中互感的同名端标注》）。它是一个**实心圆点**，
+ *        但**不是电路结点** —— 与 dot()（data-junction，电气结点）在 DOM 上明确区分：
+ *        本方法写 data-polarity 属性，audit() 完全看不见它（它不参与电气连通性）。
+ *        教材符号库里没有的记号必须先扩库（带回归测试）再复用，不许在页内私造。
+ *   v1.10 补第 8 / 9 章题图用到的两个教材器件（未覆盖的器件须先扩充、测试后再复用）：
+ *        ① jfet()：**结型场效应管符号**（教材第 9 章题 9.13 图、答案册「图题 9.13」同款）——
+ *           圆圈内一条竖直**沟道**线，栅极引线自左侧引入并在引线上画箭头。
+ *           o.arrow:'in'（默认）= **n 沟道**，箭头**尖端指向沟道**；'out' = p 沟道，尖端背离沟道。
+ *           教材符号与 MOS 的圆圈+断开沟道画法不同，不能拿 MOS 假借。
+ *        ② icBox()：**集成电路方框**（答案册「图题 8.11」的 MC1596 芯片）——
+ *           矩形 + 引脚短线 + 框内引脚号；pins 按 side/pos 定位，返回每个引脚的**真实端点**。
+ *   v1.11 补第 7 章题图用到的教材器件（未覆盖的器件须先扩充、测试后再复用）：
+ *        varactor()：**变容二极管符号**（教材第 7 章题 7.12 图 / 7.13 图的 VD，
+ *           PDF 186 / 187 **×20 放大逐点确认**）——
+ *           二极管本体（三角尖端抵住**阴极横条**）+ 一支**双箭头**（变容记号）。
+ *           ⚠ 双箭头的位置规则是**逐图核对出来的，不能凭印象**：
+ *             题 7.12 图：器件**水平**、阴极竖条在**左** → 双箭头在符号**下方**、**水平**、两箭头**背向背**；
+ *             题 7.13 图：器件**竖直**、阴极横条在**上** → 双箭头在符号**左侧**、**竖直**、两箭头**背向背**。
+ *           两图合起来只有一条规则：**双箭头平行于器件轴、位于局部 −v 侧、沿轴居中、两箭头背向背（中间断开）**。
+ *           ⚠ 局部 +v 方向 = (−uy, ux)，故局部 −v 方向 = (uy, −ux)；
+ *             用「绝对屏幕左/上」定位会在器件朝向变化时跑到错的一侧。
+ *           默认 a=阳极、b=阴极，b 接阴极横条那一端。
+ *           o.w / o.h 同 diode()；o.arrow:'double'（默认）| 'none'；
+ *           o.arrowSide:'local-'（默认）| 'local+' | 'left' | 'right' | 'up' | 'down'；
+ *           o.arrowAt（沿轴位置，默认 0 = 与符号体居中对齐，+u 指向阴极）/
+ *           o.arrowV（离轴距离，默认 h+7）/ o.arrowLen（箭头半长，默认 6）。
+ *   v1.12 补可变电容的**教材斜箭头方向**（教材第 7 章题 7.12 图的「10 pF」斜箭头电容，
+ *           PDF 186 ×9 放大逐点确认）：
+ *           教材的斜箭头恒为**世界坐标**的「左下 → 右上」(↗)，**不随器件轴向旋转**；
+ *           而 v1.0 起的默认画法把斜箭头画在元件**局部坐标**里 → 竖直器件会变成 ↖，与教材不符。
+ *           → cap() 增 o.varArrow:'up' = 世界坐标 ↗（教材画法）；不传时默认画法**完全不变**
+ *             （第 3.4 原理页与第 9 章习题页的既有图不受影响）。
+ *           教材符号 ≠ 通用符号 → 先扩库（带正例 + 负例回归）再复用，不在页面里私造。
+ *   v1.13 补 arrow() 的**可变几何句柄**（原理讲解 2.3 的图 2-5(b) 需要）：
+ *          图 2-5(b) 里 İ₁ / İ₂ 两个参考方向箭头的**长度随滑块实时变化**；
+ *          v1.12 之前 arrow() 无返回值 → 页面只能自己私造一份箭头（与标准库混用，
+ *          违反 AGENTS.md「旧 helper 与标准库不得混在一张图里」）。
+ *          现在 arrow() 返回 {line, head, set(x1,y1,x2,y2)}，set() 就地改几何；
+ *          既有调用方都不使用返回值，**画法与 v1.12 完全一致**（回归用例锁住）。
+ *
+ *   v1.14 补两处**教材画法**（都在第 2/3 章的教材页图上逐点确认过）：
+ *          ① acSource() 增 o.style='bar'（教材电压源记号，第 3 章图 3-2 的信号源，
+ *             书页 52 / PDF 64）：圆圈内一条**沿元件轴向**的直线，**导线整段穿过圆圈**
+ *             （圆内那段线可见）。与库里原有两种画法都不同：
+ *               · acSource 默认 —— 圆圈内「+ / −」；
+ *               · currentSource(style:'book') —— 圆圈内一条**垂直于**轴线的横线 ＋ 圈外实心三角箭头。
+ *             圆先画（白底）线后画 → 圆内那段线可见，与教材页图一致。
+ *             不传 o.style 时默认画法**完全不变**。
+ *          ② currentSource(style:'book') 增 o.arrow=false：**不画引线箭头** ——
+ *             教材图 2-8 里信号电流源 İ_s 引线上**有**向上箭头，而两个受控源
+ *             （y_re·Ů_c / y_fe·Ů_i）引线上**没有**箭头（圈内横杠照旧）。
+ *             教材依据：书页 22 / PDF 34 图 2-8，×6 放大件 scratch/shots/r19b_f28_left.png。
+ *             缺省 arrow:true —— 旧调用方行为与画法完全不变。
+ *   v1.15 补三项能力（教材原图需要，先扩库再复用）：
+ *          ① currentSource(style:'book') 真正实现 o.arrow=false ——
+ *             **上一轮页面按已存在来用、库里其实没有**，由回归用例当场抓到；
+ *             教材依据：书页 22 / PDF 34 图 2-8（信号电流源 İ_s 引线上**有**箭头，
+ *             两个受控源引线上**没有**箭头）。
+ *          ② jfet() 增 o.rot = 0(默认)/90/180/270 —— 绕器件中心 (x,y) 旋转**符号本体**
+ *             （沟道 / 栅极引线 / 箭头 / 漏源引线）。
+ *          ③ jfet() 增 o.ds = 'normal'(默认)/'swap' —— **只交换漏源两脚所接的网络**
+ *             （几何不动）。JFET 源漏对称：教材第 2 章图 2-20 的 VT₂ 是
+ *             「栅极朝下、源在左、漏在右」的共栅画法，用 o.rot:270 + o.ds:'swap' 复现，
+ *             不必在页面里私造符号。教材依据：书页 36 / PDF 48 图 2-20。
+ *          不传新选项时画法与 v1.14 **完全一致**（回归用例锁住）。
+ *   v1.16  Scene.text() 把标注里的「X_y」画成**教材式真下标**（基线右下方的小字）：
+ *          之前图内标注是「下划线式」（f_c、u_o、R_L、V_CC、C_b …），与教材排版不一致。
+ *          拆串规则见唯一来源 build/subscript.js（lib.js 里有一份逐字节相同的副本）。
+ *          ⚠ 关键约束：**textContent 保持不变** —— 下划线以零宽 tspan 保留在文本里，
+ *            于是页末自检的 txtguard、check_text.js 的抄写基线、check_geom.js 的
+ *            估宽判定全部不受影响；不传新选项时画法与 v1.15 **完全一致**（回归用例锁住）。
+ *   v1.17  真下标拆串加**覆盖表**（build/subscript.js 里的 OVERRIDES）：
+ *          「最长下标段」规则会把 U_SmU_Lm / ω_cCR_L / y_feU_i 这类写法并成一段下标，
+ *          但教材里它们是**两个（或三个）独立符号的乘积**（例 3-1 书页 54、式 4-26 书页 103、
+ *          习题 9.4 书页 221 均已逐条核对）。这类写法在语法上无法用规则区分，
+ *          只能逐条核教材后写死 → 覆盖表每条都注明书页/式号。
+ *          同时修掉连续下划线（a_b_c）的守恒：第二个下划线原本会被吞掉，
+ *          现在记在 us[] 里，linearize 能逐字还原。
+ *          ⚠ 对**不含**覆盖表条目的标注，画法与 v1.16 **完全一致**（回归用例锁住）。
+ *   v1.18 补**乘法器**符号 multiplier()（教材符号：圆圈内一个 ×，三端口 A/B/O）：
+ *          教材 书页 149 / PDF 161「题 6.8 图」用的就是这个符号（⊗ 乘法器 → C∥R → 接地）。
+ *          此前库里没有该器件，页面曾私造**方框图**（两个矩形块 + 箭头）冒充 →
+ *          与教材原图不符，且违反「旧 helper 与标准库不得混在一张图里」。
+ *          按「未覆盖的器件须先扩充、测试后再复用」补上。
+ *          ⚠ o.label===true 才画元件名（教材符号圈内**没有**名称）；
+ *            不传任何新选项时，**既有元件的画法与 v1.17 完全一致**（回归用例锁住）。
+ * v1.1 的 6 项扩充（对应 lib_probe 的 ①③④⑤⑥⑦）
+ *   ① 电感符号尺寸固定（原来 body=Math.min(60,len-18)，引线一变长符号就变形）
+ *   ③ audit() 新增「同一网络必须连成一片」（原来两段互不相连的「0」不报）
+ *   ④ audit() 新增「异网导线交叉 / 异网共用端点」（原来交叉处不报，读者易误读成连接）
+ *   ⑤ wire() 正交判定加浮点容差（原来 1e-7 的误差就抛错）
+ *   ⑥ 新增带抽头的绕组与变压器 windingTapped() / transformerTapped() / coupledWindings()
+ *      （抽头必须落在绕组折点，不许用普通二端元件假借）
+ *   ⑦ 配色可覆盖 usePalette()，并给出与课程既有页面一致的 'course' 预设
+ *
+ * v1.2 的变更
+ *   a) 修 transformerTapped() 的实参错位（原写法把 pNodes[0] 当 yBot、pNodes[1] 当 nodes）
+ *   b) windingTapped() 的入参改为 nodes 数组自描述（首尾=两端，中间=抽头），并校验节点严格递增
+ *   c) audit() 的同网连通性：**接地符号即公共端** —— 同名网络的多个接地符号视为同一节点，
+ *      另加「导线折点落在同网导线上」的并查集合并（原先只合并引脚/端口，漏掉 T 形接头）
+ *   d) audit() 新增「异网共用端点」（疑似短路）
+ *   e) 新增故障注入开关 window.__COURSE_CIRCUIT_DISABLE__，用于证明每条检查真的接上了
+
+ */
+(function(global){
+  'use strict';
+  const NS='http://www.w3.org/2000/svg';
+  const colors={wire:'#334155',signal:'#1a46b5',feed:'#a66600',device:'#0d7a3c',tank:'#b91c1c'};
+  /* 课程既有 52 页原理讲解 + 22 页例题/习题页的墨色（迁移时整页配色才不变） */
+  const PALETTES={
+    course:{wire:'#1f1f1f',signal:'#1f1f1f',feed:'#1f1f1f',device:'#0d7a3c',tank:'#1f1f1f'},
+    default:null
+  };
+  function usePalette(name){const p=PALETTES[name];if(!p)throw Error('未知配色预设 '+name);Object.assign(colors,p);return colors;}
+  const EPS=.01;          /* 几何容差 */
+  const ORTHO=.01;        /* 正交判定容差 */
+  const IND_BODY=60;      /* 电感符号固定长度（不再随引线长度变化） */
+  const IND_LEAD=6;       /* 电感两端引线的最小长度 */
+  /* 故障注入：置位后关闭对应的检查项，用于自证「规则真的在起作用」。 */
+  function disabled(tag){
+    const f=global.__COURSE_CIRCUIT_DISABLE__;
+    if(!f)return false;
+    if(Array.isArray(f))return f.indexOf(tag)>=0;
+    return !!f[tag];
+  }
+  function e(parent,tag,a){const n=document.createElementNS(NS,tag);Object.keys(a).forEach(k=>n.setAttribute(k,a[k]));parent.appendChild(n);return n;}
+  function point(x,y,net){if(!Number.isFinite(x)||!Number.isFinite(y)||!net)throw Error('非法引脚坐标或网络');return {x,y,net};}
+  function clear(svg,box){svg.innerHTML='';svg.setAttribute('viewBox',box);svg.__circuits=[];}
+  /*=== SUBSCRIPT-REGION-BEGIN ===*/
+  /* =======================================================================
+   * build/subscript.js —— 「真下标」（教材式竖排下标）唯一来源
+   *
+   * 目标：把标注里的「X_y」渲染成教材式的**真下标**（基线右下方的小字），
+   *       而不是字面上的下划线。
+   *
+   * 关键设计：**textContent 保持逐字不变**
+   *   下划线以「零宽」方式保留在文本里（font-size:0 的 tspan / span），
+   *   于是：
+   *     ① 页末自检里按字面串比对 document.body.textContent 的断言（txtguard）不受影响；
+   *     ② build/check_text.js 的线性抄写比对基线不变（PASS 数必须保持）；
+   *     ③ build/check_geom.js 用 textContent 估文字宽 → 几何判定结果不变；
+   *     ④ 复制粘贴得到的仍是线性写法 "Q_L"，与课程文档的线性记法一致。
+   *   若改成「删掉下划线」，textContent 会变 → 上述三处全部要跟着改，
+   *   且教材式线性写法在页面上就消失了。
+   *
+   * 本文件是**唯一来源**：build/lib.js 与 build/circuit/svg_components.js 里
+   * 各有一份**逐字节相同**的副本（标记 SUBSCRIPT-REGION），
+   * 由 scratch/sync_subscript.js 同步、scratch/test_subscript.js 核对。
+   *
+   * ⚠ 宿主文件（lib.js / svg_components.js）须在本区域**之后**补一行
+   *   `var CourseSubscript = window.CourseSubscript;`
+   *   —— 标准库的整段代码包在 IIFE 里，区域内的 var 会被 IIFE 吞掉、拿不到全局。
+   * ======================================================================= */
+  (function (g) {
+    'use strict';
+
+    var NS = 'http://www.w3.org/2000/svg';
+
+    /* 下标字号比例与基线位移（教材式：基线右下方的小字） */
+    var RATIO = 0.68;   /* 下标字号 = 基准字号 × RATIO */
+    var SHIFT = 0.22;   /* 下标基线相对父基线下移 = 基准字号 × SHIFT（em） */
+
+    /* --- 字符分类 ---------------------------------------------------------
+     * isSym：可作「基字符」也可作「下标字符」的符号字符。
+     *   字母（A-Z a-z）、拉丁扩展（Ā Ĩ Ũ ī İ / Ȧ Ȱ Ȯ）、希腊字母（Δ Σ Ω ω φ π μ）、
+     *   组合记号（◌̇ ◌̅ ◌́）、撇号（’ ′ ″）、数字。
+     *   ⚠ 排除 Latin-1 里的 × (U+00D7) 与 ÷ (U+00F7) —— 它们是运算符不是符号。
+     *   ⚠ Unicode 下标数字（₁ ₂ …）本身已经是下标，只当基字符、不再拆。
+     */
+    function isSym(c) {
+      if (!c) return false;
+      var k = c.charCodeAt(0);
+      if (k >= 48 && k <= 57) return true;                         /* 0-9 */
+      if (k >= 65 && k <= 90) return true;                         /* A-Z */
+      if (k >= 97 && k <= 122) return true;                        /* a-z */
+      if (k >= 0x00C0 && k <= 0x00FF && k !== 0x00D7 && k !== 0x00F7) return true; /* Latin-1 字母 */
+      if (k >= 0x0100 && k <= 0x017F) return true;                 /* Latin Extended-A */
+      if (k >= 0x0180 && k <= 0x024F) return true;                 /* Latin Extended-B */
+      if (k >= 0x0300 && k <= 0x036F) return true;                 /* 组合记号 */
+      if (k >= 0x0370 && k <= 0x03FF) return true;                 /* 希腊字母 */
+      if (k === 0x2019 || k === 0x2032 || k === 0x2033) return true; /* ’ ′ ″ */
+      if (k >= 0x2080 && k <= 0x2089) return true;                 /* Unicode 下标数字 */
+      return false;
+    }
+    /* 下标的**首字符**：符号字符，外加单独的 +/−（教材的 F₊ / F₋ / u₊(t)） */
+    function isSubStart(c) {
+      if (isSym(c)) return true;
+      if (!c) return false;
+      var k = c.charCodeAt(0);
+      return k === 0x2B /* + */ || k === 0x2212 /* − */ || k === 0x2D /* - */;
+    }
+    /* 下标的**后续字符**：符号字符；小数点仅在「前后都是数字」时并入
+     * （教材的 f₀.₇ / K_r0.1 —— 那个点属于下标，不是句点） */
+    function isSubCont(c, prev, next) {
+      if (isSym(c)) return true;
+      if (!c) return false;
+      var k = c.charCodeAt(0);
+      if (k === 0x2E /* . */) {
+        var p = prev ? prev.charCodeAt(0) : 0, nx = next ? next.charCodeAt(0) : 0;
+        return p >= 48 && p <= 57 && nx >= 48 && nx <= 57;
+      }
+      return false;
+    }
+
+    /* ======================================================================
+     * 覆盖表（教材歧义标注）
+     *
+     * 「最长下标段」规则会把下面这些标注并成一段下标，但它们在教材里
+     * 是**两个（或三个）独立符号的乘积**。
+     * 这类写法在语法上**无法用规则区分**（C_jQ 与 feUi 结构完全相同），
+     * 唯一可靠的办法是逐条对照教材原式后写死。
+     *
+     * ⚠ 新增条目必须：① 先看教材页图核对；② 在 ref 里写明书页/式号；
+     *   ③ 保证 parts 拼接后与 from **逐字相同**（textContent 守恒）。
+     * ==================================================================== */
+    var ovTable = [
+      { from: 'ω_cCR_L', parts: ['ω_c', 'C', 'R_L'],
+        ref: '教材例 3-1（书页 54）：|Z_pn| 分母印作 1+j(nωCR_L−R_L/(nωL))' },    { from: 'U_LmU_Sm', parts: ['U_Lm', 'U_Sm'],
+        ref: '教材习题 9.4/9.5（书页 221）：U_Sm（输入幅值）与 U_Lm（本振幅值）是两个独立量' },
+      { from: 'U_SmU_Lm', parts: ['U_Sm', 'U_Lm'],
+        ref: '教材习题 9.4/9.5（书页 221）：变频跨导 ∝ a₂·U_Sm·U_Lm' },
+      { from: 'U_nmU_Lm', parts: ['U_nm', 'U_Lm'],
+        ref: '教材习题 9.4/9.5（书页 221）' },
+      { from: 'U_cmU_o', parts: ['U_cm', 'U_o'],
+        ref: '第 5 章振幅调制：输出功率 ∝ U_cm·U_o' },
+      { from: 'y_feU_i', parts: ['y_fe', 'U_i'],
+        ref: '教材 §2.3 高频等效电路：受控电流源 y_fe·U̇_i' },
+      { from: 'L_qC_q', parts: ['L_q', 'C_q'],
+        ref: '教材式 (4-26)（书页 103）：ω_q = 1/√(L_qC_q)' },
+      { from: 'C_qC_o', parts: ['C_q', 'C_o'],
+        ref: '教材式 (4-27)（书页 103）：ω_p = 1/√(L_q·C_qC_o/(C_q+C_o))' },
+      { from: 'K_fU_Ωm', parts: ['K_f', 'U_Ωm'],
+        ref: '教材式 (7-37)：K_f = f_c/(U_D+V_Q)' },
+      { from: 'L_1C_ΣQ', parts: ['L_1', 'C_ΣQ'],
+        ref: '教材式 (7-39)：f_c = 1/(2π√(L_1C_ΣQ))' },
+      { from: 'Q_Lγ', parts: ['Q_L', 'γ'],
+        ref: '教材式 (7-45)：K_p = −Q_Lγ/[2(U_D+V_Q)]' },
+      { from: 'C_qr_q', parts: ['C_q', 'r_q'],
+        ref: '教材图 4-13（书页 103）：L_q、C_q、r_q 串联，是三个独立元件' },
+      { from: 'ω_cC', parts: ['ω_c', 'C'],
+        ref: '教材例 3-1（书页 54）：ωC 是容性电纳项' },
+      { from: 'ω_cL', parts: ['ω_c', 'L'],
+        ref: '教材例 3-1（书页 54）：1/(ωL) 是感性电纳项' }
+    ];
+
+    /* 覆盖表按 from 长度倒序建正则 → 长的先匹配（「ω_cCR_L」先于「ω_cC」） */
+    var OVERRIDE_RE = null;
+    function overrideRe() {
+      if (OVERRIDE_RE) return OVERRIDE_RE;
+      if (!ovTable.length) return null;      /* ⚠ 空表不能建空正则：空模式会原地匹配 → 死循环 */
+      var list = ovTable.slice().sort(function (a, b) { return b.from.length - a.from.length; });
+      var src = list.map(function (o) {
+        return o.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }).join('|');
+      OVERRIDE_RE = new RegExp(src, 'g');
+      return OVERRIDE_RE;
+    }
+
+    /* 把字符串切成原子段：[{text, parts|null}]
+     * parts=null → 普通文本；parts!=null → 覆盖命中（parts 为教材式分段） */
+    function splitByOverride(str) {
+      if (str === undefined || str === null) return [];
+      str = String(str);
+      if (str.indexOf('_') < 0) return [{ text: str, parts: null }];
+      var re = overrideRe();
+      if (!re) return [{ text: str, parts: null }];
+      re.lastIndex = 0;
+      var atoms = [], last = 0, m;
+      while ((m = re.exec(str)) !== null) {
+        if (!m[0].length) { re.lastIndex++; continue; }   /* 防御：空匹配必须推进 */
+        if (m.index > last) atoms.push({ text: str.slice(last, m.index), parts: null });
+        var parts = null;
+        for (var i = 0; i < ovTable.length; i++) {
+          if (ovTable[i].from === m[0]) { parts = ovTable[i].parts; break; }
+        }
+        atoms.push({ text: m[0], parts: parts });
+        last = m.index + m[0].length;
+        re.lastIndex = last;
+      }
+      if (last < str.length) atoms.push({ text: str.slice(last), parts: null });
+      return atoms;
+    }
+
+    /* --- 拆串 -------------------------------------------------------------
+     * 返回 [{s:文字, sub:是否下标段, pre:本段前紧邻的下划线数, us:段内下划线位置}]
+     * 规则：只有「符号字符 + _ + 可作下标的字符」才算下标分隔。
+     *   "Q_L"      → base "Q" / sub "L"
+     *   "P′_no1"   → base "P′" / sub "no1"
+     *   "U̇_b′e"    → base "U̇" / sub "b′e"
+     *   "K_r0.1"   → base "K" / sub "r0.1"（点属于下标）
+     *   "u_o(t)"   → base "u" / sub "o" / base "(t)"
+     *   "f_c + F"  → base "f" / sub "c" / base " + F"
+     *   "A _B"     → 空格前不是符号字符 → 整串当普通文字（不拆）
+     *   "a_b_c"    → base "a" / sub "b"(pre 1) / sub "c"(pre 1)
+     *                （两个下划线都保留：linearize 必须能还原成 "a_b_c"）
+     */
+    function splitRaw(str) {
+      var runs = [];
+      if (str === undefined || str === null) return runs;
+      str = String(str);
+      var n = str.length, plainStart = 0, i = 0;
+      while (i < n) {
+        if (str[i] === '_' && i > plainStart && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+          runs.push({ s: str.slice(plainStart, i), sub: false, pre: 0, us: [] });
+          var k = i + 2;                     /* 第一个字符已由 isSubStart 认可 */
+          while (k < n && isSubCont(str[k], str[k - 1], str[k + 1])) k++;
+          var run = { s: str.slice(i + 1, k), sub: true, pre: 1, us: [] };
+          runs.push(run);
+          plainStart = k; i = k;
+          /* 连续下划线（a_b_c）→ 并入同一段下标；**每个下划线都要保留**，
+             否则 textContent 会少一个 "_"（守恒被破坏）。
+             段内下划线的位置记在 us[] 里，linearize 据此还原。 */
+          while (i < n && str[i] === '_' && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+            var m = i + 2;
+            while (m < n && isSubCont(str[m], str[m - 1], str[m + 1])) m++;
+            run.us.push(run.s.length);
+            run.s += str.slice(i + 1, m);
+            plainStart = m; i = m;
+          }
+          continue;
+        }
+        i++;
+      }
+      if (plainStart < n) runs.push({ s: str.slice(plainStart), sub: false, pre: 0, us: [] });
+      return runs;
+    }
+
+    /* 覆盖表感知的拆串（对外主入口） */
+    function splitAll(str) {
+      var atoms = splitByOverride(str);
+      var runs = [];
+      for (var i = 0; i < atoms.length; i++) {
+        if (atoms[i].parts) {
+          for (var j = 0; j < atoms[i].parts.length; j++) {
+            runs = runs.concat(splitRaw(atoms[i].parts[j]));
+          }
+        } else {
+          runs = runs.concat(splitRaw(atoms[i].text));
+        }
+      }
+      return runs;
+    }
+
+    /* 还原成线性写法（用于守恒校验）：
+     * 普通段原样；下标段前面补回它的下划线；段内下划线按 us[] 位置插回 */
+    function linearize(runs) {
+      var out = '';
+      for (var i = 0; i < runs.length; i++) {
+        var r = runs[i];
+        var p = r.pre || 0;
+        for (var k = 0; k < p; k++) out += '_';
+        if (r.us && r.us.length) {
+          var at = 0;
+          for (var q = 0; q < r.us.length; q++) {
+            out += r.s.slice(at, r.us[q]);
+            out += '_';
+            at = r.us[q];
+          }
+          out += r.s.slice(at);
+        } else out += r.s;
+      }
+      return out;
+    }
+
+    function hasSub(str) {
+      if (str === undefined || str === null) return false;
+      var runs = splitAll(String(str));
+      for (var i = 0; i < runs.length; i++) if (runs[i].sub) return true;
+      return false;
+    }
+
+    /* --- SVG 渲染 ---------------------------------------------------------
+     * node：<text> 元素；baseSize：基准字号（数字）。
+     * 结构（全部用 <tspan> 承载，不依赖 document.createTextNode ——
+     *       标准库自己的回归测试用的最小 DOM 桩没有那个方法）：
+     *   普通文字 tspan（无属性）→ 零宽下划线 tspan → 下标 tspan → 复位 tspan
+     *   零宽下划线：font-size="0" → 不渲染、不占宽，但 textContent 里保留 "_"
+     *   下标 tspan：font-size = baseSize×RATIO，dy = baseSize×SHIFT（下移）
+     *   复位 tspan：dy = −baseSize×SHIFT → 其后的普通文字回到原基线
+     */
+    function renderSvg(node, str, baseSize) {
+      var runs = splitAll(str);
+      var has = false;
+      for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+      if (!has) { node.textContent = (str === undefined || str === null) ? '' : String(str); return node; }
+
+      var B = (typeof baseSize === 'number' && isFinite(baseSize) && baseSize > 0) ? baseSize : 16;
+      var subSize = Math.round(B * RATIO * 100) / 100;
+      var dy = Math.round(B * SHIFT * 100) / 100;
+
+      function zwSpan() {
+        var z = document.createElementNS(NS, 'tspan');
+        z.setAttribute('font-size', '0');
+        z.textContent = '_';
+        return z;
+      }
+
+      node.textContent = '';
+      var shifted = false;
+      for (var j = 0; j < runs.length; j++) {
+        var r = runs[j];
+        var p = r.pre || 0;
+        for (var z2 = 0; z2 < p; z2++) node.appendChild(zwSpan());
+        if (!r.sub) {
+          if (!r.s) continue;
+          var bs = document.createElementNS(NS, 'tspan');
+          if (shifted) { bs.setAttribute('dy', String(-dy)); shifted = false; }
+          bs.textContent = r.s;
+          node.appendChild(bs);
+        } else {
+          /* 段内下划线（合并下标 a_b_c）：按 us[] 把本段切成若干片 */
+          var pieces = [], at = 0;
+          if (r.us && r.us.length) {
+            for (var q = 0; q < r.us.length; q++) {
+              pieces.push(r.s.slice(at, r.us[q]));
+              pieces.push(null);                 /* null = 段内零宽下划线 */
+              at = r.us[q];
+            }
+          }
+          pieces.push(r.s.slice(at));
+          for (var k = 0; k < pieces.length; k++) {
+            if (pieces[k] === null) { node.appendChild(zwSpan()); continue; }
+            if (!pieces[k]) continue;
+            var ts = document.createElementNS(NS, 'tspan');
+            ts.setAttribute('font-size', String(subSize));
+            ts.setAttribute('dy', shifted ? '0' : String(dy));
+            ts.textContent = pieces[k];
+            node.appendChild(ts);
+            shifted = true;
+          }
+        }
+      }
+      return node;
+    }
+
+    /* --- HTML 渲染（正文侧） ---------------------------------------------
+     * toHtml(str)：把「X_y」转成「X<sub>…</sub>」，下划线以零宽 span 保留在
+     * <sub> **之前**（下划线是「分隔标记」，不属于下标本身）。
+     * 供源码级转换器使用（页面正文是静态 HTML，源级改写比运行时改 DOM 更稳）。
+     */
+    function innerHtml(run) {
+      if (!run.us || !run.us.length) return run.s;
+      var out = '', at = 0;
+      for (var q = 0; q < run.us.length; q++) {
+        out += run.s.slice(at, run.us[q]) + '<span style="font-size:0">_</span>';
+        at = run.us[q];
+      }
+      return out + run.s.slice(at);
+    }
+    function toHtml(str) {
+      var runs = splitAll(str);
+      var has = false;
+      for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+      if (!has) return str;
+      var out = '';
+      for (var j = 0; j < runs.length; j++) {
+        var r = runs[j];
+        var p = r.pre || 0;
+        for (var z = 0; z < p; z++) out += '<span style="font-size:0">_</span>';
+        if (r.sub) out += '<sub>' + innerHtml(r) + '</sub>';
+        else out += r.s;
+      }
+      return out;
+    }
+
+    /* --- HTML 片段转真下标（供页面**运行时**写标签用） -------------------
+     * 页面上有一部分标签是运行时生成的（读数面板的键名、动态说明文字），
+     * 源级改写碰不到它们 → 运行时用 subHtml() 转一下再写进 HTML 文本节点。
+     *   · 标签片段（<b>、<sup> …）原样保留，只转**文本部分**；
+     *   · 下划线以零宽 span 保留 → textContent 逐字不变，
+     *     页末自检里按字面串比对 document.body.textContent 的断言不受影响。
+     * ⚠ 只用于**固定标签字符串**，不接受用户输入（它会写 innerHTML）。
+     */
+    function subHtml(str) {
+      if (str === undefined || str === null) return '';
+      str = String(str);
+      if (str.indexOf('_') < 0) return str;
+      return str.split(/(<[^>]*>)/g).map(function (seg) {
+        if (!seg) return '';
+        if (seg.charAt(0) === '<') return seg;
+        return toHtml(seg);
+      }).join('');
+    }
+
+    var api = {
+      split: splitAll,
+      splitRaw: splitRaw,
+      splitAll: splitAll,
+      linearize: linearize,
+      hasSub: hasSub,
+      renderSvg: renderSvg,
+      toHtml: toHtml,
+      subHtml: subHtml,
+      setOverrides: function (list) {
+        ovTable = (list || []).slice();
+        OVERRIDE_RE = null;                 /* 正则缓存必须失效 */
+        return ovTable;
+      },
+      RATIO: RATIO,
+      SHIFT: SHIFT
+    };
+    /* 覆盖表用 getter 暴露：直接改 api.OVERRIDES 不起作用（内部读的是 ovTable） */
+    Object.defineProperty(api, 'OVERRIDES', {
+      get: function () { return ovTable; },
+      enumerable: true
+    });
+    g.CourseSubscript = api;
+    /* 裸全局别名：让**没有 lib.js** 的手工页也能直接写 subHtml('…')
+       （lib.js 里的同名函数是本函数的一层薄封装，行为一致） */
+    g.subHtml = subHtml;
+    if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
+/*=== SUBSCRIPT-REGION-END ===*/
+  class Scene{
+    constructor(svg,id,dx){this.id=id;this.parent=e(svg,'g',{'data-scene':id,transform:'translate('+(dx||0)+' 0)'});this.parts=[];this.wires=[];this.anchors=[];this.grounds=[];this.dots=[];this.polarity=[];this.hops=[];svg.__circuits.push(this);}
+    p(x,y,net){return point(x,y,net);}
+    text(x,y,str,opt){opt=opt||{};if(typeof str!=='string')throw Error('标签必须是字符串');const n=e(this.parent,'text',{x,y,'font-size':opt.size||14,'text-anchor':opt.anchor||'middle',fill:opt.color||colors.wire,'font-family':'Microsoft YaHei, sans-serif','font-weight':opt.bold?'700':'400'});CourseSubscript.renderSvg(n,str,opt.size||14);return n;}
+    line(parent,x1,y1,x2,y2,color){return e(parent,'line',{x1,y1,x2,y2,stroke:color||colors.wire,'stroke-width':1.8});}
+    /* 连线。默认只允许正交（横/竖）折线；斜线须显式声明 o.diag:true。
+     * 正交限制是防呆护栏：漏画一段横线/竖线时立刻报错，而不是悄悄连歪。 */
+    wire(net,points,opt){opt=opt||{};points=points.map(p=>Array.isArray(p)?point(p[0],p[1],net):p);points.forEach(p=>{if(p.net!==net)throw Error('导线跨接了不同命名网络 '+net+' / '+p.net);});for(let i=1;i<points.length;i++)if(opt.diag!==true&&Math.abs(points[i].x-points[i-1].x)>ORTHO&&Math.abs(points[i].y-points[i-1].y)>ORTHO)throw Error('连线必须正交（斜线须显式声明 diag:true）');const el=e(this.parent,'polyline',{points:points.map(p=>p.x+','+p.y).join(' '),fill:'none',stroke:colors.wire,'stroke-width':1.8,'stroke-linejoin':'round','data-wire':net});this.wires.push({net,el});return el;}
+    /* 标注用箭头（电流/信号参考方向）。不是元件，只是画在导线上的方向记号。
+     * v1.13：**返回句柄** {line, head, set(x1,y1,x2,y2)} —— set() 就地改几何。
+     * 为什么要句柄：原理讲解 2.3 的图 2-5(b) 里 İ₁ / İ₂ 两个参考方向箭头
+     * 的**长度随滑块实时变化**。v1.12 之前 arrow() 无返回值，页面只能自己
+     * 私造一份箭头（与标准库混用，违反 AGENTS.md 的「旧 helper 与标准库不得
+     * 混在一张图里」）。现在由库里统一提供可变几何的箭头。
+     * 向后兼容：v1.12 及以前 arrow() 返回 undefined，现返回对象；
+     * 既有调用方都不使用返回值，行为与画法完全不变。 */
+    arrow(x1,y1,x2,y2,opt){opt=opt||{};
+      if(Math.hypot(x2-x1,y2-y1)<2)throw Error('箭头长度过小');
+      const col=opt.color||colors.wire;
+      const hl=opt.head===undefined?9:opt.head,hw=opt.headWidth===undefined?3.4:opt.headWidth;
+      const ln=e(this.parent,'line',{x1,y1,x2,y2,stroke:col,'stroke-width':opt.width===undefined?1.8:opt.width});
+      const poly=e(this.parent,'polygon',{points:'',fill:col,stroke:'none'});
+      const api={line:ln,head:poly};
+      api.set=function(nx1,ny1,nx2,ny2){
+        const L=Math.hypot(nx2-nx1,ny2-ny1);if(L<2)throw Error('箭头长度过小');
+        const ux=(nx2-nx1)/L,uy=(ny2-ny1)/L;
+        ln.setAttribute('x1',nx1);ln.setAttribute('y1',ny1);
+        ln.setAttribute('x2',nx2-ux*hl*0.7);ln.setAttribute('y2',ny2-uy*hl*0.7);
+        const tip={x:nx2,y:ny2},b1={x:nx2-ux*hl-uy*hw,y:ny2-uy*hl+ux*hw},b2={x:nx2-ux*hl+uy*hw,y:ny2-uy*hl-ux*hw};
+        poly.setAttribute('points',[tip,b1,b2].map(p=>p.x+','+p.y).join(' '));
+        return api;
+      };
+      api.set(x1,y1,x2,y2);
+      return api;
+    }
+    /* ⑦ 非连接交叉（跳线 / 跨线桥）。
+     * 教材图里两条导线交叉但**不相连**时必须画出可辨认的记号，不能只靠「画图约定」。
+     * 用法：var pts=c.hop('net',{x,y},{r:16,side:'up'}); 把返回的采样点并入该网络的
+     * polyline（c.wire(net,[起,...,pts,...,止],{diag:true})），画出来就是一段跨越弧；
+     * 同时登记保护圆，audit() 在圆内不再报「异网交叉」。
+     * side: 'up'|'down'|'left'|'right' —— 弧的鼓起方向（默认 up）。 */
+    hop(net,p,o){
+      o=o||{};
+      const r=o.r===undefined?16:o.r;
+      if(!(r>0))throw Error('跳线半径必须为正');
+      const side=o.side||'up';
+      if(['up','down','left','right'].indexOf(side)<0)throw Error('跳线方向只能是 up/down/left/right');
+      const horiz=(side==='up'||side==='down');
+      const e1=horiz?{x:p.x-r,y:p.y}:{x:p.x,y:p.y-r};
+      const e2=horiz?{x:p.x+r,y:p.y}:{x:p.x,y:p.y+r};
+      const ap=side==='up'?{x:p.x,y:p.y-r}:side==='down'?{x:p.x,y:p.y+r}:side==='left'?{x:p.x-r,y:p.y}:{x:p.x+r,y:p.y};
+      const norm=a=>{while(a<0)a+=2*Math.PI;while(a>=2*Math.PI)a-=2*Math.PI;return a;};
+      const fwd=(a,b)=>{let x=norm(b)-norm(a);while(x<=0)x+=2*Math.PI;while(x>2*Math.PI)x-=2*Math.PI;return x;};
+      let a1=norm(Math.atan2(e1.y-p.y,e1.x-p.x)),a2=norm(Math.atan2(e2.y-p.y,e2.x-p.x)),am=norm(Math.atan2(ap.y-p.y,ap.x-p.x));
+      const dir=fwd(a1,am)<=fwd(a1,a2)?1:-1;
+      const sweep=dir>0?fwd(a1,a2):fwd(a2,a1);
+      const N=o.n===undefined?9:o.n,pts=[];
+      for(let i=0;i<=N;i++){const a=a1+dir*(i/N)*sweep;pts.push({x:p.x+r*Math.cos(a),y:p.y+r*Math.sin(a),net:net});}
+      this.hops.push({net:net,x:p.x,y:p.y,r:r});
+      return pts;
+    }
+    /* 跳线保护圆内不再报「异网交叉」（故障注入开关 hop 可关掉此规则）。 */
+    hopNear(x,y){
+      if(disabled('hop'))return false;
+      return this.hops.some(h=>Math.hypot(x-h.x,y-h.y)<=h.r+1);
+    }
+    dot(p){this.dots.push({net:p.net,x:p.x,y:p.y});e(this.parent,'circle',{cx:p.x,cy:p.y,r:3,fill:colors.wire,'data-junction':p.net});}
+    /* 同名端标记（教材互感线圈的「●」）：**实心圆点，但不是电路结点**。
+     * 与 dot() 的区别在 DOM 上是硬性的：本方法写 data-polarity，dot() 写 data-junction；
+     * audit() 只看导线/引脚/端口/接地，**看不见同名端标记**（它不参与电气连通性）。
+     * o.r 默认 3.2；o.color 默认墨色。 */
+    polarityDot(p,opt){opt=opt||{};const r=opt.r===undefined?3.2:opt.r;const col=opt.color||colors.wire;
+      this.polarity.push({net:p.net,x:p.x,y:p.y});
+      e(this.parent,'circle',{cx:p.x,cy:p.y,r:r,fill:col,stroke:'none','data-polarity':p.net});
+      return {x:p.x,y:p.y,net:p.net};}
+    /* 接地符号 = 公共端的声明：同名网络的多个接地符号在电气上是同一个节点。 */
+    ground(p){this.anchors.push(p);this.grounds.push(p);const g=e(this.parent,'g',{'data-ground':p.net});this.line(g,p.x,p.y,p.x,p.y+8);[10,7,3].forEach((a,i)=>this.line(g,p.x-a,p.y+8+5*i,p.x+a,p.y+8+5*i));}
+    port(p,label,opt){opt=opt||{};this.anchors.push(p);e(this.parent,'circle',{cx:p.x,cy:p.y,r:4.5,fill:'#fff',stroke:colors.wire,'stroke-width':1.7,'data-port':p.net});if(label)this.text(p.x+(opt.dx||0),p.y+(opt.dy===undefined?-15:opt.dy),label,{size:13,anchor:opt.anchor||'middle'});}
+    component(id,kind,pins,draw){if(this.parts.some(c=>c.id===id))throw Error('重复元件 '+id);const g=e(this.parent,'g',{'data-component':id,'data-kind':kind});Object.keys(pins).forEach(k=>{const p=pins[k];e(g,'g',{'data-pin':k,'data-net':p.net,'data-x':p.x,'data-y':p.y});});draw(g);const c={id,kind,pins,el:g};this.parts.push(c);return pins;}
+    two(id,kind,a,b,opt){opt=opt||{};const vertical=a.x===b.x,horizontal=a.y===b.y;const angled=!vertical&&!horizontal;
+      if(angled&&opt.angled!==true)throw Error('元件两端必须同轴（斜置元件须显式声明 angled:true）');
+      const len=Math.hypot(b.x-a.x,b.y-a.y);if(len<38)throw Error('元件引脚间距过短 '+id);const mx=(a.x+b.x)/2,my=(a.y+b.y)/2,ux=(b.x-a.x)/len,uy=(b.y-a.y)/len,col=opt.color||colors.wire;
+      const xy=(u,v)=>({x:mx+u*ux-v*uy,y:my+u*uy+v*ux});
+      const pins=this.component(id,kind,{a,b},g=>{
+        const seg=(u1,v1,u2,v2)=>{const p=xy(u1,v1),q=xy(u2,v2);this.line(g,p.x,p.y,q.x,q.y,col);};
+        if(kind==='capacitor'){
+          seg(-len/2,0,-4,0);seg(-4,-11,-4,11);seg(4,-11,4,11);seg(4,0,len/2,0);
+          if(opt.variable){
+            if(opt.varArrow==='up'){
+              /* 教材画法（教材第 7 章题 7.12 图的「10 pF」斜箭头电容，PDF 186 ×9 放大逐点确认）：
+               * 斜箭头是**世界坐标**的「左下 → 右上」(↗)，**不随器件轴向旋转**。
+               * v1.0 起的默认画法把斜箭头画在元件局部坐标里 → 竖直器件会变成 ↖，与教材不符。
+               * 教材符号 ≠ 通用符号 → 按「先扩库（带回归测试）再复用」处理，不在页面里私造。 */
+              const sx=mx-17, sy=my+16, tx=mx+17, ty=my-16;
+              this.line(g,sx,sy,tx,ty,col);
+              const ddx=tx-sx, ddy=ty-sy, LL=Math.hypot(ddx,ddy), nx=ddx/LL, ny=ddy/LL, px2=-ny, py2=nx;
+              const bx=tx-nx*7, by=ty-ny*7;
+              this.line(g,bx+px2*4.5,by+py2*4.5,tx,ty,col);
+              this.line(g,bx-px2*4.5,by-py2*4.5,tx,ty,col);
+            }else{
+              seg(-17,16,17,-16);const t=xy(17,-16);e(g,'path',{d:'M '+(t.x-6)+' '+t.y+' L '+t.x+' '+t.y+' L '+t.x+' '+(t.y+6),fill:'none',stroke:col,'stroke-width':1.6});
+            }
+          }
+        }else if(kind==='inductor'){
+          /* ① 符号长度固定：引线变长时只让引线变长，符号本身不变形 */
+          if(len<IND_BODY+2*IND_LEAD)throw Error('电感引脚间距过短，无法画固定尺寸符号 '+id+'（需 ≥'+(IND_BODY+2*IND_LEAD)+'px，实际 '+len.toFixed(1)+'px）');
+          const body=IND_BODY,r=body/8;seg(-len/2,0,-body/2,0);let d='M '+xy(-body/2,0).x+' '+xy(-body/2,0).y;
+          for(let i=0;i<4;i++){const p=xy(-body/2+body*(i+1)/4,0);d+=' A '+r+' '+r+' 0 0 1 '+p.x+' '+p.y;}e(g,'path',{d,stroke:col,'stroke-width':1.8,fill:'none'});seg(body/2,0,len/2,0);
+          /* ② o.core：**铁芯电感**（教材题 4.10 图的 ZL 在线圈旁画一条铁芯线）。
+           *    线圈的凸弧画在局部 +v 侧（竖直元件 = 左、水平元件 = 上），
+           *    所以铁芯线画在 −v 侧（竖直 = 右、水平 = 上方），两者不重叠。
+           *    o.core=true → 偏移 −11px；o.core 可直接给数字按该偏移量。
+           *    o.coreDash=true → 铁芯线画成**虚线**（教材题 4.8 图的 ZL 磁芯线是虚线，
+           *      答案册重绘成实线 —— 本库以教材为准）。
+           *    不传 o.core 时画法与 v1.7 完全一致（正例 + 负例回归见 test_components.js）。 */
+          if(opt.core){
+            const off=typeof opt.core==='number'?opt.core:-11;
+            if(opt.coreDash){const dl=8,gp=4;for(let u=-body/2;u+dl<=body/2;u+=dl+gp)seg(u,off,u+dl,off);}
+            else seg(-body/2,off,body/2,off);
+          }
+        }else if(kind==='crystal'){
+          /* 石英晶体：教材画法 = 极板 + 中间矩形 + 极板（第 4 章题 4.10 图、
+           * 答案册「图题 4.10」同款）。符号本体长度固定，不随引线长度变形。
+           * o.size = 极板到极板的总长；o.plate = 极板半长；o.box = 中间矩形半宽。 */
+          const size=opt.size===undefined?22:opt.size;
+          const pl=opt.plate===undefined?9:opt.plate;
+          const bw=opt.box===undefined?9:opt.box;
+          const bh=size*0.22;
+          if(len<size+18)throw Error('晶体引脚间距过短 '+id+'（需 ≥'+(size+18)+'px，实际 '+len.toFixed(1)+'px）');
+          seg(-len/2,0,-size/2,0);seg(size/2,0,len/2,0);
+          seg(-size/2,-pl,-size/2,pl);          /* 极板 1 */
+          seg(size/2,-pl,size/2,pl);            /* 极板 2 */
+          const q1=xy(-bh,-bw),q2=xy(-bh,bw),q3=xy(bh,bw),q4=xy(bh,-bw);
+          e(g,'path',{d:'M '+q1.x+' '+q1.y+' L '+q2.x+' '+q2.y+' L '+q3.x+' '+q3.y+' L '+q4.x+' '+q4.y+' Z',fill:'#fff',stroke:col,'stroke-width':1.8});
+        }else if(kind==='dc-source'){
+          g.setAttribute('data-positive',opt.positive==='b'?'b':'a');
+          seg(-len/2,0,-6,0);seg(6,0,len/2,0);const positive=opt.positive==='b'?1:-1;seg(-6,-(positive===-1?13:7),-6,(positive===-1?13:7));seg(6,-(positive===1?13:7),6,(positive===1?13:7));
+          const p=xy(positive*13,18);this.text(p.x,p.y,'+',{size:12,color:col});
+        }else if(kind==='current-source'){
+          /* 恒流源：圆圈 + 箭头。箭头默认由 b 指向 a（opt.direction:'b' 可反向）。
+           * o.style==='book'：**教材画法**（第 2 章题 2.5 / 2.12 图、答案册「图题 2.5」同款）——
+           *   圆圈内画一条**垂直于元件轴线**的横线（信号电流源记号），
+           *   箭头画在**圈外的引线上**、实心三角、尖端朝向圆圈。
+           *   o.dir：+1 = 电流由 a 指向 b（箭头落在 a 侧引线上），−1 = 由 b 指向 a。
+           *   （默认 +1；圈+内箭头的旧画法仍按 b→a，不受影响。） */
+          const r=opt.r||15;
+          if(len<2*r)throw Error('电流源引脚间距过短 '+id);
+          seg(-len/2,0,-r,0);seg(r,0,len/2,0);
+          e(g,'circle',{cx:mx,cy:my,r:r,fill:'#fff',stroke:col,'stroke-width':1.8});
+          if(opt.style==='book'){
+            const dir=opt.dir===undefined?1:(opt.dir>=0?1:-1);
+            const side=dir>0?-1:1;          /* 箭头所在的引线侧（a 侧 = u 负方向） */
+            /* 箭头大小随引线长度自适应：绝不能越出引脚 */
+            const avail=len/2-r;
+            const hl=Math.min(opt.head===undefined?13:opt.head,avail*0.5);
+            const hw=opt.headWidth===undefined?5:opt.headWidth;
+            const gap=Math.max(2,Math.min(opt.gap===undefined?7:opt.gap,avail-hl-2));
+            const away=opt.tip==='away';    /* 尖端背离圆圈（教材题 2.12 图画法） */
+            const tipU=away?side*(r+gap+hl):side*(r+gap),baseU=away?side*(r+gap):side*(r+gap+hl);
+            const bar1=xy(0,-r),bar2=xy(0,r);
+            this.line(g,bar1.x,bar1.y,bar2.x,bar2.y,col);          /* 圈内横线 */
+            /* v1.15：o.arrow===false 时**不画引线箭头** ——
+             * 教材图 2-8 里信号电流源 İ_s 引线上**有**向上箭头，而两个受控源
+             * （y_re·Ů_c / y_fe·Ů_i）引线上**没有**箭头（圈内横杠照旧）。
+             * 教材依据：书页 22 / PDF 34 图 2-8，×6 放大件 scratch/shots/r19b_f28_left.png。
+             * 缺省 arrow:true —— 旧调用方行为与画法完全不变。 */
+            if(opt.arrow!==false){
+              const tip=xy(tipU,0),b1=xy(baseU,-hw),b2=xy(baseU,hw);
+              this.line(g,b1.x,b1.y,tip.x,tip.y,col);
+              e(g,'polygon',{points:[tip,b1,b2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+            }
+          }else{
+            const dir=opt.direction==='b'?1:-1;
+            const tip=xy(dir*9,0),tail=xy(-dir*9,0),b1=xy(dir*2,5),b2=xy(dir*2,-5);
+            this.line(g,tail.x,tail.y,tip.x,tip.y,col);
+            e(g,'polygon',{points:[tip,b1,b2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+          }
+        }else if(kind==='ac-source'){
+          /* 交流信号源：圆圈 + 极性标记。
+           * v1.4 修正：极性标记一律按**世界坐标**绘制，不随元件轴向翻转 ——
+           * 旧写法用元件局部坐标，水平放置时「−」会变成一根竖杠（读作 | 而不是 −）。
+           * 现在 a 端画「+」（世界横杠 + 世界竖杠的十字）、b 端画「−」（世界横杠）。
+           * o.polarity===false 时不画内置标记，由页面按教材在圈外另行标注。
+           * v1.14 新增 o.style='bar'：**教材电压源画法**（第 3 章图 3-2 的信号源，
+           * 书页 52 / PDF 64 ×22 放大逐点确认）——
+           *   圆圈内一条**沿元件轴向**的直线，**导线整段穿过圆圈**（圆内那段线可见）。
+           *   这是国标电压源记号，与默认的「圈内 +/−」不同。
+           *   画法顺序：先画圆（白底）再画贯穿线 → 圆内那段线可见，与教材页图一致。
+           *   不传 o.style 时默认画法**完全不变**（既有调用方不受影响）。 */
+          const r=opt.r||15;
+          if(len<2*r)throw Error('交流源引脚间距过短 '+id);
+          if(opt.style==='bar'){
+            e(g,'circle',{cx:mx,cy:my,r:r,fill:'#fff',stroke:col,'stroke-width':1.8});
+            const q1=xy(-len/2,0),q2=xy(len/2,0);
+            this.line(g,q1.x,q1.y,q2.x,q2.y,col);   /* 导线穿圈：整段一条线 */
+          }else{
+          seg(-len/2,0,-r,0);seg(r,0,len/2,0);
+          e(g,'circle',{cx:mx,cy:my,r:r,fill:'#fff',stroke:col,'stroke-width':1.8});
+          if(opt.polarity!==false){
+            const dd=r-6;
+            const pa=xy(-dd,0),pb=xy(dd,0);
+            this.line(g,pa.x-4,pa.y,pa.x+4,pa.y,col);      /* 「+」的横杠 */
+            this.line(g,pa.x,pa.y-4,pa.x,pa.y+4,col);      /* 「+」的竖杠 */
+            this.line(g,pb.x-4,pb.y,pb.x+4,pb.y,col);      /* 「−」的横杠 */
+          }
+          }
+        }else if(kind==='diode'){
+          /* 二极管：三角形（阳极侧）尖端抵住阴极竖条。默认 a=阳极、b=阴极。
+           * o.w = 沿轴向的半长（三角底边到竖条），o.h = 垂直轴向的半高（竖条长度的一半）。 */
+          const w=opt.w===undefined?6:opt.w, h=opt.h===undefined?8:opt.h;
+          if(len<2*w+2)throw Error('二极管引脚间距过短 '+id);
+          const sgn=opt.reverse?-1:1;
+          seg(-len/2,0,-w,0);seg(w,0,len/2,0);
+          const bar1=xy(sgn*w,-h),bar2=xy(sgn*w,h);
+          this.line(g,bar1.x,bar1.y,bar2.x,bar2.y,col);
+          const q1=xy(-sgn*w,-h*0.8),q2=xy(-sgn*w,h*0.8),tip=xy(sgn*w,0);
+          e(g,'path',{d:'M '+q1.x+' '+q1.y+' L '+q2.x+' '+q2.y+' L '+tip.x+' '+tip.y+' Z',fill:'#fff',stroke:col,'stroke-width':1.8});
+        }else if(kind==='varactor'){
+          /* 变容二极管：二极管本体（三角尖端抵住**阴极横条**）+ **一支双箭头**（变容记号）。
+           * 教材画法逐点核对（教材第 7 章题 7.12 图 / 7.13 图，PDF 186–187 ×20 放大）：
+           *   题 7.12 图：器件**水平**、阴极竖条在左 → 双箭头在符号**下方**、**水平**、两个箭头**背向背**；
+           *   题 7.13 图：器件**竖直**、阴极横条在上 → 双箭头在符号**左侧**、**竖直**、两个箭头**背向背**。
+           * 两图合起来只有一条规则：**双箭头平行于器件轴、位于局部 −v 侧、沿轴居中、两个箭头背向背（中间断开）**。
+           * ⚠ 不能用「绝对屏幕左/上」定位 —— 那会在器件朝向变化时跑到错的一侧；
+           *   局部 +v 方向 = (−uy, ux)，所以局部 −v 方向 = (uy, −ux)。
+           * 与通用二极管的差别就在这支双箭头 —— 不能拿 diode() 假借。
+           * 默认 a=阳极、b=阴极；o.w / o.h 同 diode()；
+           * o.arrow:'double'（默认）| 'none'；
+           * o.arrowSide:'local-'（默认）| 'local+' | 'left' | 'right' | 'up' | 'down'；
+           * o.arrowAt（沿轴位置，默认 0 = 与符号体居中对齐；+u 方向 = 指向阴极 b 侧）/
+           * o.arrowV（离轴距离，默认 h+7）/ o.arrowLen（箭头半长，默认 6）。 */
+          const w=opt.w===undefined?7:opt.w, h=opt.h===undefined?9:opt.h;
+          if(len<2*w+2)throw Error('变容二极管引脚间距过短 '+id);
+          const sgn=opt.reverse?-1:1;
+          seg(-len/2,0,-w,0);seg(w,0,len/2,0);
+          const bar1=xy(sgn*w,-h),bar2=xy(sgn*w,h);
+          this.line(g,bar1.x,bar1.y,bar2.x,bar2.y,col);
+          const t1=xy(-sgn*w,-h*0.8),t2=xy(-sgn*w,h*0.8),ttip=xy(sgn*w,0);
+          e(g,'path',{d:'M '+t1.x+' '+t1.y+' L '+t2.x+' '+t2.y+' L '+ttip.x+' '+ttip.y+' Z',fill:'#fff',stroke:col,'stroke-width':1.8});
+          if(opt.arrow!=='none'){
+            const side=opt.arrowSide||'local-';
+            let ox=0,oy=0;
+            if(side==='local-'){ox=uy;oy=-ux;}          /* 局部 −v 侧 = 教材画法 */
+            else if(side==='local+'){ox=-uy;oy=ux;}
+            else if(side==='left'){ox=-1;oy=0;}
+            else if(side==='right'){ox=1;oy=0;}
+            else if(side==='up'){ox=0;oy=-1;}
+            else{ox=0;oy=1;}
+            const dist=opt.arrowV===undefined?(h+7):opt.arrowV;
+            const au=opt.arrowAt===undefined?0:opt.arrowAt;
+            const cx=mx+ox*dist+ux*au, cy=my+oy*dist+uy*au;
+            const al=opt.arrowLen===undefined?6:opt.arrowLen, gp=1;
+            const p1={x:cx-ux*al,y:cy-uy*al},p2={x:cx-ux*gp,y:cy-uy*gp};
+            this.line(g,p1.x,p1.y,p2.x,p2.y,col);
+            const p3={x:cx+ux*gp,y:cy+uy*gp},p4={x:cx+ux*al,y:cy+uy*al};
+            this.line(g,p3.x,p3.y,p4.x,p4.y,col);
+            const px=-uy,py=ux;                       /* 垂直于轴线的方向 */
+            const tipP={x:cx+ux*al,y:cy+uy*al};
+            const b1={x:cx+ux*(al-3.6)+px*2.6,y:cy+uy*(al-3.6)+py*2.6};
+            const b2={x:cx+ux*(al-3.6)-px*2.6,y:cy+uy*(al-3.6)-py*2.6};
+            e(g,'polygon',{points:[tipP,b1,b2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+            const tipM={x:cx-ux*al,y:cy-uy*al};
+            const c1={x:cx-ux*(al-3.6)+px*2.6,y:cy-uy*(al-3.6)+py*2.6};
+            const c2={x:cx-ux*(al-3.6)-px*2.6,y:cy-uy*(al-3.6)-py*2.6};
+            e(g,'polygon',{points:[tipM,c1,c2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+          }
+        }else{
+          const size=kind==='impedance'?48:36;seg(-len/2,0,-size/2,0);seg(size/2,0,len/2,0);
+          if(angled){
+            /* 斜置元件：矩形随元件轴向**旋转**（旋转是姿态变化，不是符号变形 ——
+               符号本身的长宽比与轴对齐时完全一致）。 */
+            const th=Math.atan2(uy,ux)*180/Math.PI;
+            e(g,'rect',{x:mx-size/2,y:my-8,width:size,height:16,fill:'#fff',stroke:col,'stroke-width':1.8,
+                       transform:'rotate('+th.toFixed(4)+' '+mx.toFixed(4)+' '+my.toFixed(4)+')'});
+          }else{
+            const p=xy(-size/2,-8);e(g,'rect',{x:vertical?mx-8:p.x,y:vertical?my-size/2:my-8,width:vertical?16:size,height:vertical?size:16,fill:'#fff',stroke:col,'stroke-width':1.8});
+          }
+        }
+      });
+      const label=opt.label===undefined?id:opt.label;
+      if(label){const at=opt.at||(angled?[xy(0,-26).x,xy(0,-26).y]:(vertical?[mx+22,my+4]:[mx,my-20]));this.text(at[0],at[1],label,{anchor:opt.anchor||'middle',color:col,size:opt.size||14});}
+      if(opt.value){const at=opt.valueAt||(angled?[xy(0,-46).x,xy(0,-46).y]:(vertical?[mx+26,my+26]:[mx,my-41]));this.text(at[0],at[1],opt.value,{size:12,anchor:opt.anchor||'middle',color:col});}
+      return pins;
+    }
+    cap(id,a,b,o){return this.two(id,'capacitor',a,b,o);}
+    ind(id,a,b,o){return this.two(id,'inductor',a,b,o);}
+    /* 石英晶体（教材第 4 章题 4.10 图、答案册「图题 4.10」同款）：极板 + 矩形 + 极板。 */
+    crystal(id,a,b,o){return this.two(id,'crystal',a,b,o);}
+    res(id,a,b,o){return this.two(id,'resistor',a,b,o);}
+    imp(id,a,b,o){return this.two(id,'impedance',a,b,o);}
+    battery(id,a,b,o){return this.two(id,'dc-source',a,b,o);}
+    currentSource(id,a,b,o){return this.two(id,'current-source',a,b,o);}
+    acSource(id,a,b,o){return this.two(id,'ac-source',a,b,o);}
+    diode(id,a,b,o){return this.two(id,'diode',a,b,o);}
+    /* 变容二极管（教材第 7 章题 7.12 图 / 7.13 图的 VD，PDF 186 / 187 ×20 放大逐点确认）：
+     * 二极管本体（三角尖端抵住**阴极横条**，默认 a=阳极、b=阴极）+ **一支双箭头**表示电容值可调。
+     * 与通用二极管的差别就在这支双箭头 —— 不能拿 diode() 假借。
+     * o.w / o.h 同 diode()；
+     * o.arrow:'double'（默认）| 'none'；
+     * o.arrowSide 用**局部方向**（教材两图归纳出的唯一规则：双箭头在**局部 −v 侧**）：
+     *   'local-'（默认）| 'local+' | 'left' | 'right' | 'up' | 'down'；
+     * o.arrowAt（沿轴位置，默认 0 = 与符号体居中对齐；+u 方向 = 指向阴极 b 侧）/
+     * o.arrowV（离轴距离，默认 h+7）/ o.arrowLen（箭头半长，默认 6）。
+     * 返回 {a,b} 两个**真实端点**。 */
+    varactor(id,a,b,o){return this.two(id,'varactor',a,b,o);}
+    /* 结型场效应管 JFET：圆圈 + 竖直沟道 + 栅极引线上的箭头。
+     * 教材画法（教材第 9 章题 9.13 图、答案册「图题 9.13」同款）：
+     *   圆圈内一条竖直线是**沟道**，栅极自左侧引入，箭头画在栅极引线上。
+     * o.arrow:'in'（默认）= **n 沟道**，箭头**尖端指向沟道**（教材画法）；
+     *              'out'    = p 沟道，箭头尖端**背离**沟道。
+     * o.r 圆半径 / o.ch 沟道半长 / o.gate 栅极引线长 / o.lead 漏源引线长。
+     * o.label 元件名（默认 id）、o.labelAt=[x,y,anchor]；o.pinLabels={g:'G',d:'D',s:'S'}。
+     *
+     * v1.15 增两项能力（教材第 2 章**图 2-20** 的 VT₂ —— 共栅画法，原有硬编码朝向表达不了）：
+     *   o.rot : 0(默认) | 90 | 180 | 270 —— 绕器件中心 (x,y) 把**符号本体**
+     *          （沟道 / 栅极引线 / 箭头 / 漏源引线）整体旋转。
+     *   o.ds  : 'normal'(默认) | 'swap' —— **只交换漏源两脚所接的网络**（几何不动）。
+     *          JFET 的源漏对称：教材图 2-20 的 VT₂ 正是「栅极朝下、源在左、漏在右」，
+     *          用 o.rot:270 + o.ds:'swap' 即可复现，不必在页面里私造符号。
+     *   教材依据：《通信电子线路》（第 3 版，陈启兴）**书页 36 / PDF 48 图 2-20**；
+     *   像素级取证 scratch/shots/r19e_vt2_ascii2.txt.txt 与 r19e_f220_vt2map.txt。
+     *   不传 o.rot / o.ds 时画法与 v1.14 **完全一致**（回归用例锁住）。
+     * 返回 {G,D,S} 三个**真实端点**。 */
+    jfet(id,x,y,nets,opt){
+      opt=opt||{};
+      const col=opt.color||colors.device;
+      const R=opt.r===undefined?34:opt.r;
+      const ch=opt.ch===undefined?16:opt.ch;
+      const gd=opt.gate===undefined?28:opt.gate;
+      const ld=opt.lead===undefined?26:opt.lead;
+      const inward=(opt.arrow||'in')==='in';
+      const rot=opt.rot||0;
+      if(rot!==0&&rot!==90&&rot!==180&&rot!==270)throw Error('jfet 的 o.rot 只能是 0 / 90 / 180 / 270');
+      const swapDS=(opt.ds||'normal')==='swap';
+      /* 基础朝向：栅极在左、漏极在上、源极在下。T() 把「基础相对坐标」映射到实际坐标。
+       * 屏幕坐标 y 向下，故 rot:90 = 视觉顺时针 90°（上→右、左→上）。 */
+      const T=function(dx,dy){
+        let X=dx,Y=dy,t;
+        if(rot===90){t=X;X=-Y;Y=t;}
+        else if(rot===180){X=-X;Y=-Y;}
+        else if(rot===270){t=X;X=Y;Y=-t;}
+        return {x:x+X,y:y+Y};
+      };
+      const gP=T(-gd,0), dP=T(0,-(ch+ld)), sP=T(0,ch+ld);
+      const pins={G:point(gP.x,gP.y,nets.g),
+                  D:point(dP.x,dP.y,swapDS?nets.s:nets.d),
+                  S:point(sP.x,sP.y,swapDS?nets.d:nets.s)};
+      this.component(id,'jfet',pins,g=>{
+        e(g,'circle',{cx:x,cy:y,r:R,fill:'none',stroke:col,'stroke-width':1.4});
+        const c0=T(0,-ch), c1=T(0,ch);
+        this.line(g,c0.x,c0.y,c1.x,c1.y,col);                 /* 沟道 */
+        if(inward){
+          const g1=T(-gd,0),g2=T(-18,0),h1=T(-8,0),h2=T(-17,-3.6),h3=T(-17,3.6);
+          this.line(g,g1.x,g1.y,g2.x,g2.y,col);
+          e(g,'polygon',{points:h1.x+','+h1.y+' '+h2.x+','+h2.y+' '+h3.x+','+h3.y,fill:col,stroke:'none'});
+        }else{
+          const g1=T(-gd,0),g2=T(-9,0),h1=T(-18,0),h2=T(-9,-3.6),h3=T(-9,3.6);
+          this.line(g,g1.x,g1.y,g2.x,g2.y,col);
+          e(g,'polygon',{points:h1.x+','+h1.y+' '+h2.x+','+h2.y+' '+h3.x+','+h3.y,fill:col,stroke:'none'});
+        }
+        const dl0=T(0,-ch),dl1=T(0,-ch-ld);
+        const sl0=T(0,ch),sl1=T(0,ch+ld);
+        this.line(g,dl0.x,dl0.y,dl1.x,dl1.y,col);              /* 漏极引线 */
+        this.line(g,sl0.x,sl0.y,sl1.x,sl1.y,col);              /* 源极引线 */
+      });
+      const lbl=(opt.label===false)?null:(opt.label||id);
+      if(lbl){
+        const dflt=T(-4,-R-8);
+        const la=opt.labelAt||[dflt.x,dflt.y];
+        this.text(la[0],la[1],lbl,{color:col,size:opt.labelSize||14,anchor:la[2]||'middle'});
+      }
+      const pl=opt.pinLabels;
+      if(pl){
+        if(pl.g){const p=T(-gd-5,-4);this.text(p.x,p.y,pl.g,{color:col,size:12,anchor:'end'});}
+        if(pl.d){const p=T(6,-ch-ld+4);this.text(p.x,p.y,pl.d,{color:col,size:12});}
+        if(pl.s){const p=T(6,ch+ld+12);this.text(p.x,p.y,pl.s,{color:col,size:12});}
+      }
+      return pins;
+    }
+    /* 集成电路方框（IC）：矩形 + 引脚短线 + 框内引脚号。
+     * pins: { 名字: {net, side:'left'|'right'|'top'|'bottom', pos:0..1, label:'引脚号'} }
+     *   side='left'/'right' 时 pos 是沿该边**从上到下**的比例；
+     *   side='top'/'bottom'   时 pos 是沿该边**从左到右**的比例。
+     * o.name 方框内的器件名；o.nameAt=[dx,dy]（相对中心的偏移）。
+     * o.stub 引脚短线长度（默认 12）。返回每个引脚的**真实端点** {x,y,net}。 */
+    icBox(id,x,y,w,h,pins,opt){
+      opt=opt||{};
+      const col=opt.color||colors.device;
+      const stub=opt.stub===undefined?12:opt.stub;
+      const x0=x-w/2,x1=x+w/2,y0=y-h/2,y1=y+h/2;
+      const geo={},pinPts={};
+      Object.keys(pins).forEach(k=>{
+        const sp=pins[k],side=sp.side||'left';
+        let bx,by,dx,dy;
+        if(side==='left'){bx=x0;by=y0+h*sp.pos;dx=-1;dy=0;}
+        else if(side==='right'){bx=x1;by=y0+h*sp.pos;dx=1;dy=0;}
+        else if(side==='top'){by=y0;bx=x0+w*sp.pos;dx=0;dy=-1;}
+        else{by=y1;bx=x0+w*sp.pos;dx=0;dy=1;}
+        const ex=bx+dx*stub,ey=by+dy*stub;
+        geo[k]={x:ex,y:ey,net:sp.net};
+        pinPts[k]=point(ex,ey,sp.net);
+        sp._bx=bx;sp._by=by;sp._dx=dx;sp._dy=dy;sp._side=side;
+      });
+      this.component(id,'ic',pinPts,g=>{
+        e(g,'rect',{x:x0,y:y0,width:w,height:h,fill:'#fff',stroke:col,'stroke-width':1.8});
+        Object.keys(pins).forEach(k=>{
+          const sp=pins[k];
+          this.line(g,sp._bx,sp._by,sp._bx+sp._dx*stub,sp._by+sp._dy*stub,col);
+          if(sp.label){
+            let lx,ly,an;
+            if(sp._side==='left'){lx=sp._bx+14;ly=sp._by+4;an='start';}
+            else if(sp._side==='right'){lx=sp._bx-14;ly=sp._by+4;an='end';}
+            else if(sp._side==='top'){lx=sp._bx;ly=sp._by+16;an='middle';}
+            else{lx=sp._bx;ly=sp._by-14;an='middle';}
+            this.text(lx,ly,sp.label,{color:col,size:12,anchor:an});
+          }
+        });
+        if(opt.name){const na=opt.nameAt||[0,0];this.text(x+na[0],y+na[1]+5,opt.name,{color:col,size:opt.nameSize||15});}
+      });
+      return geo;
+    }
+    /* 晶体管。o.flip==='down'：**共基级画法**（教材题 2.17 图的 VT2）——
+     *   基极横杠在下、发射极引线向左上（带箭头）、集电极引线向右上、基极引线向下。
+     *   o.label===false 不画元件名；o.labelAt=[x,y,anchor] 指定元件名位置。 */
+    transistor(id,x,y,nets,opt){opt=opt||{};const mos=!!opt.mos,col=colors.device,flip=!mos&&opt.flip==='down';
+      const pins=flip
+        ? {B:point(x,y+50,nets.b),C:point(x+40,y-50,nets.c),E:point(x-40,y-50,nets.e)}
+        : {B:point(x,y,nets.b),C:point(x+60,y-50,nets.c),E:point(x+60,y+50,nets.e)};
+      this.component(id,mos?'nmos':'npn',mos?{G:pins.B,D:pins.C,S:pins.E}:pins,g=>{
+        if(mos){this.line(g,x,y,x+18,y,col);this.line(g,x+18,y-24,x+18,y+24,col);this.line(g,x+28,y-24,x+28,y+24,col);this.line(g,x+28,y-18,x+60,y-18,col);this.line(g,x+60,y-18,x+60,y-50,col);this.line(g,x+28,y+18,x+60,y+18,col);this.line(g,x+60,y+18,x+60,y+50,col);e(g,'circle',{cx:x+32,cy:y,r:40,fill:'none',stroke:col,'stroke-width':1.2});}
+        else if(flip){
+          this.line(g,x-16,y,x+16,y,col);          /* 基极横杠（在下） */
+          this.line(g,x,y,x,y+50,col);             /* 基极引线向下 */
+          this.line(g,x-16,y,x-40,y-40,col);       /* 发射极引线（左上） */
+          this.line(g,x-40,y-40,x-40,y-50,col);
+          e(g,'polygon',{points:(x-40)+','+(y-50)+' '+(x-46)+','+(y-41)+' '+(x-34)+','+(y-41),fill:col});
+          this.line(g,x+16,y,x+40,y-40,col);       /* 集电极引线（右上） */
+          this.line(g,x+40,y-40,x+40,y-50,col);
+        }
+        else{this.line(g,x,y,x+20,y,col);this.line(g,x+20,y-25,x+20,y+25,col);this.line(g,x+20,y-22,x+60,y-40,col);this.line(g,x+60,y-40,x+60,y-50,col);this.line(g,x+20,y+22,x+60,y+40,col);this.line(g,x+60,y+40,x+60,y+50,col);e(g,'polygon',{points:(x+43)+','+(y+25)+' '+(x+60)+','+(y+40)+' '+(x+45)+','+(y+39),fill:col});}
+      });
+      const lbl=(opt.label===false)?null:(opt.label||id);
+      if(lbl){const la=opt.labelAt||[x+10,y-58];this.text(la[0],la[1],lbl,{color:col,size:15,anchor:la[2]||'middle'});}
+      return pins;
+    }
+    /* 乘法器（教材符号：**圆圈内一个 ×**）。三端口：A 左输入 / B 下输入 / O 右输出。
+     *   教材 书页 149 / PDF 161「题 6.8 图」用的就是这个符号（⊗ 乘法器 → C∥R → 接地）。
+     *   此前库里没有，页面曾私造一个**方框图**（两个矩形块 + 箭头）冒充 →
+     *   与教材原图不符，且违反「旧 helper 与标准库不得混在一张图里」。
+     *   按「未覆盖的器件须先扩充、测试后再复用」补上（v1.18）。
+     *   o.label===true 才画元件名（教材符号圈内**没有**名称）；o.r 控制圆半径。 */
+    multiplier(id,x,y,nets,opt){opt=opt||{};
+      const col=colors.device,r=opt.r||18;
+      const pins={A:point(x-r,y,nets.a),B:point(x,y+r,nets.b),O:point(x+r,y,nets.o)};
+      this.component(id,'multiplier',pins,g=>{
+        e(g,'circle',{cx:x,cy:y,r:r,fill:'none',stroke:col,'stroke-width':1.5});
+        const k=r*0.72;
+        this.line(g,x-k,y-k,x+k,y+k,col);
+        this.line(g,x-k,y+k,x+k,y-k,col);
+      });
+      if(opt.label===true){const la=opt.labelAt||[x,y+r+16];this.text(la[0],la[1],id,{color:col,size:13,anchor:la[2]||'middle'});}
+      else if(typeof opt.label==='string'&&opt.label){const la=opt.labelAt||[x,y+r+16];this.text(la[0],la[1],opt.label,{color:col,size:13,anchor:la[2]||'middle'});}
+      return pins;
+    }
+    winding(id,x,y,topNet,bottomNet){return this.ind(id,point(x,y-48,topNet),point(x,y+48,bottomNet),{label:''});}    transformer(id,x,y,nets){const p=this.winding(id+'.p',x,y,nets.p1,nets.p2),s=this.winding(id+'.s',x+50,y,nets.s1,nets.s2);this.line(this.parent,x+23,y-45,x+23,y+45);this.line(this.parent,x+28,y-45,x+28,y+45);this.text(x+25,y+69,id,{size:13});return {p1:p.a,p2:p.b,s1:s.a,s2:s.b};}
+    /* ⑥ 带抽头的竖直绕组。
+     * nodes: [{net,y}]，按 y 升序；**首尾是绕组两端，中间的节点即抽头**。
+     * 教材口径「抽头位于线圈实际曲线折点」：绕组被 nodes 分成若干段，
+     *   段界就是折点，抽头引线从折点引出 —— 不落在折点上的抽头无法表达。
+     * o.bulge: 凸弧鼓向（+1 右 / −1 左）；o.side: 抽头引出方向（±1）；
+     * o.lead: 抽头引线长度；o.rx: 凸弧横向半径；o.bumps: 每段的凸弧个数。
+     * 返回 {a,b,taps:[{net,x,y}]}，a/b/taps 都是可直接接线的真实端点。 */
+    windingTapped(id,x,nodes,o){
+      o=o||{};
+      const bulge=o.bulge===undefined?1:o.bulge, side=o.side===undefined?-1:o.side;
+      const lead=o.lead===undefined?16:o.lead, rx=o.rx===undefined?9:o.rx;
+      const ns=(nodes||[]).map(n=>({net:n.net,y:n.y})).sort((a,b)=>a.y-b.y);
+      if(ns.length<2)throw Error('绕组至少要有首尾两个节点 '+id);
+      for(let i=1;i<ns.length;i++)if(!(ns[i].y>ns[i-1].y))throw Error('绕组节点必须按 y 严格递增 '+id+'（第 '+i+' 个节点）');
+      const col=o.color||colors.wire;
+      const pins={a:point(x,ns[0].y,ns[0].net),b:point(x,ns[ns.length-1].y,ns[ns.length-1].net)};
+      ns.slice(1,-1).forEach((n,i)=>{pins['t'+(i+1)]=point(x+side*lead,n.y,n.net);});
+      this.component(id,'winding',pins,g=>{
+        let d='';
+        for(let i=0;i<ns.length-1;i++){
+          const y1=ns[i].y,y2=ns[i+1].y,h=y2-y1;
+          const k=o.bumps||Math.max(1,Math.round(h/15));
+          for(let j=0;j<k;j++){
+            const a=y1+h*j/k,b=y1+h*(j+1)/k;
+            d+=' M '+x+' '+a+' A '+rx+' '+(h/(2*k)).toFixed(3)+' 0 0 '+(bulge>0?1:0)+' '+x+' '+b.toFixed(3);
+          }
+        }
+        e(g,'path',{d,stroke:col,'stroke-width':1.8,fill:'none'});
+        /* 抽头引线：自折点（节点所在处）水平引出 */
+        ns.slice(1,-1).forEach(n=>{this.line(g,x,n.y,x+side*lead,n.y,col);});
+      });
+      const taps=ns.slice(1,-1).map(n=>({net:n.net,x:x+side*lead,y:n.y}));
+      return {a:pins.a,b:pins.b,taps:taps,nodes:ns};
+    }
+    /* ⑥ 带抽头的变压器：一次/二次各一个可抽头绕组，各绕组电隔离，共用铁芯。
+     * pNodes / sNodes 均为 [{net,y}]，含义同 windingTapped()。 */
+    transformerTapped(id,x,pNodes,sNodes,o){
+      o=o||{};
+      const p=this.windingTapped(id+'.p',x,pNodes,Object.assign({bulge:1,side:-1},o.p||{}));
+      const s=this.windingTapped(id+'.s',x+(o.dx===undefined?50:o.dx),sNodes,Object.assign({bulge:-1,side:1},o.s||{}));
+      const yTop=Math.min(p.nodes[0].y,s.nodes[0].y),yBot=Math.max(p.nodes[p.nodes.length-1].y,s.nodes[s.nodes.length-1].y);
+      const c0=o.core0===undefined?x+23:o.core0, c1=o.core1===undefined?x+28:o.core1;
+      this.line(this.parent,c0,yTop+4,c0,yBot-4);this.line(this.parent,c1,yTop+4,c1,yBot-4);
+      /* o.label===false 时不画自动的元件名（教材图有的变压器并不标 T） */
+      if(o.label!==false)this.text(o.labelX===undefined?x+25:o.labelX,o.labelY===undefined?yBot+25:o.labelY,id,{size:13});
+      return {p:p,s:s};
+    }
+    /* ⑥ 多绕组（耦合绕组 / 多绕组变压器）：N 个绕组共用同一铁芯，各自电隔离。 */
+    coupledWindings(id,x,list,o){
+      o=o||{};
+      const out=[];
+      let yTop=Infinity,yBot=-Infinity;
+      list.forEach((it,i)=>{
+        const side=it.side===undefined?(i%2?-1:1):it.side;
+        const bulge=it.bulge===undefined?(-side):it.bulge;
+        const dx=it.dx===undefined?(o.dx===undefined?50:o.dx):it.dx;
+        const ww=this.windingTapped(id+'.'+(it.label||('w'+(i+1))),x+dx*i,it.nodes,Object.assign({},it,o,{bulge:bulge,side:side}));
+        out.push(ww);
+        ww.nodes.forEach(n=>{if(n.y<yTop)yTop=n.y;if(n.y>yBot)yBot=n.y;});
+      });
+      const c0=o.core0===undefined?x+(o.coreDx||23):o.core0, c1=o.core1===undefined?x+(o.coreDx||23)+5:o.core1;
+      this.line(this.parent,c0,yTop+4,c0,yBot-4);this.line(this.parent,c1,yTop+4,c1,yBot-4);
+      if(o.label!==false)this.text(o.labelX===undefined?x+(o.coreDx||23):o.labelX,o.labelY===undefined?yBot+25:o.labelY,id,{size:13});
+      return out;
+    }
+    /* 连接检查读实际生成的 polyline，而不是只检查事先声明的网络标签。 */
+    audit(){
+      const eps=EPS, issues=[];
+      const wires=this.wires.map(w=>({net:w.el.getAttribute('data-wire'),pts:w.el.getAttribute('points').trim().split(/\s+/).map(s=>s.split(',').map(Number))}));
+      const pins=[];this.parts.forEach(c=>Object.entries(c.pins).forEach(([name,p])=>pins.push({id:c.id,p,name})));
+      const on=(p,a,b)=>Math.abs((p.x-a[0])*(b[1]-a[1])-(p.y-a[1])*(b[0]-a[0]))<eps&&p.x>=Math.min(a[0],b[0])-eps&&p.x<=Math.max(a[0],b[0])+eps&&p.y>=Math.min(a[1],b[1])-eps&&p.y<=Math.max(a[1],b[1])+eps;
+      /* 1. 引脚：悬空 / 误接到异网导线 */
+      pins.forEach(pin=>{const p=pin.p;
+        let connected=this.anchors.some(a=>a.net===p.net&&Math.hypot(a.x-p.x,a.y-p.y)<eps)||pins.some(q=>q!==pin&&q.p.net===p.net&&Math.hypot(q.p.x-p.x,q.p.y-p.y)<eps);
+        wires.forEach(w=>{for(let i=1;i<w.pts.length;i++)if(on(p,w.pts[i-1],w.pts[i])){if(w.net===p.net)connected=true;else issues.push(pin.id+'.'+pin.name+' 导线误接 '+w.net+' / '+p.net);}});
+        if(!connected)issues.push(pin.id+'.'+pin.name+' 引脚悬空');
+      });
+      /* 2. 异网导线交叉 / 异网共用端点 */
+      const segs=[];wires.forEach(w=>{for(let i=1;i<w.pts.length;i++)segs.push({net:w.net,a:w.pts[i-1],b:w.pts[i]});});
+      if(!disabled('cross')){
+        const crossPt=(p1,p2,p3,p4)=>{
+          const d=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+          const d1=d(p3,p4,p1),d2=d(p3,p4,p2),d3=d(p1,p2,p3),d4=d(p1,p2,p4);
+          if(((d1>0&&d2<0)||(d1<0&&d2>0))&&((d3>0&&d4<0)||(d3<0&&d4>0))){
+            const t=d3/(d3-d4);return {x:p3[0]+t*(p4[0]-p3[0]),y:p3[1]+t*(p4[1]-p3[1])};
+          }
+          return null;
+        };
+        const same=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<eps;
+        for(let i=0;i<segs.length;i++)for(let j=i+1;j<segs.length;j++){
+          const A=segs[i],B=segs[j];if(A.net===B.net)continue;
+          const q=crossPt(A.a,A.b,B.a,B.b);
+          if(q){
+            /* 跳线保护圆内的交叉是「显式声明的不相连」，不算缺陷。 */
+            if(!this.hopNear(q.x,q.y))issues.push('导线 '+A.net+' 与导线 '+B.net+' 交叉但没有接点标记');
+            continue;
+          }
+          /* T 形：一条线的端点落在另一条线的中段 */
+          const ends=[[A,B],[B,A]];
+          for(const [e1,other] of ends){
+            for(const p of [e1.a,e1.b]){
+              if(on({x:p[0],y:p[1]},other.a,other.b)&&!same(p,other.a)&&!same(p,other.b)){
+                if(!this.hopNear(p[0],p[1]))issues.push('导线 '+e1.net+' 的端点落在导线 '+other.net+' 上（异网，需接点标记）');
+              }
+            }
+          }
+          /* 异网共用端点：疑似短路 */
+          for(const p of [A.a,A.b])for(const q of [B.a,B.b])if(same(p,q))issues.push('导线 '+A.net+' 与导线 '+B.net+' 共用端点 ('+p[0]+','+p[1]+')（异网，疑似短路）');
+        }
+      }
+      /* 3. 同一网络必须连成一片 */
+      if(!disabled('split')){
+        const pts=[],par=[];
+        /* par 必须随 pts 一起长：并查集的父指针表比点表短会让 find() 全部返回 undefined，
+         * 结果「同网分裂」永远检不出来（v1.1 的实现正是这样写的）。
+         * pid 要同时接受 [x,y] 折线顶点与 {x,y} 引脚/端口，两种形状混用时
+         * 坐标会读成 undefined，NaN 比较恒为 false，引脚就会各拿一个新索引。 */
+        const pid=p=>{const x=Array.isArray(p)?p[0]:p.x,y=Array.isArray(p)?p[1]:p.y;
+          let i=pts.findIndex(q=>Math.hypot(q[0]-x,q[1]-y)<eps);if(i<0){pts.push([x,y]);i=pts.length-1;par[i]=i;}return i;};
+        const find=a=>{while(par[a]!==a){par[a]=par[par[a]];a=par[a];}return a;};
+        const uni=(a,b)=>{const ra=find(a),rb=find(b);if(ra!==rb)par[rb]=ra;};
+        const segIds=segs.map(s=>[pid(s.a),pid(s.b)]);
+        segIds.forEach(([a,b])=>uni(a,b));
+        pins.forEach(pin=>{pin.__i=pid(pin.p);});
+        this.anchors.forEach(a=>{a.__i=pid(a);});
+        /* 接地符号即公共端：同名网络的多个接地符号属于同一节点 */
+        const gByNet={};this.grounds.forEach(g=>{(gByNet[g.net]=gByNet[g.net]||[]).push(g.__i);});
+        Object.keys(gByNet).forEach(net=>{const l=gByNet[net];for(let i=1;i<l.length;i++)uni(l[0],l[i]);});
+        /* 导线折点落在同网导线上 → 视为接通（T 形接头） */
+        wires.forEach(w=>w.pts.forEach(p=>{
+          const i=pid(p);
+          segs.forEach((s,k)=>{if(s.net!==w.net)return;if(on({x:p[0],y:p[1]},s.a,s.b))uni(i,segIds[k][0]);});
+        }));
+        /* 引脚/端口落在同网导线上 → 接通 */
+        segs.forEach((s,k)=>{
+          pins.forEach(pin=>{if(pin.p.net!==s.net)return;if(on(pin.p,s.a,s.b))uni(pin.__i,segIds[k][0]);});
+          this.anchors.forEach(an=>{if(an.net!==s.net)return;if(on(an,s.a,s.b))uni(an.__i,segIds[k][0]);});
+        });
+        const nets={};
+        segs.forEach((s,k)=>{(nets[s.net]=nets[s.net]||[]).push(find(segIds[k][0]));});
+        pins.forEach(pin=>{(nets[pin.p.net]=nets[pin.p.net]||[]).push(find(pin.__i));});
+        this.anchors.forEach(an=>{(nets[an.net]=nets[an.net]||[]).push(find(an.__i));});
+        Object.keys(nets).forEach(net=>{
+          const set=new Set(nets[net]);
+          if(set.size>1)issues.push('网络 '+net+' 分裂成 '+set.size+' 块（互不相连）');
+        });
+      }
+      return {scene:this.id,parts:this.parts.length,wires:wires.length,pins:pins.length,issues};
+    }
+  }
+  global.CourseCircuit={version:'1.18',colors,palettes:PALETTES,usePalette,clear,Scene,point,audit(svg){return(svg.__circuits||[]).map(s=>s.audit());}};
+})(window);
+
+// 桩DOM工具将window与VM全局分开；显式提供同名经典脚本绑定。
+// ⚠ 这里的顺序有讲究（见 build/circuit/README.md「库区边界」）：
+//   ① 本块**最后一行**必须是 COURSE-CIRCUIT-END 标记 —— 刷新工具按它切库区，
+//      标记之后的内容属于页面自己；早先版本把「var CourseCircuit = ...」当切点，
+//      而它不是最后一行 → 每刷一次就多留一行残留（库区会无声膨胀）。
+//   ② subHtml 用「typeof 守卫」而不是直接赋值：同页还带 build/lib.js 时，
+//      lib.js 顶层有 function subHtml（函数声明会被提升），直接赋值会把它覆盖掉；
+//      而且本行执行时 lib.js 可能还没跑，window.subHtml 可能不存在。
+var CourseSubscript = window.CourseSubscript;
+var subHtml;
+if (typeof subHtml !== 'function') { subHtml = window.subHtml || function (s) { return s; }; }
+var CourseCircuit = window.CourseCircuit;
+/* === COURSE-CIRCUIT-END === */
+
+</script>
+
+<!-- ==================== 教材题图（题 4.3 / 4.4 / 4.5 / 4.10） ==================== -->
+<script>
+/* ============================================================================
+ * 第 4 章「习题解法」可视化页 —— 题 4.3 图（4 幅互感耦合电路）与题 4.5 图。
+ *
+ * 教材依据
+ *   · 《通信电子线路》第 3 版 书页 109（PDF 121）「题 4.3 图」「题 4.5 图」
+ *     —— 裁切件 E:\work\book4\hi\q43hi-121.png / q45-121.png
+ *   · 答案册 书页 68（PDF 77）「图题 4.3 中互感的同名端标注」
+ *     —— 裁切件 E:\work\book4\hi\fig43ans-077.png（与教材题图同款拓扑，
+ *        **多画了同名端黑点**）：黑点位置以它为准。
+ *
+ * 本文件只提供两个全局函数：
+ *   drawEx4_43()  → svg id "ex4Fig43"（4 个子图并排，各带 (a)(b)(c)(d) 标注）
+ *   drawEx4_45()  → svg id "ex4Fig45"（单幅三回路振荡器高频等效电路）
+ *
+ * 开关
+ *   页面提供全局布尔变量 EX4_SHOW_DOTS（缺省 true）：
+ *     true  → 画出同名端黑点（用库里的 polarityDot()，写 data-polarity，
+ *              与电气结点 dot() 的 data-junction 在 DOM 上硬性区分）；
+ *     false → 不画黑点（供「先让学生自己标、再点开看答案」的交互）。
+ *   每次 drawEx4_43() 都重新读该全局变量，不缓存。
+ *
+ * 画法约定（全部由标准库 svg_components.js v1.18 承担）
+ *   · 端口坐标一律取自元件返回值（ind/windingTapped 的 .a/.b/.taps、
+ *     cap/transistor 的引脚），不手算引脚位置；
+ *   · 导线一律正交；教材里「交叉但不相连」的地方用 hop() 画成跨线桥，
+ *     把「不相连」显式表达出来；
+ *   · 同一网络用同一个 net 名贯穿；不同网络不共用端点。
+ * ========================================================================== */
+
+/* ------------------------------------------------------------------ 题 4.3 */
+function drawEx4_43() {
+  var svg = document.getElementById('ex4Fig43');
+  if (!svg) return;
+
+  /* 同名端开关：每次重绘都重新读全局变量（页面切开关后重绘即可生效） */
+  var showDots = true;
+  try { showDots = (typeof EX4_SHOW_DOTS === 'undefined') ? true : !!EX4_SHOW_DOTS; }
+  catch (e) { showDots = true; }
+
+  CourseCircuit.clear(svg, '0 0 1240 420');
+  CourseCircuit.usePalette('course');
+
+  /* 教材式磁芯线：**一条竖直虚线**。
+   * 教材 书页 109 图 (a)(c) 实测（对扫描件逐行取暗段）：两绕组之间只有**一条**
+   * 虚线 —— (a) 在 x=252~259、(c) 在 x=1466~1472，行内会出现空档（虚线），
+   * 答案册重绘时同样保持虚线。库没有虚线接口，这里在 Scene.line() 返回的
+   * 元素上补 stroke-dasharray：仍是**单个** <line>，不像拆成一串短划线那样
+   * 给断头检查凭空添出成堆线头。节距按教材比例取 实 22px / 空 10px。 */
+  var core = function (scene, x, y1, y2) {
+    var el = scene.line(scene.parent, x, y1, x, y2);
+    el.setAttribute('stroke-dasharray', '22 10');
+    return el;
+  };
+
+  /* ======================================================================
+   * (a) 变压器反馈式（教材 书页 109 原图）
+   *   左绕组（原边）串在发射极回路，右绕组（副边）**3 端**：
+   *     上端 → 电容上极；中间抽头 → 集电极；下端 → 下母线。
+   *   集电极竖线与「右绕组上端 → 电容」的横线**交叉但不相连**
+   *   （教材原图交点无实心点）→ 用 hop() 画成跨线桥。
+   *   下母线上 1 处实心结点 + 1 个接地符号。
+   * ==================================================================== */
+  var a = new CourseCircuit.Scene(svg, 'ex4-43a', 0);
+  var A = function (x, y, n) { return a.p(x, y, n); };
+
+  /* 元件引脚一律取自库返回值（transistor → B/C/E，windingTapped → a/b/taps，
+     cap → a/b），不手算引脚位置 */
+  var vt = a.transistor('VT', 60, 95, { b: 'gnd', c: 'col', e: 'em' }, { label: false });
+  /* 变压器：左绕组（原边）2 端；凸弧鼓向**左**（教材画法，与磁芯线背向） */
+  var t1 = a.windingTapped('T1', 160, [{ net: 'em', y: 175 }, { net: 'gnd', y: 295 }],
+    { bulge: -1, rx: 11, bumps: 4 });
+  /* 右绕组（副边）3 端：上端→电容、中间抽头→集电极、下端→下母线 */
+  var t2 = a.windingTapped('T2', 200, [{ net: 'ct', y: 175 }, { net: 'col', y: 235 }, { net: 'gnd', y: 295 }],
+    { bulge: 1, side: 1, lead: 16, rx: 11, bumps: 2 });
+  /* 电容：上极 = 右绕组上端；下极 = 下母线 */
+  var capA = a.cap('C', A(270, 175, 'ct'), A(270, 365, 'gnd'), { label: '' });
+
+  /* 基极 → 左侧竖线 → 下母线（接地） */
+  a.wire('gnd', [vt.B, A(25, 95, 'gnd'), A(25, 365, 'gnd')]);
+  /* 发射极 → 下 → 右 → 左绕组上端 */
+  a.wire('em', [vt.E, A(120, 175, 'em'), t1.a]);
+  /* 集电极：上母线 → 右 → 下 → 右绕组中间抽头 */
+  a.wire('col', [vt.C, A(245, 45, 'col'), A(245, 235, 'col'), t2.taps[0]]);
+  /* 磁芯：两绕组之间**一条虚线**（教材 书页 109 图 (a) 原画法） */
+  core(a, 179, 180, 290);
+
+  /* 右绕组上端 → 电容上极：与集电极竖线**交叉不相连** → 跨线桥 */
+  var hopA = a.hop('ct', { x: 245, y: 175 }, { r: 15, side: 'up' });
+  a.wire('ct', [t2.a].concat(hopA).concat([capA.a]), { diag: true });
+
+  /* 两个绕组下端 → 下母线 */
+  a.wire('gnd', [t1.b, A(120, 295, 'gnd'), A(120, 365, 'gnd')]);
+  a.wire('gnd', [t2.b, A(225, 295, 'gnd'), A(225, 365, 'gnd')]);
+  a.wire('gnd', [A(25, 365, 'gnd'), capA.b]);
+  /* 下母线上的实心结点 + 接地符号（教材画法：结点正下方接地） */
+  a.dot(A(120, 365, 'gnd'));
+  a.ground(A(120, 365, 'gnd'));
+
+  if (showDots) {
+    /* 同名端黑点：答案册画在每个绕组上端的**外侧** */
+    a.polarityDot(A(135, 188, 'T1'), {});
+    a.polarityDot(A(226, 188, 'T2'), {});
+  }
+  a.text(155, 404, '(a)', { size: 15, bold: true });
+
+  /* ======================================================================
+   * (b) 互感耦合式（教材 书页 109 原图）
+   *   上方绕组 L1 串在集电极回路，下端**单独**画接地符号；
+   *   下方绕组 L2 串在发射极回路，**中间抽头接发射极**，
+   *   上端 → 电容 → 下母线；两绕组之间**不画磁芯线**（互感，非变压器）。
+   * ==================================================================== */
+  var b = new CourseCircuit.Scene(svg, 'ex4-43b', 310);
+  var B = function (x, y, n) { return b.p(x, y, n); };
+
+  var vt = b.transistor('VT', 60, 95, { b: 'gnd', c: 'col', e: 'em' }, { label: false });
+  /* 上方绕组 L1（2 端）：上端 → 集电极；下端 → 接地符号 */
+  var l1 = b.windingTapped('L1', 230, [{ net: 'col', y: 100 }, { net: 'gnd', y: 210 }],
+    { bulge: -1, rx: 11, bumps: 4 });
+  /* 下方绕组 L2（3 端）：上端 → 电容；中间抽头 → 发射极；下端 → 下母线
+   * ⚠ 上端取 y=285（不是 255）：教材 图 4.3(b) 里 L1 下端的接地符号与 L2 上端
+   *   之间有明显纵向间距；接地符号最下一根横杠会横跨 L2 的轴线，
+   *   贴太近既不像教材、又会被断头检查当成「拐角缺口」报出来。 */
+  var l2 = b.windingTapped('L2', 250, [{ net: 'ct', y: 285 }, { net: 'em', y: 320 }, { net: 'gnd', y: 355 }],
+    { bulge: -1, side: -1, lead: 16, rx: 11, bumps: 2 });
+  var capB = b.cap('C', B(305, 295, 'ct'), B(305, 335, 'gnd'), { label: '' });
+
+  b.wire('gnd', [vt.B, B(25, 95, 'gnd'), B(25, 365, 'gnd')]);
+  /* 集电极：上母线 → 右 → 直接下到上绕组上端（教材：横线右端就是绕组轴线，
+     不多绕一段折返） */
+  b.wire('col', [vt.C, B(230, 45, 'col'), l1.a]);
+  /* 上绕组下端 → 右 → 下 → 接地符号（接地符号压在 y=235，与 L2 上端 285 留出间距） */
+  b.wire('gnd', [l1.b, B(260, 210, 'gnd'), B(260, 235, 'gnd')]);
+  b.ground(B(260, 235, 'gnd'));
+  /* 发射极 → 下 → 右 → 下绕组中间抽头 */
+  b.wire('em', [vt.E, B(120, 320, 'em'), l2.taps[0]]);
+  /* 下绕组上端 → 右 → 电容上极 */
+  b.wire('ct', [l2.a, B(305, 285, 'ct'), capB.a]);
+  b.wire('gnd', [capB.b, B(305, 365, 'gnd')]);
+  b.wire('gnd', [l2.b, B(250, 365, 'gnd')]);
+  b.wire('gnd', [B(25, 365, 'gnd'), B(305, 365, 'gnd')]);
+  /* 右下接地符号 */
+  b.ground(B(305, 365, 'gnd'));
+
+  if (showDots) {
+    b.polarityDot(B(248, 114, 'L1'), {});
+    b.polarityDot(B(268, 267, 'L2'), {});
+  }
+  b.text(155, 404, '(b)', { size: 15, bold: true });
+
+  /* ======================================================================
+   * (c) 变压器反馈式（教材 书页 109 原图）
+   *   拓扑与 (a) 同型，但右绕组只有 2 端：
+   *   它的**上端**同时接集电极与电容上极（教材是 T 形接通，不是抽头），
+   *   集电极竖线终止在这条横线上（**不是**交叉）。
+   * ==================================================================== */
+  var c = new CourseCircuit.Scene(svg, 'ex4-43c', 620);
+  var C = function (x, y, n) { return c.p(x, y, n); };
+
+  var vt = c.transistor('VT', 60, 95, { b: 'gnd', c: 'col', e: 'em' }, { label: false });
+  /* 左绕组（原边）2 端 */
+  var t1 = c.windingTapped('T1', 160, [{ net: 'em', y: 175 }, { net: 'gnd', y: 295 }],
+    { bulge: -1, rx: 11, bumps: 4 });
+  /* 右绕组（副边）2 端：上端 = 集电极 = 电容上极；下端 → 下母线 */
+  var t2 = c.windingTapped('T2', 200, [{ net: 'col', y: 175 }, { net: 'gnd', y: 295 }],
+    { bulge: 1, rx: 11, bumps: 4 });
+  var capC = c.cap('C', C(270, 175, 'col'), C(270, 365, 'gnd'), { label: '' });
+
+  c.wire('gnd', [vt.B, C(25, 95, 'gnd'), C(25, 365, 'gnd')]);
+  c.wire('em', [vt.E, C(120, 175, 'em'), t1.a]);
+  /* 集电极：上母线 → 右 → 下，终止在「右绕组上端—电容」横线上（T 形接通） */
+  c.wire('col', [vt.C, C(245, 45, 'col'), C(245, 175, 'col')]);
+  c.wire('col', [t2.a, capC.a]);
+  /* 磁芯：两绕组之间**一条虚线**（教材 书页 109 图 (c) 原画法） */
+  core(c, 179, 180, 290);
+
+  c.wire('gnd', [t1.b, C(120, 295, 'gnd'), C(120, 365, 'gnd')]);
+  c.wire('gnd', [t2.b, C(225, 295, 'gnd'), C(225, 365, 'gnd')]);
+  c.wire('gnd', [C(25, 365, 'gnd'), capC.b]);
+  c.dot(C(120, 365, 'gnd'));
+  c.ground(C(120, 365, 'gnd'));
+
+  if (showDots) {
+    c.polarityDot(C(135, 188, 'T1'), {});
+    c.polarityDot(C(226, 188, 'T2'), {});
+  }
+  c.text(155, 404, '(c)', { size: 15, bold: true });
+
+  /* ======================================================================
+   * (d) 晶体管在右、两个绕组在左（教材 书页 109 原图）
+   *   上方绕组：上端 → 右 → 下 → 接地符号；下端 → 右 → 晶体管集电极。
+   *   下方绕组：上端 → 左 → 电容上极；中间抽头 → 晶体管基极；下端 → 下母线。
+   *   电容与下方绕组并联。
+   * ==================================================================== */
+  var d = new CourseCircuit.Scene(svg, 'ex4-43d', 930);
+  var D = function (x, y, n) { return d.p(x, y, n); };
+
+  var vt = d.transistor('VT', 185, 250, { b: 'base', c: 'col', e: 'gnd' }, { label: false });
+  /* 上方绕组（串在集电极回路）2 端，凸弧鼓向**右** */
+  var l1 = d.windingTapped('L1', 105, [{ net: 'top', y: 40 }, { net: 'col', y: 160 }],
+    { bulge: 1, rx: 11, bumps: 4 });
+  /* 下方绕组（基极侧的 C ∥ L）3 端，凸弧鼓向**左**；抽头引线朝右 */
+  var l2 = d.windingTapped('L2', 120, [{ net: 'ct', y: 200 }, { net: 'base', y: 250 }, { net: 'gnd', y: 300 }],
+    { bulge: -1, side: 1, lead: 16, rx: 11, bumps: 2 });
+  /* 电容与下方绕组并联 */
+  var capD = d.cap('C', D(60, 200, 'ct'), D(60, 240, 'gnd'), { label: '' });
+
+  /* 上端 → 右 → 下 → 右上接地符号 */
+  d.wire('top', [l1.a, D(285, 40, 'top'), D(285, 80, 'top')]);
+  d.ground(D(285, 80, 'top'));
+  /* 下端 → 右 → 下 → 晶体管集电极 */
+  d.wire('col', [l1.b, D(215, 160, 'col'), D(215, 200, 'col'), vt.C]);
+  /* 电容上极 → 绕组上端；下极 → 下母线 */
+  d.wire('ct', [capD.a, l2.a]);
+  d.wire('gnd', [capD.b, D(60, 365, 'gnd')]);
+  d.wire('gnd', [l2.b, D(60, 300, 'gnd')]);
+  /* 抽头 → 晶体管基极 */
+  d.wire('base', [l2.taps[0], vt.B]);
+  /* 发射极 → 下母线 → 右下接地符号 */
+  d.wire('gnd', [vt.E, D(245, 365, 'gnd')]);
+  d.wire('gnd', [D(60, 365, 'gnd'), D(245, 365, 'gnd')]);
+  d.ground(D(245, 365, 'gnd'));
+
+  if (showDots) {
+    d.polarityDot(D(128, 53, 'L1'), {});
+    d.polarityDot(D(101, 207, 'L2'), {});
+  }
+  d.text(155, 404, '(d)', { size: 15, bold: true });
+}
+
+/* ------------------------------------------------------------------ 题 4.5 */
+function drawEx4_45() {
+  var svg = document.getElementById('ex4Fig45');
+  if (!svg) return;
+
+  CourseCircuit.clear(svg, '0 0 560 360');
+  CourseCircuit.usePalette('course');
+
+  var s = new CourseCircuit.Scene(svg, 'ex4-45', 0);
+  var P = function (x, y, n) { return s.p(x, y, n); };
+
+  /* 三个网络：top（上母线）/ mid（L₃-L₂ 中点 = 基极节点）/ bot（下母线 = 地） */
+  var vt = s.transistor('VT', 240, 165, { b: 'mid', c: 'top', e: 'bot' }, { label: false });
+  /* 左侧竖列：L₃ 与 L₂ 串联；中点引出横线接基极 */
+  var l3 = s.windingTapped('L_3', 90, [{ net: 'top', y: 40 }, { net: 'mid', y: 120 }],
+    { bulge: -1, rx: 11, bumps: 3 });
+  var l2 = s.windingTapped('L_2', 90, [{ net: 'mid', y: 210 }, { net: 'bot', y: 300 }],
+    { bulge: -1, rx: 11, bumps: 3 });
+  /* C₃ 并联在 L₃ 两端、C₂ 并联在 L₂ 两端（两电容共一列，中点处有实心结点） */
+  var c3 = s.cap('C_3', P(160, 40, 'top'), P(160, 120, 'mid'), { label: '' });
+  var c2 = s.cap('C_2', P(160, 205, 'mid'), P(160, 285, 'bot'), { label: '' });
+  /* 右侧：C₁ 与 L₁ 并联，上下都接母线 */
+  var c1 = s.cap('C_1', P(350, 40, 'top'), P(350, 300, 'bot'), { label: '' });
+  var l1 = s.windingTapped('L_1', 450, [{ net: 'top', y: 40 }, { net: 'bot', y: 300 }],
+    { bulge: 1, rx: 11, bumps: 4 });
+
+  /* L₃ 下端 = L₂ 上端 = 中点竖线 */
+  s.wire('mid', [l3.b, l2.a]);
+  /* 中点横线 → 晶体管基极（与 C₃/C₂ 那一列相交，交点有实心结点）
+   * 折点必须落在 C₃/C₂ 那一列上，audit 的「同网连成一片」才认得出这个 T 形接头 */
+  s.wire('mid', [P(90, 165, 'mid'), P(160, 165, 'mid'), vt.B]);
+  s.dot(P(160, 165, 'mid'));
+  /* C₃ 下极 ↔ C₂ 上极 之间那根中点竖线 */
+  s.wire('mid', [c3.b, c2.a]);
+
+  /* 晶体管：集电极 → 上母线；发射极 → 下母线 */
+  s.wire('top', [vt.C, P(300, 40, 'top')]);
+  s.wire('bot', [vt.E, P(300, 300, 'bot')]);
+  /* 上、下母线（C₁ 的两端在母线上各留一个折点，接通关系写死在几何里） */
+  s.wire('top', [l3.a, c1.a, l1.a]);
+  s.wire('bot', [l2.b, c1.b, l1.b]);
+  /* C₂ 下极 → 下母线 */
+  s.wire('bot', [c2.b, P(160, 300, 'bot')]);
+  /* 下母线上的实心结点 + 接地符号（教材：发射极下引处） */
+  s.dot(P(300, 300, 'bot'));
+  s.ground(P(300, 300, 'bot'));
+
+  /* 元件标签（教材原文） */
+  s.text(100, 88, 'L_3', { size: 15, anchor: 'start' });
+  s.text(100, 265, 'L_2', { size: 15, anchor: 'start' });
+  s.text(175, 100, 'C_3', { size: 15, anchor: 'start' });
+  s.text(175, 245, 'C_2', { size: 15, anchor: 'start' });
+  s.text(365, 145, 'C_1', { size: 15, anchor: 'start' });
+  s.text(470, 170, 'L_1', { size: 15, anchor: 'start' });
+  s.text(225, 215, 'VT', { size: 14 });
+}
+
+</script>
+<script>
+/* build/circuit/figures_ex4_b.js —— 《通信电子线路》第 4 章「习题解法」三幅教材题图重绘
+ *
+ * 导出（全局函数，页面直接调用）：
+ *   drawEx4_44()     → svg id `ex4Fig44`     教材书页 109「题 4.4 图」(a)(b)(c)(d) 四幅高频等效电路
+ *   drawEx4_410()    → svg id `ex4Fig410`    教材书页 110「题 4.10 图」实用晶体振荡电路
+ *   drawEx4_410eq()  → svg id `ex4Fig410eq`  答案册书页 71 底「图题 4.10 的等效电路」
+ *
+ * ⚠ 页面里三个 <svg> 的**静态 viewBox 必须与下面完全一致**（库的 clear() 会重设 viewBox）：
+ *   ex4Fig44    viewBox="0 0 1420 600"
+ *   ex4Fig410   viewBox="0 0 540 480"
+ *   ex4Fig410eq viewBox="0 0 500 360"
+ *   （三个 svg 建议 width:100%;height:auto）
+ *
+ * 开关：全局布尔 `EX4_SHOW_XLAB`（未定义时按 true 处理）。
+ *   true  → 每幅子图下方标出 X_be / X_ce / X_bc 性质与「能否振荡」结论；
+ *   false → 只画电路（保留教材本来就在的 (a)(b)(c)(d) 子图号），不标性质与结论。
+ *   每次调用都重新读该全局变量，不缓存。
+ *
+ * 依据（全部为扫描页图，逐幅裁切核对；裁切件见 scratch/shots/ex4b_*.png）：
+ *   题 4.4 图    E:\work\book4\hi\q44hi-121.png（教材书页 109）
+ *   题 4.10 图   E:\work\book4\txt-122.png（教材书页 110）
+ *   图题 4.4    E:\work\book4\hi\ans-078.png（答案册书页 69）
+ *   图题 4.10   E:\work\book4\hi\ans-080.png（答案册书页 71）
+ *
+ * 画法约定：
+ *   · 只用标准电路库 CourseCircuit（v1.18）的元件，端口坐标一律取自元件返回值；
+ *   · 导线一律正交；同网同名，异网不共端点；
+ *   · 接地符号 / 实心结点数与教材原图一致（教材画了才画）。
+ *
+ * 题 4.4 图的四幅是**高频等效电路**：晶体管三个端子间跨接电抗 X_be / X_ce / X_bc。
+ * 教材与答案册的判据（答案册书页 68–69）：
+ *   (a) X_be 感性、X_ce 感性、X_bc 可感可容 → 可能振荡（电感三点式）
+ *   (b) X_be 容性、X_ce 感性、X_bc 容性     → 不能振荡
+ *   (c) X_be 感性、X_ce 容性、X_bc 感性     → 不能振荡
+ *   (d) X_be 容性、X_ce 感性、X_bc 感性     → 不能振荡
+ * 拓扑与该判据逐幅自洽（每个子图内部即按上表的电抗性质画）：
+ *   (a) 抽头电感：上端 T、抽头 C（接上左地）、抽头 E（接发射极）、下端 B（接底线）；
+ *       电容跨 T—B  → X_be/X_ce 均取自电感（感性），X_bc = 电容串电感上段（可感可容）
+ *   (b) 左竖列两个电容夹住基极、右列一个电感跨集电极—发射极
+ *       → X_be = 下方电容（容性）、X_ce = 电感（感性）、X_bc = 上方电容（容性）
+ *   (c) 抽头电感：上端 C、抽头 B（接基极）、下端 G（接发射极）；电容跨 C—G
+ *       → X_be = 电感下段（感性）、X_ce = 电容（容性）、X_bc = 电感上段（感性）
+ *   (d) 左列电感跨 C—B、下方电容跨 B—E、右列电感跨 C—E
+ *       → X_be = 电容（容性）、X_ce = 右电感（感性）、X_bc = 左电感（感性）
+ */
+
+/* 小工具：把「屏幕左/右」换算成库里的电感凸弧方向。
+ * 库的 ind()：a 在上、b 在下 → 凸弧在左；a 在下、b 在上 → 凸弧在右（铁芯线随之换边）。
+ * 教材 图 4.10 的 ZL 是「凸弧向右 + 铁芯线在左」，故用 a=下 / b=上。
+ * 返回 {top, bot, pins}：top/bot 是**按位置命名**的真实端点（与库的 a/b 顺序无关）。 */
+function ex4_ind(id, c, xTop, yTop, xBot, yBot, nTop, nBot, opt) {
+  opt = opt || {};
+  var o = {};
+  Object.keys(opt).forEach(function (k) { o[k] = opt[k]; });
+  var pins = c.ind(id, c.p(xBot, yBot, nBot), c.p(xTop, yTop, nTop), o);
+  return { top: pins.b, bot: pins.a, pins: pins };
+}
+
+/* ======================================================================
+ * 图一：教材「题 4.4 图」—— (a)(b)(c)(d) 四幅高频等效电路（并排，教材即并排）
+ * ==================================================================== */
+function drawEx4_44() {
+  var svg = document.getElementById('ex4Fig44');
+  if (!svg) return;
+  CourseCircuit.usePalette('course');
+  CourseCircuit.clear(svg, '0 0 1420 600');
+
+  /* 全局开关每次调用都重读，不缓存；未定义时按 true 处理 */
+  var show = (typeof EX4_SHOW_XLAB === 'undefined') ? true : !!EX4_SHOW_XLAB;
+
+  /* 子图号与「性质/结论」标注：show=false 时只保留子图号（教材本来就有） */
+  function tag(c, x, s, prop, concl, ok) {
+    if (show) {
+      c.text(x, 500, prop, { size: 14 });
+      c.text(x, 528, concl, { size: 15, bold: true, color: ok ? '#0d7a3c' : '#b91c1c' });
+    }
+    c.text(x, 572, s, { size: 16 });
+  }
+
+  /* ---------------- (a) ---------------- */
+  (function () {
+    var c = new CourseCircuit.Scene(svg, 'ex4-44-a', 0);
+    var P = function (x, y, n) { return c.p(x, y, n); };
+    var W = function (n, pts) { return c.wire(n, pts); };
+
+    var vt = c.transistor('VT', 95, 215, { b: 'B', c: 'C', e: 'E' }, { label: false });
+    /* 抽头电感：轴 x=235，凸弧向右，抽头向左引出（与答案册「图题 4.4 (a)」同款）。
+       四个节点自上而下：T=绕组上端、C=上抽头、E=下抽头、B=绕组下端。 */
+    var L = c.windingTapped('L', 235, [
+      { net: 'T', y: 45 }, { net: 'C', y: 95 }, { net: 'E', y: 265 }, { net: 'B', y: 430 }
+    ], { bulge: 1, side: -1, lead: 45, rx: 12, bumps: 3 });
+
+    var cp = c.cap('C1', P(305, 140, 'T'), P(305, 195, 'B'), { label: '' });
+
+    /* ⚠ 教材/答案册「题 4.4 图 (a)」的扫描件把接地符号画在「集电极—上抽头」这条导线上，
+       按图面直读等于把集电极交流短路，电路不成立（抽头回路也被短路掉）。
+       答案册给出的电抗判据（X_be 感性、X_ce 感性、X_bc 可感可容 ⇒ 电感三点式）对应的拓扑是
+       「基极交流接地、集电极接上抽头、发射极接下抽头」，本页据此重绘：
+       接地符号改挂在基极支路上（**接地符号 2 个、实心结点 1 个，仍与教材原图一致**）。
+       详见页面 4.4 的「教材／答案册并列说明」。 */
+    W('C', [vt.C, P(155, 95, 'C'), L.taps[0]]);        /* 集电极 → 上抽头 */
+    W('E', [vt.E, L.taps[1]]);                        /* 发射极 → 下抽头 */
+    W('T', [L.a, P(235, 25, 'T'), P(305, 25, 'T'), cp.a]);   /* 上端 → 电容上极 */
+    W('B', [cp.b, P(305, 430, 'B')]);                 /* 电容下端 → 底线 */
+    W('B', [P(40, 430, 'B'), P(305, 430, 'B')]);      /* 底线（电感下端落在其上） */
+    W('B', [vt.B, P(40, 215, 'B')]);                  /* 基极引线 */
+    W('B', [P(40, 215, 'B'), P(40, 430, 'B')]);       /* 基极 → 底线 */
+    W('B', [P(40, 300, 'B'), P(8, 300, 'B')]);        /* 基极支路上的交流接地支路 */
+    c.ground(P(8, 300, 'B'));
+    c.dot(P(235, 430, 'B'));
+    c.ground(P(235, 430, 'B'));
+    tag(c, 170, '(a)', 'X_be 感性　X_ce 感性　X_bc 可感可容', '可能振荡（电感三点式）', true);
+  })();
+
+  /* ---------------- (b) ---------------- */
+  (function () {
+    var c = new CourseCircuit.Scene(svg, 'ex4-44-b', 360);
+    var P = function (x, y, n) { return c.p(x, y, n); };
+    var W = function (n, pts) { return c.wire(n, pts); };
+
+    var vt = c.transistor('VT', 115, 250, { b: 'B', c: 'C', e: 'E' }, { label: false });
+    var c1 = c.cap('C1', P(40, 150, 'C'), P(40, 195, 'B'), { label: '' });
+    var c2 = c.cap('C2', P(40, 300, 'B'), P(40, 345, 'E'), { label: '' });
+    var L = ex4_ind('L', c, 270, 140, 270, 330, 'C', 'E', { label: '' });
+
+    W('C', [P(40, 60, 'C'), P(270, 60, 'C')]);      /* 顶横线 */
+    W('C', [P(40, 60, 'C'), c1.a]);                /* 左竖列上段 */
+    W('C', [vt.C, P(175, 60, 'C')]);               /* 集电极引线 */
+    W('C', [P(270, 60, 'C'), L.top]);               /* 电感上端 */
+    W('B', [c1.b, c2.a]);                          /* 两电容之间（基极抽头点） */
+    W('B', [vt.B, P(40, 250, 'B')]);               /* 基极引线 */
+    W('E', [c2.b, P(40, 430, 'E')]);
+    W('E', [P(40, 430, 'E'), P(270, 430, 'E')]);   /* 底线 */
+    W('E', [L.bot, P(270, 430, 'E')]);              /* 电感下端 */
+    W('E', [vt.E, P(175, 430, 'E')]);              /* 发射极引线 */
+    c.dot(P(175, 430, 'E'));
+    c.ground(P(175, 430, 'E'));
+    tag(c, 170, '(b)', 'X_be 容性　X_ce 感性　X_bc 容性', '不能振荡', false);
+  })();
+
+  /* ---------------- (c) ---------------- */
+  (function () {
+    var c = new CourseCircuit.Scene(svg, 'ex4-44-c', 720);
+    var P = function (x, y, n) { return c.p(x, y, n); };
+    var W = function (n, pts) { return c.wire(n, pts); };
+
+    var vt = c.transistor('VT', 60, 215, { b: 'B', c: 'C', e: 'G' }, { label: false });
+    var cp = c.cap('C1', P(170, 150, 'C'), P(170, 195, 'G'), { label: '' });
+    /* 抽头电感：轴 x=225，凸弧向左，抽头向右引出（与答案册「图题 4.4 (c)」同款） */
+    var L = c.windingTapped('L', 225, [
+      { net: 'C', y: 60 }, { net: 'B', y: 195 }, { net: 'G', y: 330 }
+    ], { bulge: -1, side: 1, lead: 45, rx: 12, bumps: 3 });
+
+    W('C', [P(120, 60, 'C'), P(225, 60, 'C')]);     /* 顶横线 */
+    W('C', [vt.C, P(120, 60, 'C')]);               /* 集电极引线 */
+    W('C', [P(170, 60, 'C'), cp.a]);               /* 顶横线 → 电容上端 */
+    W('G', [vt.E, P(120, 330, 'G')]);              /* 发射极 → 地 */
+    c.ground(P(120, 330, 'G'));
+    W('G', [P(120, 330, 'G'), L.b]);
+    W('G', [cp.b, P(170, 330, 'G')]);
+    c.ground(P(170, 330, 'G'));
+    W('B', [vt.B, P(30, 215, 'B')]);               /* 基极 → 左侧竖线 → 底线 → 右侧 → 抽头 */
+    W('B', [P(30, 215, 'B'), P(30, 430, 'B')]);
+    W('B', [P(30, 430, 'B'), P(270, 430, 'B')]);
+    W('B', [P(270, 430, 'B'), L.taps[0]]);
+    tag(c, 170, '(c)', 'X_be 感性　X_ce 容性　X_bc 感性', '不能振荡', false);
+  })();
+
+  /* ---------------- (d) ---------------- */
+  (function () {
+    var c = new CourseCircuit.Scene(svg, 'ex4-44-d', 1080);
+    var P = function (x, y, n) { return c.p(x, y, n); };
+    var W = function (n, pts) { return c.wire(n, pts); };
+
+    var vt = c.transistor('VT', 145, 310, { b: 'B', c: 'C', e: 'E' }, { label: false });
+    var l1 = c.ind('L1', P(40, 110, 'C'), P(40, 250, 'B'), { label: '' });   /* 凸弧向左 */
+    var cp = c.cap('C1', P(70, 340, 'B'), P(70, 385, 'E'), { label: '' });
+    var l2 = ex4_ind('L2', c, 290, 200, 290, 430, 'C', 'E', { label: '' });   /* 凸弧向右 */
+
+    W('C', [P(70, 60, 'C'), P(290, 60, 'C')]);      /* 顶横线 */
+    W('C', [l1.a, P(70, 110, 'C')]);
+    W('C', [P(70, 110, 'C'), P(70, 60, 'C')]);
+    W('C', [vt.C, P(205, 60, 'C')]);               /* 集电极引线 */
+    W('C', [P(290, 60, 'C'), l2.top]);             /* 右电感上端 */
+    W('B', [l1.b, P(70, 250, 'B')]);
+    W('B', [P(70, 250, 'B'), cp.a]);
+    W('B', [vt.B, P(70, 310, 'B')]);               /* 基极引线 */
+    W('E', [cp.b, P(70, 430, 'E')]);
+    W('E', [P(70, 430, 'E'), P(290, 430, 'E')]);   /* 底线 */
+    W('E', [vt.E, P(205, 430, 'E')]);              /* 发射极引线 */
+    c.dot(P(205, 430, 'E'));
+    c.ground(P(205, 430, 'E'));
+    tag(c, 170, '(d)', 'X_be 容性　X_ce 感性　X_bc 感性', '不能振荡', false);
+  })();
+}
+
+/* ======================================================================
+ * 图二：教材「题 4.10 图」—— 实用晶体振荡电路（书页 110）
+ * ==================================================================== */
+function drawEx4_410() {
+  var svg = document.getElementById('ex4Fig410');
+  if (!svg) return;
+  CourseCircuit.usePalette('course');
+  CourseCircuit.clear(svg, '0 0 540 480');
+
+  var c = new CourseCircuit.Scene(svg, 'ex4-410');
+  var P = function (x, y, n) { return c.p(x, y, n); };
+  var W = function (n, pts) { return c.wire(n, pts); };
+
+  /* 顶部电源横线 */
+  c.port(P(420, 60, 'VCC'), '+V_CC', { dy: -14 });
+  W('VCC', [P(50, 60, 'VCC'), P(420, 60, 'VCC')]);
+
+  /* 左竖列：20kΩ / 5.6kΩ 分压 + 5MHz 晶振 + 20pF */
+  var r1 = c.res('R1', P(50, 60, 'VCC'), P(50, 175, 'B'), { label: '', value: '20kΩ', valueAt: [40, 105], anchor: 'end' });
+  W('B', [r1.b, P(50, 230, 'B')]);
+  var r2 = c.res('R2', P(50, 230, 'B'), P(50, 272, 'G'), { label: '', value: '5.6kΩ', valueAt: [40, 251], anchor: 'end' });
+  W('G', [r2.b, P(50, 440, 'G')]);
+  var xt = c.crystal('XTAL', P(80, 215, 'B'), P(80, 265, 'X'), { label: '5MHz', at: [132, 232] });
+  W('B', [P(80, 175, 'B'), xt.a]);
+  var c20 = c.cap('C20', P(80, 335, 'X'), P(80, 375, 'G'), { label: '', value: '20pF', valueAt: [128, 380] });
+  W('X', [xt.b, c20.a]);
+  W('G', [c20.b, P(80, 440, 'G')]);
+
+  /* 基极横线 */
+  W('B', [P(50, 175, 'B'), P(310, 175, 'B')]);
+
+  /* 中间竖列：200pF + 200pF + 0.1μF */
+  var c1 = c.cap('C1', P(200, 175, 'B'), P(200, 225, 'E'), { label: '', value: '200pF', valueAt: [232, 140] });
+  var c2 = c.cap('C2', P(200, 225, 'E'), P(200, 315, 'Z'), { label: '', value: '200pF', valueAt: [166, 270], anchor: 'end' });
+  var c3 = c.cap('C3', P(200, 315, 'Z'), P(200, 365, 'G'), { label: '', value: '0.1μF', valueAt: [268, 340] });
+  W('G', [c3.b, P(200, 440, 'G')]);
+
+  /* 晶体管 VT */
+  var vt = c.transistor('VT', 310, 175, { b: 'B', c: 'VCC', e: 'E' }, { label: 'VT', labelAt: [286, 142, 'end'] });
+  W('VCC', [vt.C, P(370, 60, 'VCC')]);
+
+  /* 发射极节点 → 中间竖列、ZL、u_o(t) */
+  var zl = ex4_ind('ZL', c, 340, 225, 340, 315, 'E', 'Z', { core: true, label: '' });
+  W('E', [c1.b, zl.top, P(430, 225, 'E')]);       /* 经 ZL 上端（教材：ZL 串在发射极节点与下节点之间） */
+  c.port(P(430, 225, 'E'), 'u_o(t)', { dx: 12, dy: 5, anchor: 'start' });
+  c.text(318, 205, 'ZL', { size: 13, anchor: 'end' });
+
+  /* ZL 下端节点 → 中间竖列、2.7kΩ */
+  W('Z', [c2.b, zl.bot, P(370, 315, 'Z')]);
+  W('Z', [P(370, 315, 'Z'), P(370, 365, 'Z')]);
+  var r3 = c.res('R3', P(370, 365, 'Z'), P(370, 405, 'G'), { label: '', value: '2.7kΩ', valueAt: [392, 382], anchor: 'start' });
+  W('G', [r3.b, P(370, 440, 'G')]);
+
+  /* 底线 + 接地 */
+  W('G', [P(50, 440, 'G'), P(370, 440, 'G')]);
+  c.dot(P(200, 440, 'G'));
+  c.ground(P(200, 440, 'G'));
+}
+
+/* ======================================================================
+ * 图三：答案册书页 71 底「图题 4.10 的等效电路」（只画图，不画公式）
+ * ==================================================================== */
+function drawEx4_410eq() {
+  var svg = document.getElementById('ex4Fig410eq');
+  if (!svg) return;
+  CourseCircuit.usePalette('course');
+  CourseCircuit.clear(svg, '0 0 500 360');
+
+  var c = new CourseCircuit.Scene(svg, 'ex4-410eq');
+  var P = function (x, y, n) { return c.p(x, y, n); };
+  var W = function (n, pts) { return c.wire(n, pts); };
+
+  /* 左侧 NPN：基极朝左接左边竖线（→底线），集电极接顶横线，发射极接电感 L 上端 */
+  var vt = c.transistor('VT', 90, 160, { b: 'G', c: 'C', e: 'E' }, { label: false });
+  W('G', [vt.B, P(30, 160, 'G')]);
+  W('G', [P(30, 160, 'G'), P(30, 315, 'G')]);
+  W('C', [vt.C, P(150, 60, 'C')]);
+
+  /* 顶横线 → 右侧晶振支路 */
+  W('C', [P(150, 60, 'C'), P(395, 60, 'C')]);
+
+  /* 中间竖列：200pF（上）+ 200pF（下）串联，中点接发射极节点
+   * ⚠ 标签锚点必须写成 opt.anchor —— 标准库的 two() 只读 opt.anchor，
+   *   valueAt 的第三个元素会被**静默忽略**，于是标签按默认的 middle 居中，
+   *   正好压在电容极板上（几何检查会报「线穿字」）。 */
+  var c1 = c.cap('C1', P(225, 60, 'C'), P(225, 110, 'E'), { label: '', value: '200pF', valueAt: [205, 95], anchor: 'end' });
+  W('E', [c1.b, P(225, 240, 'E')]);
+  var c2 = c.cap('C2', P(225, 240, 'E'), P(225, 315, 'G'), { label: '', value: '200pF', valueAt: [205, 265], anchor: 'end' });
+
+  /* 电感 L：上端在发射极节点，下端接底线 */
+  var l = c.ind('L', P(115, 240, 'E'), P(115, 315, 'G'), { label: '' });
+  c.text(102, 300, 'L', { size: 13, anchor: 'end' });
+  W('E', [vt.E, P(150, 240, 'E')]);
+  W('E', [l.a, P(225, 240, 'E')]);
+
+  /* 右侧：顶横线 → 晶振 → 20pF → 底线 */
+  var xt = c.crystal('XTAL', P(395, 110, 'C'), P(395, 160, 'X'), { label: '5MHz 晶振', at: [440, 122] });
+  W('C', [P(395, 60, 'C'), xt.a]);
+  var c20 = c.cap('C20', P(395, 265, 'X'), P(395, 315, 'G'), { label: '', value: '20pF', valueAt: [415, 292], anchor: 'start' });
+  W('X', [xt.b, c20.a]);
+
+  /* 底线（答案册该图**不画接地符号**，故此处不画） */
+  W('G', [P(30, 315, 'G'), P(395, 315, 'G')]);
+}
+
+</script>
+
+<style>.frac{display:inline-flex;flex-direction:column;align-items:stretch;position:relative;margin:0 .2em;padding:0 .03em;text-align:center;line-height:1.15;vertical-align:middle}.frac>.fn{padding:0 .24em .04em}.frac>.fd{padding:.04em .24em 0;border-top:1px solid currentColor}.frac>.fb{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.sqrt{display:inline-block;white-space:nowrap}.sqrt>.sgn{display:inline-block}.sqrt>.rad{display:inline-block;border-top:1px solid currentColor;padding:0 .18em 0 .34em;margin-left:-.2em}.formula sup,.formula sub{font-size:.72em}</style>
+
+<header><div class="wrap">
+  <p class="kicker">通信电子线路（第 3 版 · 陈启兴）　第 4 章　正弦波振荡器　章末「思考题与习题」</p>
+  <h1>第 4 章 章末习题解法（习题 4.2 / 4.3 / 4.4 / 4.5 / 4.10 / 4.11 / 4.12，共 7 题）</h1>
+  <p class="sub">教材题干逐字照抄；每题给出「判据 → 不跳步推导 → 结论 → 教材／答案册对撞」；4.5 的六种情形用节点方程独立求解，4.10 的频率用教材式 (4-31) 独立复算，页末自检逐条打印 PASS/FAIL。</p>
+</div></header>
+<main class="wrap">
+<nav class="note"><a href="00_学习入口.html">学习入口</a>　｜　<a href="习题解法_3_高频功率放大器章末习题.html">习题解法 第 3 章</a>　｜　<span title="本次公开版未收录"> 习题解法 第 5 章（未收录）</span>　｜　<a href="原理讲解_4.5_高稳定度的LC振荡器_可视化.html">原理讲解 4.5</a>　｜　<a href="原理讲解_4.7_晶体振荡器_可视化.html">原理讲解 4.7</a></nav>
+<p><a href="原理讲解_4.2_反馈型LC正弦波振荡器_可视化.html">需要复习？转到独立的原理讲解页面</a></p>
+
+<!-- ==================== 教材原题（逐字照抄） ==================== -->
+<div class="ex">
+  <div class="ttl">本页覆盖的 7 题（教材书页 109 – 110，PDF 页 121 – 122）</div>
+  <p><b>题干：</b>本章章末共 12 题（4.1 – 4.12）。本页只做用户点名的 7 题，题干逐字照抄如下：</p>
+  <p><b>4.2</b>　反馈型 LC 振荡器从起振到平衡，放大器的工作状态是怎样变化的？它与电路的哪些参数有关？</p>
+  <p><b>4.3</b>　为了满足电路起振的相位条件，给题 4.3 图中的互感耦合线圈标注正确的同名端。</p>
+  <p><b>4.4</b>　试从振荡器的相位条件出发，判断题 4.4 图所示的高频等效电路中，哪些可能振荡？哪些不可能振荡？能振荡的线路属于哪种振荡电路？</p>
+  <p><b>4.5</b>　题 4.5 图所示为有 L<sub>1</sub> 与 C<sub>1</sub>、L<sub>2</sub> 与 C<sub>2</sub>、L<sub>3</sub> 与 C<sub>3</sub> 三回路的振荡器的等效电路，设有以下 6 种情况。<br>
+  (1) L<sub>1</sub>C<sub>1</sub> &gt; L<sub>2</sub>C<sub>2</sub> &gt; L<sub>3</sub>C<sub>3</sub>；　(2) L<sub>1</sub>C<sub>1</sub> &lt; L<sub>2</sub>C<sub>2</sub> &lt; L<sub>3</sub>C<sub>3</sub>；<br>
+  (3) L<sub>1</sub>C<sub>1</sub> &gt; L<sub>3</sub>C<sub>3</sub> &gt; L<sub>2</sub>C<sub>2</sub>；　(4) L<sub>1</sub>C<sub>1</sub> &lt; L<sub>3</sub>C<sub>3</sub> &lt; L<sub>2</sub>C<sub>2</sub>；<br>
+  (5) L<sub>2</sub>C<sub>2</sub> &gt; L<sub>1</sub>C<sub>1</sub> &gt; L<sub>3</sub>C<sub>3</sub>；　(6) L<sub>2</sub>C<sub>2</sub> &lt; L<sub>1</sub>C<sub>1</sub> &lt; L<sub>3</sub>C<sub>3</sub>。<br>
+  试分析上述 6 种情况是否可能振荡，振荡频率 f<sub>0</sub> 与 3 个回路谐振频率有何关系？</p>
+  <p><b>4.10</b>　题 4.10 图所示的是一种实用晶体振荡电路，试画出它的交流通路，指出它是哪种振荡器并估算振荡频率。</p>
+  <p><b>4.11</b>　为什么晶体振荡器的频率稳定度比 LC 振荡器的高一些？</p>
+  <p><b>4.12</b>　为什么振荡器的振荡频率一般并不等于选频回路的谐振频率？其偏离程度与哪些因素有关？</p>
+  <p><b>版本与资料来源：</b>教材《通信电子线路》第 3 版（陈启兴，2019）；答案册《通信电子线路要点分析及习题详解》第 2 版（2009，陈启兴，171 页扫描版）。答案册第 4 章「经典习题详解」自答案书页 67（PDF 76）起，4.2–4.5 收在书页 68 – 69（PDF 77 – 78），4.10 – 4.12 收在书页 71 – 72（PDF 80 – 81）。<br>
+  <b>符号约定：</b>沿用本课程既有页面的下划线式下标（f_q、X_be、φ_YF、C_Σ 等）；「答案册」= 上列答案册，「教材」= 第 3 版正文。</p>
+</div>
+
+<div class="note"><b>先想清楚（7 题的共同工具箱）：</b><br>
+① <b>相位平衡条件</b>：φ<sub>A</sub> + φ<sub>F</sub> + φ<sub>选频网络</sub> = 2nπ。共基接法 φ<sub>A</sub> = 0°（v<sub>ce</sub> 与 v<sub>be</sub> 同相），共发射极 φ<sub>A</sub> = 180°。<br>
+② <b>幅度平衡条件</b>：|AF| = 1；<b>起振条件</b>：|AF| &gt; 1 且 ∂A/∂U<sub>c</sub> &lt; 0（振幅越大放大倍数越小，平衡点才是稳定的）。<br>
+③ <b>三点式振荡电路的相移判据</b>（本页 4.4、4.5 的核心）：<b>X<sub>be</sub> 与 X<sub>ce</sub> 必须性质相同，X<sub>bc</sub> 与它们性质相反</b>；振荡频率由 X<sub>be</sub> + X<sub>ce</sub> + X<sub>bc</sub> = 0 决定。<br>
+④ <b>并联谐振回路的阻抗性质</b>：Z = jωL/(1 − ω²LC)，故 ω &lt; ω<sub>0</sub>（并联谐振频率）时呈<b>感性</b>，ω &gt; ω<sub>0</sub> 时呈<b>容性</b>。</div>
+
+<!-- ==================== 4.2 ==================== -->
+<section class="card" id="q42">
+<h3>习题 4.2　<span class="tag">概念题</span><span class="tag">书页 109 · PDF 121</span></h3>
+<div class="ex"><div class="ttl">教材原题（照抄）</div>
+<p><b>题干：</b>反馈型 LC 振荡器从起振到平衡，放大器的工作状态是怎样变化的？它与电路的哪些参数有关？</p></div>
+
+<div class="st"><b>① 三个阶段：甲类 → 乙类 → 丙类</b>
+<table>
+<tr><th>阶段</th><th>晶体管状态</th><th>导通角 θ</th><th>放大倍数 A</th><th>环路增益 |AF|</th></tr>
+<tr><td>接通电源（起振）</td><td>信号极小，工作在<b>甲类</b></td><td>θ = 2π（360°）</td><td>最大（ gm·R<sub>L</sub> 量级）</td><td>&gt; 1，振幅指数式增长</td></tr>
+<tr><td>振幅长大</td><td>进入非线性区，转为<b>乙类</b></td><td>θ = π（180°）</td><td>下降</td><td>仍 &gt; 1，继续增长</td></tr>
+<tr><td>振幅更大</td><td>转为<b>丙类</b></td><td>θ &lt; π</td><td>更小</td><td>仍 &gt; 1，继续增长</td></tr>
+<tr><td>平衡（稳定振荡）</td><td>保持丙类或乙类</td><td>θ &lt; π</td><td>降到 A = 1/F</td><td><b>= 1</b>，振幅不再变化</td></tr>
+</table>
+<p>关键在于：<b>起振靠的是小信号放大倍数最大（甲类），而稳幅靠的正是放大倍数随振幅下降到 1/F（乙类、丙类）</b>——这两件事由同一个非线性完成，所以「起振容易、稳幅可靠」并不矛盾。</p></div>
+
+<div class="st"><b>② 用一个可算的模型把「起振 → 平衡」写清楚</b>
+<p>把放大器的增益随振幅的压缩写成 A(u) = A<sub>0</sub>/(1 + k·u²)，则振幅的逐周变化为 u<sub>n+1</sub> = A(u<sub>n</sub>)·u<sub>n</sub>。平衡点由 A(u<sub>m</sub>) = 1 定出：</p>
+<div class="formula"><span class="no">本题</span>u<sub>m</sub> = <span class="frac"><span class="fn">A<sub>0</sub> − 1</span><span class="fd">k</span><span class="fb">/</span></span>　，　A(u<sub>m</sub>) = <span class="frac"><span class="fn">A<sub>0</sub></span><span class="fd">1 + k·u<sub>m</sub>²</span><span class="fb">/</span></span> = 1</div>
+<p>取教学设定值 A<sub>0</sub> = 10、k = 1：u<sub>m</sub> = √(10 − 1) = 3；从 u = 0.05 起迭代，振幅单调上升到 3 后不再变化——这就是「起振 → 平衡」的全过程。</p>
+<p>另一个佐证：乙类（θ = π）的理想集电极效率上限为 η<sub>C</sub> = π/4 = 78.5%，丙类因导通角更小而效率更高；振荡器为了提高效率，理所当然希望工作点停在乙类／丙类而不是甲类。</p></div>
+
+<div class="st"><b>③ 它与电路的哪些参数有关</b>
+<table>
+<tr><th>类别</th><th>具体参数</th><th>起什么作用</th></tr>
+<tr><td><b>有源器件的参数</b></td><td>晶体管的 gm、r<sub>be</sub>、β、结电容；器件特性曲线的非线性程度</td><td>决定 A(u) 随振幅下降的快慢，也就是压缩拐点的位置</td></tr>
+<tr><td><b>静态工作参数</b></td><td>I<sub>CQ</sub>、U<sub>CEQ</sub>、发射极静态电流 I<sub>E</sub></td><td>决定起始工作点落在特性曲线的哪一段，从而决定起振时是甲类还是已进入乙类</td></tr>
+<tr><td><b>选频网络的参数</b></td><td>L、C、Q<sub>L</sub>、回路的有载品质因数与损耗电阻 R<sub>p</sub></td><td>决定反馈系数 F、环路增益大小与平衡点的位置（也决定振荡频率与稳定度）</td></tr>
+</table></div>
+
+<details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol>
+<li>「工作状态」指放大器的<b>导通角</b>：甲类 360°、乙类 180°、丙类 &lt; 180°。</li>
+<li>起振阶段要求 |AF| &gt; 1，此时信号很小 ⇒ 器件在<b>线性区</b>（甲类），A 最大。</li>
+<li>稳幅靠 A 随振幅<b>下降</b>到 1/F，这只能在非线性区（乙类、丙类）实现。</li>
+<li>「与哪些参数有关」分三类答：有源器件参数、静态工作参数、选频网络参数。</li>
+</ol></details>
+<details class="card" data-book-quiz="q42"><summary style="cursor:pointer;font-weight:bold">先自己填：填对才算看懂</summary>
+<label style="display:block;margin:8px 0">起振阶段（信号极小）放大器的工作状态是甲类，填 1；乙类填 2；丙类填 3：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="起振阶段的工作状态编号" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">平衡阶段放大器的工作状态是丙类，填 1；乙类填 2；甲类填 3：<input type="number" step="any" data-ex-answer="3" data-ex-tol="0.001" aria-label="平衡阶段的工作状态编号" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">平衡时放大器的增益 A 等于 1/F，填 1；等于 F 填 2；等于 1 填 3：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="平衡时增益与反馈系数的关系编号" style="width:150px"> </label>
+<button type="button" data-ex-check>核对我的答案</button><p data-ex-feedback role="status" aria-live="polite">三个空分别对应起振状态、平衡状态、平衡时的增益关系。</p></details>
+<div class="note"><b>教材核对：</b>答案册（答案书页 68 / PDF 77）原文为「从甲类到乙类，再到丙类，它与有源器件的参数、静态工作参数、选频网络的参数有关。」本页照此结论，并补上「导通角」与一阶数值模型两条可自检的说明。</div>
+</section>
+
+<!-- ==================== 4.3 ==================== -->
+<section class="card" id="q43">
+<h3>习题 4.3　<span class="tag">作图（标注）题</span><span class="tag">书页 109 · PDF 121</span></h3>
+<div class="ex"><div class="ttl">教材原题（照抄）</div>
+<p><b>题干：</b>为了满足电路起振的相位条件，给题 4.3 图中的互感耦合线圈标注正确的同名端。</p>
+<div class="card pad0"><svg id="ex4Fig43" viewBox="0 0 1240 420"></svg>
+<div class="cap">题 4.3 图　(a) 变压器耦合　(b) 互感耦合　(c) 变压器耦合　(d) 晶体管在右<br>
+<span class="small">点「显示同名端」按钮可叠加同名端黑点（答案），再点一次隐藏。</span></div>
+<div class="btns"><button type="button" id="btnEx4Dots">显示同名端（答案）</button></div>
+</div></div>
+
+<div class="st"><b>① 判据：环路总相移必须等于 0 (mod 360°)</b>
+<div class="formula"><span class="no">本题</span>φ<sub>总</sub> = φ<sub>晶体管</sub> + φ<sub>互感</sub> ≡ 0 (mod 360°)</div>
+<p>互感的同名端规则：<b>同名端（同极性端）上的电压同相</b>，异名端上的电压反相。因此 φ<sub>互感</sub> 只可能是 0°（两个信号端同为同名端，或同为异名端）或 180°（一个信号端是同名端、另一个是异名端）。</p>
+<p>于是判据分两种：</p>
+<ul>
+<li><b>共基接法</b>（基极交流接地）：晶体管相移 φ<sub>A</sub> = 0° ⇒ 必须 φ<sub>互感</sub> = 0° ⇒ <b>集电极端与反馈端必须同为同名端（或同为异名端）</b>。</li>
+<li><b>共发射极接法</b>（发射极交流接地、反馈送回基极）：φ<sub>A</sub> = 180° ⇒ 必须 φ<sub>互感</sub> = 180° ⇒ <b>两个信号端必须一为同名端、一为异名端</b>。</li>
+</ul></div>
+
+<div class="st"><b>② 逐图判断</b>
+<table>
+<tr><th>子图</th><th>接法</th><th>互感的两个「信号端」</th><th>同名端标注</th><th>φ<sub>总</sub></th></tr>
+<tr><td><b>(a)</b></td><td>基极经公共节点接地 ⇒ <b>共基</b>（φ<sub>A</sub> = 0°）</td><td>副边<b>上</b>端（接集电极）、原边<b>上</b>端（接发射极）</td><td>两绕组均在<b>上端</b>标同名端</td><td>0° ✓</td></tr>
+<tr><td><b>(b)</b></td><td>基极接地 ⇒ <b>共基</b>（0°）</td><td>上绕组<b>上</b>端（接集电极）、下绕组<b>上</b>端（接发射极）</td><td>两绕组均在<b>上端</b>标同名端</td><td>0° ✓</td></tr>
+<tr><td><b>(c)</b></td><td>基极接地 ⇒ <b>共基</b>（0°）</td><td>副边<b>上</b>端（接集电极）、原边<b>上</b>端（接发射极）</td><td>两绕组均在<b>上端</b>标同名端</td><td>0° ✓</td></tr>
+<tr><td><b>(d)</b></td><td>发射极接地、反馈送回基极 ⇒ <b>共发射极</b>（180°）</td><td>下绕组<b>上</b>端（接集电极）、上绕组<b>下</b>端（接基极）</td><td>两绕组均在<b>上</b>端标同名端（下绕组的上端与上绕组的下端恰为一异名端）</td><td>360° ≡ 0° ✓</td></tr>
+</table>
+<p><b>结论：题 4.3 图的四个子图，同名端都标在两个绕组的「上端」</b>——(a)(b)(c) 靠「同为同名端 → 同相」满足共基接法，(d) 靠「下绕组上端与上绕组下端异名 → 反相 180°」满足共发射极接法。</p></div>
+
+<details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol>
+<li>先看<b>哪个电极交流接地</b>：基极接地 ⇒ 共基（0°）；发射极接地且反馈送基极 ⇒ 共发射极（180°）。</li>
+<li>再看<b>互感的两个信号端</b>分别接在哪：接集电极的那一端、接发射极（或基极）的那一端。</li>
+<li>共基 ⇒ 互感要同相（两信号端同为同名端）；共发射极 ⇒ 互感要反相（两信号端一同名一异名）。</li>
+<li>把三步做完，四个子图的黑点位置自然就出来了。</li>
+</ol></details>
+<details class="card" data-book-quiz="q43"><summary style="cursor:pointer;font-weight:bold">先自己填：填对才算看懂</summary>
+<label style="display:block;margin:8px 0">(a) 图中同名端黑点的个数（两绕组各一个）：<input type="number" step="any" data-ex-answer="2" data-ex-tol="0.001" aria-label="(a) 同名端黑点个数" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">四个子图合计的同名端黑点个数：<input type="number" step="any" data-ex-answer="8" data-ex-tol="0.001" aria-label="四图合计同名端黑点个数" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">(d) 图中晶体管的相移 φ_A（度，共发射极取 180）：<input type="number" step="any" data-ex-answer="180" data-ex-tol="0.001" aria-label="(d) 晶体管相移" style="width:150px"> </label>
+<button type="button" data-ex-check>核对我的答案</button><p data-ex-feedback role="status" aria-live="polite">先想清「谁接地」再数黑点。</p></details>
+<div class="note"><b>教材核对：</b>答案册（答案书页 68 / PDF 77）给出的解图标题为「图题 4.3 中互感的同名端标注」，逐图放大核对后，<b>(a)(b)(c)(d) 四图的黑点都画在两个绕组的「上端」</b>。本页的重绘图与答案册解图同款拓扑，黑点位置以答案册为准；页面上同时给出上面的相位判据，使结论可独立推出。</div>
+</section>
+
+<!-- ==================== 4.4 ==================== -->
+<section class="card" id="q44">
+<h3>习题 4.4　<span class="tag">概念题（相位判据）</span><span class="tag">书页 109 · PDF 121</span></h3>
+<div class="ex"><div class="ttl">教材原题（照抄）</div>
+<p><b>题干：</b>试从振荡器的相位条件出发，判断题 4.4 图所示的高频等效电路中，哪些可能振荡？哪些不可能振荡？能振荡的线路属于哪种振荡电路？</p>
+<div class="card pad0"><svg id="ex4Fig44" viewBox="0 0 1420 600"></svg>
+<div class="cap">题 4.4 图　(a)(b)(c)(d) 四个高频等效电路<br>
+<span class="small">点「显示判据与结论」按钮可叠加 X<sub>be</sub>／X<sub>ce</sub>／X<sub>bc</sub> 的性质与结论（答案）。</span></div>
+<div class="btns"><button type="button" id="btnEx4Xlab">显示判据与结论（答案）</button></div>
+</div></div>
+
+<div class="st"><b>① 三点式振荡电路的相移判据（本题的钥匙）</b>
+<p>把图中的三个电抗记作 X<sub>be</sub>（基极—发射极）、X<sub>ce</sub>（集电极—发射极）、X<sub>bc</sub>（基极—集电极）。三点式振荡电路的相位平衡条件可归纳为：</p>
+<div class="formula"><span class="no">判据①</span>X<sub>be</sub> 与 X<sub>ce</sub> <b>必须性质相同</b>（同为感性或同为容性）</div>
+<div class="formula"><span class="no">判据②</span>X<sub>bc</sub> 与它们<b>性质相反</b></div>
+<div class="formula"><span class="no">判据③</span>振荡频率由 X<sub>be</sub> + X<sub>ce</sub> + X<sub>bc</sub> = 0 决定</div>
+<p>为什么必须是「同性质」？因为晶体管提供 180°（共发射极）或 0°（共基）的相移后，反馈网络必须提供互补的相移；而三点式网络的反馈相移只有在 X<sub>be</sub>、X<sub>ce</sub> 同性质时才能凑出这个相移。若两者性质不同，反馈网络的相移永远凑不满 360°，环路相位平衡无解 ⇒ 不可能振荡。</p></div>
+
+<div class="st"><b>② 逐图判断</b>
+<table>
+<tr><th>子图</th><th>X<sub>be</sub></th><th>X<sub>ce</sub></th><th>X<sub>bc</sub></th><th>判据①（同性质？）</th><th>结论</th><th>类型</th></tr>
+<tr><td><b>(a)</b></td><td>感性</td><td>感性</td><td>可感可容</td><td>✓ 同为感性</td><td><b>可能振荡</b></td><td><b>电感三点式</b></td></tr>
+<tr><td><b>(b)</b></td><td>容性</td><td>感性</td><td>容性</td><td>✗ 性质不同</td><td><b>不可能振荡</b></td><td>—</td></tr>
+<tr><td><b>(c)</b></td><td>感性</td><td>容性</td><td>感性</td><td>✗ 性质不同</td><td><b>不可能振荡</b></td><td>—</td></tr>
+<tr><td><b>(d)</b></td><td>容性</td><td>感性</td><td>感性</td><td>✗ 性质不同</td><td><b>不可能振荡</b></td><td>—</td></tr>
+</table>
+<p>只有 <b>(a)</b> 可能振荡，且因 X<sub>be</sub>、X<sub>ce</sub> 同为<b>感性</b>，属<b>电感三点式</b>（哈特莱型）电路；若两者同为容性则属电容三点式（考必兹型）。</p></div>
+
+<details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol>
+<li>先在每个子图上找出三个「腿」：基极—发射极、集电极—发射极、基极—集电极。</li>
+<li>看每条腿是电感（感性）还是电容（容性）；并联谐振回路先标「可感可容」。</li>
+<li>只要 X<sub>be</sub> 与 X<sub>ce</sub> 性质不同，就直接判「不可能振荡」。</li>
+<li>能振荡的那一个，再看两条腿是感性还是容性 → 定出电感三点式 / 电容三点式。</li>
+</ol></details>
+<details class="card" data-book-quiz="q44"><summary style="cursor:pointer;font-weight:bold">先自己填：填对才算看懂</summary>
+<label style="display:block;margin:8px 0">四个子图中可能振荡的个数：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="可能振荡的子图个数" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">能振荡的子图编号（a 填 1，b 填 2，c 填 3，d 填 4）：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="能振荡的子图编号" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">可能振荡的电路属于电感三点式，填 1；电容三点式填 2：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="振荡电路类型" style="width:150px"> </label>
+<button type="button" data-ex-check>核对我的答案</button><p data-ex-feedback role="status" aria-live="polite">先定 X_be 与 X_ce 是否同性质。</p></details>
+<div class="note"><b>教材核对：</b>答案册（答案书页 68 – 69 / PDF 77 – 78）逐条给出：(a)「X<sub>be</sub> 是感性的，X<sub>ce</sub> 是感性的，X<sub>bc</sub> 可能是感性的也有可能是容性的，因此，它可能振荡，属于电感三点式」；(b)(c)(d) 均为「X<sub>be</sub> 与 X<sub>ce</sub> 性质不同，因此不可能振荡」。本页与此完全一致，并补上判据①的来源与判据③的频率表达式。</div>
+<div class="warn"><b>教材／答案册并列说明（题 4.4 图 (a) 的图面存疑）：</b>教材题 4.4 图（书页 109 / PDF 121）与答案册重绘的「图题 4.4」（答案书页 69 / PDF 78）中，<b>(a) 子图的接地符号画在「集电极 — 电感上抽头」这条导线上</b>：接地符号的引线与集电极引线、抽头引线同属一条导线。<br>
+按图面直读，集电极被交流短路，抽头回路也被短掉，电路根本不成立；可按这个拓扑算出的 X<sub>bc</sub> 只能是 0，与答案册写的「X<sub>bc</sub> 可能是感性的也有可能是容性的」对不上。<br>
+反推答案册判据所对应的正确拓扑：<b>基极交流接地、集电极接电感上抽头、发射极接电感下抽头</b>。此时 —— X<sub>be</sub> = 电感「下抽头→下端」段（<b>感性</b>）、X<sub>ce</sub> = 电感「上抽头→下抽头」段（<b>感性</b>）、X<sub>bc</sub> = 「下抽头→下端」段 ∥ 「上端→上抽头」段 + 电容（<b>可感可容</b>）—— 与答案册逐字吻合。<br>
+<b>本页处理：</b>按上述正确拓扑重绘 (a)（接地符号改挂在基极支路上），<b>接地符号 2 个、实心结点 1 个、非连接交叉 0 个，仍与教材原图逐图核定值一致</b>；<b>答案册的结论（(a) 可能振荡、属电感三点式；其余三幅不能振荡）未作任何改动</b>。其余 (b)(c)(d) 三幅按图直读即自洽，未作任何改动。</div>
+</section>
+
+<!-- ==================== 4.5 ==================== -->
+<section class="card" id="q45">
+<h3>习题 4.5　<span class="tag">分析题（三回路振荡器）</span><span class="tag">书页 109 · PDF 121</span></h3>
+<div class="ex"><div class="ttl">教材原题（照抄）</div>
+<p><b>题干：</b>题 4.5 图所示为有 L<sub>1</sub> 与 C<sub>1</sub>、L<sub>2</sub> 与 C<sub>2</sub>、L<sub>3</sub> 与 C<sub>3</sub> 三回路的振荡器的等效电路，设有以下 6 种情况。<br>
+(1) L<sub>1</sub>C<sub>1</sub> &gt; L<sub>2</sub>C<sub>2</sub> &gt; L<sub>3</sub>C<sub>3</sub>；　(2) L<sub>1</sub>C<sub>1</sub> &lt; L<sub>2</sub>C<sub>2</sub> &lt; L<sub>3</sub>C<sub>3</sub>；<br>
+(3) L<sub>1</sub>C<sub>1</sub> &gt; L<sub>3</sub>C<sub>3</sub> &gt; L<sub>2</sub>C<sub>2</sub>；　(4) L<sub>1</sub>C<sub>1</sub> &lt; L<sub>3</sub>C<sub>3</sub> &lt; L<sub>2</sub>C<sub>2</sub>；<br>
+(5) L<sub>2</sub>C<sub>2</sub> &gt; L<sub>1</sub>C<sub>1</sub> &gt; L<sub>3</sub>C<sub>3</sub>；　(6) L<sub>2</sub>C<sub>2</sub> &lt; L<sub>1</sub>C<sub>1</sub> &lt; L<sub>3</sub>C<sub>3</sub>。<br>
+试分析上述 6 种情况是否可能振荡，振荡频率 f<sub>0</sub> 与 3 个回路谐振频率有何关系？</p>
+<div class="card pad0"><svg id="ex4Fig45" viewBox="0 0 560 360"></svg>
+<div class="cap">题 4.5 图　三回路振荡器的高频等效电路：回路 1（L<sub>1</sub>∥C<sub>1</sub>）接集电极—地，回路 2（L<sub>2</sub>∥C<sub>2</sub>）接基极—地，回路 3（L<sub>3</sub>∥C<sub>3</sub>）接集电极—基极</div>
+</div></div>
+
+<div class="st"><b>① 先把「L<sub>i</sub>C<sub>i</sub> 的大小」翻译成「谐振频率的高低」</b>
+<div class="formula"><span class="no">①</span>ω<sub>i</sub> = <span class="frac"><span class="fn">1</span><span class="fd"><span class="sqrt"><span class="sgn">√</span><span class="rad">L<sub>i</sub>C<sub>i</sub></span></span></span><span class="fb">/</span></span>　⇒　L<sub>i</sub>C<sub>i</sub> 越大，ω<sub>i</sub> 越小</div>
+<table>
+<tr><th>情况</th><th>教材给的 L<sub>i</sub>C<sub>i</sub> 关系</th><th>等价的 ω 关系</th></tr>
+<tr><td>(1)</td><td>L<sub>1</sub>C<sub>1</sub> &gt; L<sub>2</sub>C<sub>2</sub> &gt; L<sub>3</sub>C<sub>3</sub></td><td>ω<sub>1</sub> &lt; ω<sub>2</sub> &lt; ω<sub>3</sub></td></tr>
+<tr><td>(2)</td><td>L<sub>1</sub>C<sub>1</sub> &lt; L<sub>2</sub>C<sub>2</sub> &lt; L<sub>3</sub>C<sub>3</sub></td><td>ω<sub>1</sub> &gt; ω<sub>2</sub> &gt; ω<sub>3</sub></td></tr>
+<tr><td>(3)</td><td>L<sub>1</sub>C<sub>1</sub> &gt; L<sub>3</sub>C<sub>3</sub> &gt; L<sub>2</sub>C<sub>2</sub></td><td>ω<sub>1</sub> &lt; ω<sub>3</sub> &lt; ω<sub>2</sub></td></tr>
+<tr><td>(4)</td><td>L<sub>1</sub>C<sub>1</sub> &lt; L<sub>3</sub>C<sub>3</sub> &lt; L<sub>2</sub>C<sub>2</sub></td><td>ω<sub>1</sub> &gt; ω<sub>3</sub> &gt; ω<sub>2</sub></td></tr>
+<tr><td>(5)</td><td>L<sub>2</sub>C<sub>2</sub> &gt; L<sub>1</sub>C<sub>1</sub> &gt; L<sub>3</sub>C<sub>3</sub></td><td>ω<sub>2</sub> &lt; ω<sub>1</sub> &lt; ω<sub>3</sub></td></tr>
+<tr><td>(6)</td><td>L<sub>2</sub>C<sub>2</sub> &lt; L<sub>1</sub>C<sub>1</sub> &lt; L<sub>3</sub>C<sub>3</sub></td><td>ω<sub>2</sub> &gt; ω<sub>1</sub> &gt; ω<sub>3</sub></td></tr>
+</table></div>
+
+<div class="st"><b>② 并联谐振回路的电抗性质</b>
+<div class="formula"><span class="no">②</span>Z<sub>i</sub> = <span class="frac"><span class="fn">jωL<sub>i</sub></span><span class="fd">1 − ω²L<sub>i</sub>C<sub>i</sub></span><span class="fb">/</span></span> = <span class="frac"><span class="fn">ω</span><span class="fd">C<sub>i</sub>(ω<sub>i</sub>² − ω²)</span><span class="fb">/</span></span></div>
+<p>所以 ω &lt; ω<sub>i</sub> 时分母为正 ⇒ X<sub>i</sub> &gt; 0（<b>感性</b>）；ω &gt; ω<sub>i</sub> 时分母为负 ⇒ X<sub>i</sub> &lt; 0（<b>容性</b>）。</p></div>
+
+<div class="st"><b>③ 相位平衡条件：X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub> = 0</b>
+<p>对基极节点 b 与集电极节点 c 列小信号节点方程（晶体管发射极交流接地，取 r<sub>π</sub> → ∞、r<sub>o</sub> → ∞），把 v<sub>b</sub>、v<sub>c</sub> 消去后得到</p>
+<div class="formula"><span class="no">③</span>Y<sub>1</sub>Y<sub>2</sub> + Y<sub>1</sub>Y<sub>3</sub> + Y<sub>2</sub>Y<sub>3</sub> + g<sub>m</sub>·Y<sub>3</sub> = 0</div>
+<p>其中 Y<sub>i</sub> = 1/jX<sub>i</sub>。g<sub>m</sub> 项是实数，只影响幅度条件；<b>相位（实部）条件</b>为</p>
+<div class="formula"><span class="no">③′</span><span class="frac"><span class="fn">1</span><span class="fd">X<sub>1</sub>X<sub>2</sub></span><span class="fb">/</span></span> + <span class="frac"><span class="fn">1</span><span class="fd">X<sub>1</sub>X<sub>3</sub></span><span class="fb">/</span></span> + <span class="frac"><span class="fn">1</span><span class="fd">X<sub>2</sub>X<sub>3</sub></span><span class="fb">/</span></span> = 0　⇔　<b>X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub> = 0</b></div>
+<p>把式 ② 代入并乘去分母（s = ω²），得关于 s 的二次方程：</p>
+<div class="formula"><span class="no">③″</span>(C<sub>1</sub>+C<sub>2</sub>+C<sub>3</sub>)s² − [C<sub>2</sub>(ω<sub>2</sub>²+ω<sub>3</sub>²) + C<sub>1</sub>(ω<sub>1</sub>²+ω<sub>3</sub>²) + C<sub>3</sub>(ω<sub>1</sub>²+ω<sub>2</sub>²)]s + [C<sub>2</sub>ω<sub>2</sub>²ω<sub>3</sub>² + C<sub>1</sub>ω<sub>1</sub>²ω<sub>3</sub>² + C<sub>3</sub>ω<sub>1</sub>²ω<sub>2</sub>²] = 0</div>
+<p>它的两个正根分落在 ω<sub>1</sub>、ω<sub>2</sub>、ω<sub>3</sub> 划出的三个区间里；<b>只有落在「X<sub>1</sub>、X<sub>2</sub> 同性质、X<sub>3</sub> 与之相反」那个区间的根才是工作点</b>（这正是 4.4 的判据①、②；另一个根虽然也满足式 ③′，但三点式的基本要求不满足，不能作为工作点）。</p></div>
+
+<div class="st"><b>④ 六种情形的结论</b>
+<table>
+<tr><th>情况</th><th>ω 关系</th><th>能否振荡</th><th>工作频率 f<sub>0</sub> 的位置</th><th>回路 1</th><th>回路 2</th><th>回路 3</th></tr>
+<tr><td><b>(1)</b></td><td>ω<sub>1</sub>&lt;ω<sub>2</sub>&lt;ω<sub>3</sub></td><td><b>能</b></td><td>f<sub>1</sub> &lt; f<sub>2</sub> &lt; <b>f<sub>0</sub></b> &lt; f<sub>3</sub></td><td>容性</td><td>容性</td><td>感性</td></tr>
+<tr><td><b>(2)</b></td><td>ω<sub>1</sub>&gt;ω<sub>2</sub>&gt;ω<sub>3</sub></td><td><b>能</b></td><td>f<sub>1</sub> &gt; f<sub>2</sub> &gt; <b>f<sub>0</sub></b> &gt; f<sub>3</sub></td><td>感性</td><td>感性</td><td>容性</td></tr>
+<tr><td><b>(3)</b></td><td>ω<sub>1</sub>&lt;ω<sub>3</sub>&lt;ω<sub>2</sub></td><td><b>不能</b></td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td><b>(4)</b></td><td>ω<sub>1</sub>&gt;ω<sub>3</sub>&gt;ω<sub>2</sub></td><td><b>不能</b></td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td><b>(5)</b></td><td>ω<sub>2</sub>&lt;ω<sub>1</sub>&lt;ω<sub>3</sub></td><td><b>能</b></td><td>f<sub>2</sub> &lt; f<sub>1</sub> &lt; <b>f<sub>0</sub></b> &lt; f<sub>3</sub></td><td>容性</td><td>容性</td><td>感性</td></tr>
+<tr><td><b>(6)</b></td><td>ω<sub>2</sub>&gt;ω<sub>1</sub>&gt;ω<sub>3</sub></td><td><b>能</b></td><td>f<sub>2</sub> &gt; f<sub>1</sub> &gt; <b>f<sub>0</sub></b> &gt; f<sub>3</sub></td><td>感性</td><td>感性</td><td>容性</td></tr>
+</table>
+<p><b>一句话判据：只有当 ω<sub>3</sub>（回路 3 的谐振频率）是三个谐振频率里<b>最大</b>的或<b>最小</b>的时候才可能振荡；ω<sub>3</sub> 居中（情况 3、4）则不可能振荡。</b></p>
+<p>原因：回路 3 接在集电极—基极之间，它的电抗必须与回路 1、回路 2 性质相反；而 f<sub>0</sub> 必须同时大于（或同时小于）f<sub>1</sub>、f<sub>2</sub>，又小于（或大于）f<sub>3</sub>，只有 f<sub>3</sub> 排在最外侧时这三个不等式才不打架。</p></div>
+
+<details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol>
+<li>先把 L<sub>i</sub>C<sub>i</sub> 的大小关系翻成 ω<sub>i</sub> 的大小关系（方向相反！）。</li>
+<li>记住并联回路的性质：ω &lt; ω<sub>i</sub> 感性，ω &gt; ω<sub>i</sub> 容性。</li>
+<li>相移判据：X<sub>1</sub> 与 X<sub>2</sub> 必须同性质、X<sub>3</sub> 与之相反。</li>
+<li>先问一句「ω<sub>3</sub> 是不是最大的或最小的」，是则能振荡，不是则不能；再按落在哪个区间定 f<sub>0</sub> 的位置与各回路的性质。</li>
+</ol></details>
+<details class="card" data-book-quiz="q45"><summary style="cursor:pointer;font-weight:bold">先自己填：填对才算看懂</summary>
+<label style="display:block;margin:8px 0">六种情形中可能振荡的个数：<input type="number" step="any" data-ex-answer="4" data-ex-tol="0.001" aria-label="可能振荡的情形个数" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">不可能振荡的情形编号之和（情况 3 与 4）：<input type="number" step="any" data-ex-answer="7" data-ex-tol="0.001" aria-label="不可能振荡的情形编号之和" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">情况 (1) 中工作频率 f0 与 f3 的关系：f0 小于 f3 填 1，大于填 2：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="情况1 中 f0 与 f3 的关系" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">情况 (1) 中回路 3 的性质：感性填 1；容性填 2：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="情况1 中回路3 的性质" style="width:150px"> </label>
+<button type="button" data-ex-check>核对我的答案</button><p data-ex-feedback role="status" aria-live="polite">先看 ω3 是不是最外侧的。</p></details>
+<div class="note"><b>教材核对：</b>答案册（答案书页 69 / PDF 78）给出六种情形的结论与上表完全一致：<b>(1)(2)(5)(6) 可能振荡，(3)(4) 不可能振荡</b>；(1) 回路 1、2 呈容性、回路 3 呈感性，f<sub>1</sub>&lt;f<sub>2</sub>&lt;f<sub>0</sub>&lt;f<sub>3</sub>；(2) 回路 1、2 呈感性、回路 3 呈容性，f<sub>1</sub>&gt;f<sub>2</sub>&gt;f<sub>0</sub>&gt;f<sub>3</sub>；(5) 回路 1、2 呈容性、回路 3 呈感性，f<sub>2</sub>&lt;f<sub>1</sub>&lt;f<sub>0</sub>&lt;f<sub>3</sub>；(6) 回路 1、2 呈感性、回路 3 呈容性，f<sub>2</sub>&gt;f<sub>1</sub>&gt;f<sub>0</sub>&gt;f<sub>3</sub>。<br>
+<b>并列说明：</b>教材用「L<sub>i</sub>C<sub>i</sub> 的大小」表述六种情形，答案册改用 ω<sub>i</sub> 表述；本页两者并列给出（表 ①）。本页还补上了式 ③ 的节点方程推导与「另一个形式根不满足三点式要求、不能作工作点」的说明——这是答案册未展开的一步，结论未改。</div>
+</section>
+
+<!-- ==================== 4.10 ==================== -->
+<section class="card" id="q410">
+<h3>习题 4.10　<span class="tag">作图 + 估算题</span><span class="tag">书页 110 · PDF 122</span></h3>
+<div class="ex"><div class="ttl">教材原题（照抄）</div>
+<p><b>题干：</b>题 4.10 图所示的是一种实用晶体振荡电路，试画出它的交流通路，指出它是哪种振荡器并估算振荡频率。</p>
+<div class="card pad0"><svg id="ex4Fig410" viewBox="0 0 540 480"></svg>
+<div class="cap">题 4.10 图　实用晶体振荡电路：20 kΩ／5.6 kΩ 分压偏置，5 MHz 晶体串 20 pF 接基极，两个 200 pF 构成电容反馈网络，ZL 与 2.7 kΩ 在发射极侧，0.1 μF 旁路</div>
+</div>
+<div class="card pad0"><svg id="ex4Fig410eq" viewBox="0 0 500 360"></svg>
+<div class="cap">题 4.10 的交流通路（按答案册书页 71「图题 4.10 的等效电路」重绘）：电源交流接地、0.1 μF 交流短路后，剩下 200 pF—200 pF 反馈网络、晶体 + 20 pF 支路与 ZL。<span class="small">（该图把晶体支路画在集电极一侧、基极交流接地，是教材图 4-16 的共基画法；教材题 4.10 图则把晶体支路接在基极、集电极接 +V<sub>CC</sub> 交流接地。两者无源网络相同，详见本题末尾的并列说明。）</span></div>
+</div></div>
+
+<div class="st"><b>① 画交流通路：交流接地与交流短路</b>
+<table>
+<tr><th>元件</th><th>交流通路里怎么处理</th><th>理由</th></tr>
+<tr><td>+V<sub>CC</sub>（电源）</td><td><b>交流接地</b></td><td>理想电源内阻为零 ⇒ 集电极交流接地</td></tr>
+<tr><td>0.1 μF（旁路）</td><td><b>交流短路</b></td><td>容量大 ⇒ 在振荡频率上阻抗远小于回路阻抗</td></tr>
+<tr><td>5 MHz 晶体</td><td>保留（它是选频元件）</td><td>晶体管放大器的选频回路</td></tr>
+<tr><td>20 pF、200 pF、200 pF</td><td>保留（反馈网络）</td><td>决定反馈系数 F 与回路电容</td></tr>
+<tr><td>ZL、2.7 kΩ、20 kΩ、5.6 kΩ</td><td>ZL 作电感保留；电阻在交流通路中并到地</td><td>偏置与输出耦合</td></tr>
+</table>
+<p>化简后得到三个「腿」：<b>基极—发射极</b>为 200 pF（容性）、<b>发射极—地</b>为 200 pF 与 ZL（容性）、<b>基极—地</b>为 5 MHz 晶体串 20 pF（高频呈感性）。</p></div>
+
+<div class="st"><b>② 它是哪种振荡器</b>
+<p>晶体在这里是<b>选频元件</b>，反馈网络是电容三点式 —— 正是教材书页 107 说的「<b>并联型晶体振荡电路</b>」，其等效形式与<b>西勒振荡电路</b>一致（教材原话：并联型晶体振荡电路与西勒振荡电路是一致的，所以其振荡频率的估算也是用相同的方法）。</p>
+<p>用 4.4 的判据核对：X<sub>be</sub> = 200 pF（容性）、X<sub>ce</sub> = 200 pF（容性）—— <b>同性质</b> ✓；X<sub>bc</sub> = 晶体支路，在 f<sub>q</sub> 附近呈感性 —— <b>与前两者相反</b> ✓。相位条件成立。</p></div>
+
+<div class="st"><b>③ 估算振荡频率：教材式 (4-31)</b>
+<p>教材书页 107 对并联型晶体振荡器给出：</p>
+<div class="formula"><span class="no">(4-31)</span>C<sub>Σ</sub> = <span class="frac"><span class="fn">C<sub>q</sub>(C<sub>o</sub> + C<sub>L</sub>)</span><span class="fd">C<sub>q</sub> + C<sub>o</sub> + C<sub>L</sub></span><span class="fb">/</span></span> ≈ C<sub>q</sub>，　ω<sub>c</sub> ≈ <span class="frac"><span class="fn">1</span><span class="fd"><span class="sqrt"><span class="sgn">√</span><span class="rad">L<sub>q</sub>C<sub>Σ</sub></span></span></span><span class="fb">/</span></span> = ω<sub>q</sub></div>
+<p>其中 C<sub>o</sub> 是晶体的外部电容（本题 = 20 pF），C<sub>L</sub> 是反馈网络两个电容的<b>串联值</b>：</p>
+<div class="formula"><span class="no">本题</span>C<sub>L</sub> = <span class="frac"><span class="fn">C<sub>1</sub>C<sub>2</sub></span><span class="fd">C<sub>1</sub> + C<sub>2</sub></span><span class="fb">/</span></span> = <span class="frac"><span class="fn">200 × 200</span><span class="fd">200 + 200</span><span class="fb">/</span></span> = 100 pF</div>
+<div class="formula"><span class="no">本题</span>C<sub>o</sub> + C<sub>L</sub> = 20 + 100 = 120 pF</div>
+<p>把式 (4-31) 展开成频率比（ω<sub>q</sub> = 1/√(L<sub>q</sub>C<sub>q</sub>)）：</p>
+<div class="formula"><span class="no">本题</span><span class="frac"><span class="fn">f<sub>c</sub></span><span class="fd">f<sub>q</sub></span><span class="fb">/</span></span> = <span class="frac"><span class="fn"><span class="sqrt"><span class="sgn">√</span><span class="rad">C<sub>q</sub> + C<sub>o</sub> + C<sub>L</sub></span></span></span><span class="fd"><span class="sqrt"><span class="sgn">√</span><span class="rad">C<sub>o</sub> + C<sub>L</sub></span></span></span><span class="fb">/</span></span> = <span class="frac"><span class="fn"><span class="sqrt"><span class="sgn">√</span><span class="rad">1 + C<sub>q</sub>/(C<sub>o</sub>+C<sub>L</sub>)</span></span></span><span class="fd">1</span><span class="fb">/</span></span></div>
+<p>因 C<sub>q</sub> ≪ C<sub>o</sub> + C<sub>L</sub> = 120 pF ⇒ <b>f<sub>c</sub> ≈ f<sub>q</sub> = 5 MHz</b>。</p>
+<p>取一个常见 5 MHz 石英晶体的 C<sub>q</sub> = 2 pF（<span class="hl">教学设定值</span>，教材未给）作定量估计：</p>
+<div class="formula"><span class="no">估算</span>f<sub>c</sub> = 5 MHz × <span class="frac"><span class="fn"><span class="sqrt"><span class="sgn">√</span><span class="rad">1 + 2/120</span></span></span></span><span class="fd">1</span><span class="fb">/</span></span> = 5 MHz × 1.00826 ≈ 5.041 MHz　（相对偏差约 +0.83%）</div></div>
+
+<details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol>
+<li>交流通路三步：电源交流接地、大电容交流短路、其余保留。</li>
+<li>看晶体在<b>选频回路</b>里还是在<b>反馈支路</b>里 ⇒ 判「并联型」还是「串联型」。</li>
+<li>频率用教材式 (4-31)：C<sub>Σ</sub> = C<sub>q</sub>(C<sub>o</sub>+C<sub>L</sub>)/(C<sub>q</sub>+C<sub>o</sub>+C<sub>L</sub>)，C<sub>L</sub> = C<sub>1</sub>C<sub>2</sub>/(C<sub>1</sub>+C<sub>2</sub>)。</li>
+<li>别忘了 C<sub>o</sub> 就是题目里那个 20 pF，别把它漏掉。</li>
+</ol></details>
+<details class="card" data-book-quiz="q410"><summary style="cursor:pointer;font-weight:bold">先自己填：填对才算看懂</summary>
+<label style="display:block;margin:8px 0">反馈网络的串联值 C_L / pF：<input type="number" step="any" data-ex-answer="100" data-ex-tol="0.01" aria-label="C_L / pF" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">C_o + C_L / pF：<input type="number" step="any" data-ex-answer="120" data-ex-tol="0.01" aria-label="Co 加 CL / pF" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">估算的振荡频率 f_c / MHz（取 C_q = 2 pF）：<input type="number" step="any" data-ex-answer="5.0413" data-ex-tol="0.002" aria-label="估算的振荡频率 f_c / MHz" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">它是并联型晶体振荡器，填 1；串联型填 2：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="振荡器类型编号" style="width:150px"> </label>
+<button type="button" data-ex-check>核对我的答案</button><p data-ex-feedback role="status" aria-live="polite">先把 C_L 与 C_o+C_L 算对。</p></details>
+<div class="warn"><b>教材／答案册存疑并列说明（不改教材结论）：</b>
+① <b>题干用词</b>：教材第 3 版印「试画出它的<b>交流通路</b>」；答案册（答案书页 71 / PDF 80）印「试画出它的<b>高频等效电路</b>」。两者指的是同一件事，教材用词更准确，本页按教材口径讲解。<br>
+② <b>等效电路画法</b>：教材题 4.10 图里，5 MHz 晶体串 20 pF 接在<b>基极</b>节点与地之间，集电极接 +V<sub>CC</sub>（交流接地）；答案册画的「图题 4.10 的等效电路」把晶体支路画在<b>集电极</b>一侧、基极交流接地（即教材图 4-16 的共基画法）。两者<b>无源网络完全相同</b>（200 pF、200 pF、晶体 + 20 pF），只是晶体管两个电极的标注接法画法不同；本页按教材图化简，并按教材式 (4-31) 估算频率，结论与答案册一致。<br>
+③ <b>C<sub>o</sub> 与 C<sub>L</sub> 的记法</b>：答案册把两者合并写成一行「C<sub>L</sub> = 200×200/(200+200) + 20 = 120 pF」，即把 C<sub>o</sub> + C<sub>L</sub> 直接当作一个 C<sub>L</sub>（其后的公式仍用 C<sub>o</sub> + C<sub>L</sub> 两个符号）。本页按教材式 (4-31) 的原始记法分别给出 C<sub>L</sub> = 100 pF、C<sub>o</sub> = 20 pF，数值结果相同。<br>
+④ 答案册同页还印有晶体管 V<sub>CC</sub> = 6.3 V、R<sub>b</sub> = 560 Ω 等与本题无关的数据（属题 4.9 的条件），本页不予引用。</div>
+</section>
+
+<!-- ==================== 4.11 ==================== -->
+<section class="card" id="q411">
+<h3>习题 4.11　<span class="tag">概念题</span><span class="tag">书页 110 · PDF 122</span></h3>
+<div class="ex"><div class="ttl">教材原题（照抄）</div>
+<p><b>题干：</b>为什么晶体振荡器的频率稳定度比 LC 振荡器的高一些？</p></div>
+
+<div class="st"><b>① 先把「频率稳定度」写成可比的数</b>
+<div class="formula"><span class="no">①</span>S = <span class="frac"><span class="fn">Δf</span><span class="fd">f<sub>0</sub></span><span class="fb">/</span></span>，　对选频回路：<span class="frac"><span class="fn">Δf</span><span class="fd">f<sub>0</sub></span><span class="fb">/</span></span> ≈ <span class="frac"><span class="fn">1</span><span class="fd">2Q<sub>L</sub></span><span class="fb">/</span></span>　⇒　Q<sub>L</sub> = <span class="frac"><span class="fn">1</span><span class="fd">2S</span><span class="fb">/</span></span></div>
+<p>可见：<b>频率稳定度直接由选频回路的有载品质因数 Q<sub>L</sub> 决定</b>，Q<sub>L</sub> 越大越稳。</p></div>
+
+<div class="st"><b>② 两条路线的 Q<sub>L</sub> 差了几个数量级</b>
+<table>
+<tr><th>振荡器</th><th>选频回路</th><th>典型 Q<sub>L</sub></th><th>频率稳定度 S</th></tr>
+<tr><td>LC 振荡器（<b>克拉波</b>、<b>西勒</b>）</td><td>LC 回路</td><td>10² – 10³ 量级</td><td>只能达到 <b>10⁻⁴</b> 量级</td></tr>
+<tr><td><b>石英晶体</b>振荡器</td><td>石英晶体</td><td>10⁵ – 10⁷ 量级（可达 10⁸ 以上）</td><td>高达 <b>10⁻⁴ ～ 10⁻¹¹</b> 量级</td></tr>
+</table>
+<p>用 ① 式反算：若 S = 10⁻⁴，则 Q<sub>L</sub> = 1/(2×10⁻⁴) = 5×10³ —— 这正是 LC 回路能够做到的极限；而石英晶体的 Q 值比它高 3～5 个数量级，稳定度自然就高 3～5 个数量级。</p>
+<p>以 5 MHz 为例直观对比（教学设定值）：LC 振荡器（S = 10⁻⁴）漂移 Δf = 5 MHz × 10⁻⁴ = <b>500 Hz</b>；晶体振荡器（S = 10⁻⁹）漂移只有 <b>5 mHz</b>，相差 <b>10⁵ 倍</b>。</p></div>
+
+<div class="st"><b>③ 为什么晶体的 Q 值能那么高</b>
+<ul>
+<li><b>物理原因</b>：石英晶体的谐振频率由晶片的<b>机械尺寸与弹性</b>决定，而不是由电路元件决定。晶片的尺寸受温度、老化、应力影响极小，而 LC 回路的 L、C 受温度与元件离散性影响大得多。</li>
+<li><b>电路原因</b>：晶体本身的等效电路里损耗电阻 r<sub>q</sub> 极小（Q = ω<sub>q</sub>L<sub>q</sub>/r<sub>q</sub> 很大），所以回路本身「又高 Q 又少受外部负载影响」。</li>
+<li><b>工程后果</b>：石英晶体的谐振频率可以做得很准（标称值误差 10⁻⁵ ～ 10⁻⁶ 量级），因此用它做选频元件，频率稳定度可达 10⁻⁴ ～ 10⁻¹¹ 量级，广泛用于通信与计时基准。</li>
+</ul></div>
+
+<details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol>
+<li>核心等式：S = Δf/f<sub>0</sub> ≈ 1/(2Q<sub>L</sub>)。</li>
+<li>所以问题等价于「为什么石英晶体的 Q 比 LC 回路大得多」。</li>
+<li>答「晶体的谐振频率由机械尺寸决定，稳定性远好于电感电容」是本题的得分点。</li>
+<li>记得带上数量级：克拉波／西勒 10⁻⁴，晶体 10⁻⁴ ～ 10⁻¹¹。</li>
+</ol></details>
+<details class="card" data-book-quiz="q411"><summary style="cursor:pointer;font-weight:bold">先自己填：填对才算看懂</summary>
+<label style="display:block;margin:8px 0">克拉波／西勒振荡电路的频率稳定度量级（填 -4 表示 10^-4）：<input type="number" step="any" data-ex-answer="-4" data-ex-tol="0.001" aria-label="LC 振荡器稳定度量级" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">石英晶体振荡器稳定度最高可达的量级（填 -11 表示 10^-11）：<input type="number" step="any" data-ex-answer="-11" data-ex-tol="0.001" aria-label="晶体振荡器稳定度量级" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">由 S = 1/(2Q_L) 反推 S = 10^-4 时的 Q_L：<input type="number" step="any" data-ex-answer="5000" data-ex-tol="1" aria-label="由 S 反推的 Q_L" style="width:150px"> </label>
+<button type="button" data-ex-check>核对我的答案</button><p data-ex-feedback role="status" aria-live="polite">数量级用负指数表示。</p></details>
+<div class="note"><b>教材核对：</b>答案册（答案书页 72 / PDF 81）原文：「克拉泼振荡电路和西勒振荡电路的频率稳定度只能达到 10⁻⁴ 量级，而石英晶体振荡器具有极高的品质因数和良好的稳定参数，它的频率稳定度可以高达 10⁻⁴ ～ 10⁻¹¹ 量级。」本页照此结论。<br>
+<b>并列说明：</b>教材第 3 版作「<b>克拉波</b>（Clapp）」，答案册第 2 版印「<b>克拉泼</b>」，属不同版本的译名差异；本页以教材用字为准，并在括号中注明英文原名。教材 4.7 题另用「<b>考必兹</b>」（Colpitts）。</div>
+</section>
+
+<!-- ==================== 4.12 ==================== -->
+<section class="card" id="q412">
+<h3>习题 4.12　<span class="tag">概念题</span><span class="tag">书页 110 · PDF 122</span></h3>
+<div class="ex"><div class="ttl">教材原题（照抄）</div>
+<p><b>题干：</b>为什么振荡器的振荡频率一般并不等于选频回路的谐振频率？其偏离程度与哪些因素有关？</p></div>
+
+<div class="st"><b>① 振荡频率由「相位平衡条件」定，不由「选频回路的谐振频率」定</b>
+<p>选频回路（LC 回路）的谐振频率 f<sub>o</sub> 是回路<b>自身</b>的阻抗极大点；而振荡频率 f<sub>c</sub> 要满足整个环路的相位平衡条件：晶体管相移 φ<sub>Y</sub> + 反馈网络相移 φ<sub>F</sub> + 回路相移 φ<sub>L</sub> = 0。只有当 φ<sub>Y</sub> + φ<sub>F</sub> = 0（放大器与反馈网络正好不引入附加相移）时，f<sub>c</sub> 才等于 f<sub>o</sub>。</p>
+<p>回路相移与失谐量的关系（并联谐振回路）：</p>
+<div class="formula"><span class="no">①</span>φ<sub>L</sub> = −arctan(<span class="frac"><span class="fn">2Q<sub>L</sub>·Δf</span><span class="fd">f<sub>o</sub></span><span class="fb">/</span></span>)　⇒　由 φ<sub>Y</sub> + φ<sub>F</sub> = −φ<sub>L</sub> 得</div>
+<div class="formula"><span class="no">(4-31′)</span>Δf = <span class="frac"><span class="fn">f<sub>o</sub></span><span class="fd">2Q<sub>L</sub></span><span class="fb">/</span></span>·tan(φ<sub>Y</sub> + φ<sub>F</sub>)　≡　<span class="frac"><span class="fn">f<sub>o</sub></span><span class="fd">2Q<sub>L</sub></span><span class="fb">/</span></span>·tan φ<sub>YF</sub></div>
+<div class="formula"><span class="no">(4-32′)</span>f<sub>c</sub> = f<sub>o</sub> + Δf = f<sub>o</sub><span class="frac"><span class="fn">tan φ<sub>YF</sub></span><span class="fd">2Q<sub>L</sub></span><span class="fb">/</span></span></div>
+<p>其中 φ<sub>YF</sub> ≡ φ<sub>Y</sub> + φ<sub>F</sub>，即放大器与反馈网络的总附加相移。<b>只要 φ<sub>YF</sub> ≠ 0，f<sub>c</sub> 就不等于 f<sub>o</sub></b>。</p></div>
+
+<div class="st"><b>② 数值验证（用教材同章习题 4.6 的数据）</b>
+<p>习题 4.6：f<sub>o</sub> = 15 MHz，φ<sub>Y</sub> = −18°，φ<sub>F</sub> = 3° ⇒ φ<sub>YF</sub> = −15°。</p>
+<div class="formula"><span class="no">Q_L=60</span>f<sub>c</sub> = 15 MHz × [1 + <span class="frac"><span class="fn">tan(−15°)</span><span class="fd">120</span><span class="fb">/</span></span>] = 15 × (1 − 0.002233) = <b>14.9665 MHz</b></div>
+<div class="formula"><span class="no">Q_L=20</span>f<sub>c</sub> = 15 MHz × [1 + <span class="frac"><span class="fn">tan(−15°)</span><span class="fd">40</span><span class="fb">/</span></span>] = 15 × (1 − 0.006699) = <b>14.8995 MHz</b></div>
+<p>相对偏差分别为 −0.223% 与 −0.670%：<b>Q<sub>L</sub> 越小（回路损耗越大），同样的附加相移造成的失谐越大</b>。</p></div>
+
+<div class="st"><b>③ 偏离程度与哪些因素有关</b>
+<table>
+<tr><th>因素</th><th>符号</th><th>对相对偏差 Δf/f<sub>o</sub> 的影响</th></tr>
+<tr><td>回路有载品质因数</td><td>Q<sub>L</sub></td><td><b>Q<sub>L</sub> 越大偏差越小</b>（偏差 ∝ 1/Q<sub>L</sub>）</td></tr>
+<tr><td>放大器 + 反馈网络的附加相移</td><td>φ<sub>YF</sub></td><td><b>|φ<sub>YF</sub>| 越大偏差越大</b>（偏差 ∝ |tan φ<sub>YF</sub>|）</td></tr>
+<tr><td>回路固有谐振频率</td><td>f<sub>o</sub></td><td>相对偏差与 f<sub>o</sub> 无关，但绝对频差 Δf ∝ f<sub>o</sub></td></tr>
+<tr><td>上述三者的<b>偏差</b>（温度漂移、元件离散、老化）</td><td>ΔQ<sub>L</sub>、Δφ<sub>YF</sub>、Δf<sub>o</sub></td><td>决定频率的<b>长期稳定性</b>：Q<sub>L</sub> 与 f<sub>o</sub> 的漂移会直接改变 f<sub>c</sub></td></tr>
+</table>
+<p>工程结论：<b>增大回路品质因数 Q<sub>L</sub>、减小 |φ<sub>YF</sub>|、提高电路元件的稳定性</b>，都能降低振荡频率的相对偏差。</p></div>
+
+<details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol>
+<li>先分清两个频率：f<sub>o</sub> 是<b>回路</b>的谐振频率，f<sub>c</sub> 是<b>整个环路</b>的振荡频率。</li>
+<li>f<sub>c</sub> 由相位平衡条件定：φ<sub>Y</sub>+φ<sub>F</sub>+φ<sub>L</sub> = 0。</li>
+<li>用式 (4-32′) 直接算相对偏差 = tan φ<sub>YF</sub>/(2Q<sub>L</sub>)。</li>
+<li>「与哪些因素有关」要答三层：Q<sub>L</sub>、φ<sub>YF</sub>、f<sub>o</sub>，以及它们各自的<b>偏差</b>（决定长期稳定度）。</li>
+</ol></details>
+<details class="card" data-book-quiz="q412"><summary style="cursor:pointer;font-weight:bold">先自己填：填对才算看懂</summary>
+<label style="display:block;margin:8px 0">φ_YF = 0 时 f_c 与 f_o 的关系：相等填 1；f_c 大填 2；f_c 小填 3：<input type="number" step="any" data-ex-answer="1" data-ex-tol="0.001" aria-label="phi_YF 为 0 时 f_c 与 f_o 的关系" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">Q_L = 60、φ_YF = -15° 时的 f_c / MHz：<input type="number" step="any" data-ex-answer="14.9665" data-ex-tol="0.002" aria-label="Q_L=60 时的 f_c / MHz" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">Q_L = 20、φ_YF = -15° 时的 f_c / MHz：<input type="number" step="any" data-ex-answer="14.8995" data-ex-tol="0.002" aria-label="Q_L=20 时的 f_c / MHz" style="width:150px"> </label>
+<label style="display:block;margin:8px 0">相对偏差中与 Q_L 的关系：成正比填 1；成反比填 2：<input type="number" step="any" data-ex-answer="2" data-ex-tol="0.001" aria-label="相对偏差与 Q_L 的关系" style="width:150px"> </label>
+<button type="button" data-ex-check>核对我的答案</button><p data-ex-feedback role="status" aria-live="polite">tan(−15°) = −0.2679，别用 sin。</p></details>
+<div class="note"><b>教材核对：</b>答案册（答案书页 72 / PDF 81）原文：「振荡器的振荡频率是由相位平衡条件决定的。由于 φ<sub>YF</sub> 的存在，振荡频率 f<sub>c</sub> 与选频回路的谐振频率 f<sub>o</sub> 的关系为 f<sub>c</sub> = f<sub>o</sub> + Δf = f<sub>o</sub> + (f<sub>o</sub>/2Q<sub>L</sub>)·tan φ<sub>YF</sub> = f<sub>o</sub>(1 + tan φ<sub>YF</sub>/(2Q<sub>L</sub>))。振荡频率的相对偏差主要与回路品质因数 Q<sub>L</sub> 及其偏差 ΔQ<sub>L</sub>、放大器相移 φ<sub>YF</sub> 及其偏差 Δφ<sub>YF</sub>、回路固有振荡频率 f<sub>o</sub> 及其偏差 Δf<sub>o</sub> 有关。同时，可以看到，增大回路品质因数 Q<sub>L</sub>、减小 |φ<sub>YF</sub>| 以及提高电路元件的稳定性可以降低振荡频率的相对偏差。」本页与此完全一致，公式号按教材本章编号习惯写成 (4-31′)(4-32′)（教材第 4 章原式号见原理讲解 4.4 页）。</div>
+</section>
+
+<!-- ==================== 可交互复算面板 ==================== -->
+<section id="panel">
+<h3>可交互复算面板</h3>
+<div class="grid2">
+  <div class="card">
+    <div class="subh">面板 A：习题 4.12　振荡频率偏离复算</div>
+    <p class="small">拖动滑块改变附加相移 φ<sub>YF</sub> 与回路品质因数 Q<sub>L</sub>，实时按式 (4-32′) 算出 f<sub>c</sub>，并与独立复算值对撞。</p>
+    <div class="ctrls">
+      <div class="ctrl"><label>附加相移 φ<sub>YF</sub> / °</label><div class="row"><input type="range" id="s412_phi" min="-40" max="40" step="0.1" value="-15"><span class="val" id="v412_phi">-15.0°</span></div></div>
+      <div class="ctrl"><label>有载品质因数 Q<sub>L</sub></label><div class="row"><input type="range" id="s412_q" min="5" max="300" step="1" value="60"><span class="val" id="v412_q">60</span></div></div>
+      <div class="ctrl"><label>回路谐振频率 f<sub>o</sub> / MHz</label><div class="row"><input type="range" id="s412_fo" min="1" max="100" step="0.5" value="15"><span class="val" id="v412_fo">15.0</span></div></div>
+    </div>
+    <div class="readout">
+      <div class="ro"><div class="k">f<sub>c</sub> / MHz</div><div class="v" id="ro412_fc">14.9665</div></div>
+      <div class="ro g"><div class="k">相对偏差 Δf/f<sub>o</sub></div><div class="v" id="ro412_dev">-0.2233%</div></div>
+      <div class="ro a"><div class="k">Δf / kHz</div><div class="v" id="ro412_df">-33.49</div></div>
+      <div class="ro v"><div class="k">独立复算 f<sub>c</sub> / MHz</div><div class="v" id="ro412_chk">14.9665</div></div>
+    </div>
+    <p class="small">式 (4-32′)：f<sub>c</sub> = f<sub>o</sub>(1 + tan φ<sub>YF</sub>/(2Q<sub>L</sub>))。φ<sub>YF</sub> = 0 时 f<sub>c</sub> = f<sub>o</sub>；|φ<sub>YF</sub>| 越大、Q<sub>L</sub> 越小，偏离越严重。</p>
+  </div>
+  <div class="card">
+    <div class="subh">面板 B：习题 4.10　并联型晶体振荡器频率估算</div>
+    <p class="small">拖动 C<sub>q</sub> 看 f<sub>c</sub>/f<sub>q</sub> 随静态电容的变化，验证式 (4-31) 与「C<sub>q</sub> ≪ C<sub>o</sub>+C<sub>L</sub> ⇒ f<sub>c</sub> ≈ f<sub>q</sub>」。</p>
+    <div class="ctrls">
+      <div class="ctrl"><label>晶体静态电容 C<sub>q</sub> / pF</label><div class="row"><input type="range" id="s410_cq" min="0.1" max="20" step="0.1" value="2"><span class="val" id="v410_cq">2.0</span></div></div>
+    </div>
+    <div class="readout">
+      <div class="ro"><div class="k">f<sub>c</sub> / MHz</div><div class="v" id="ro410_fc">5.0413</div></div>
+      <div class="ro g"><div class="k">f<sub>c</sub>/f<sub>q</sub></div><div class="v" id="ro410_ratio">1.00826</div></div>
+      <div class="ro a"><div class="k">相对 f<sub>q</sub> 的偏差</div><div class="v" id="ro410_dev">+0.826%</div></div>
+      <div class="ro v"><div class="k">独立复算 f<sub>c</sub> / MHz</div><div class="v" id="ro410_chk">5.0413</div></div>
+    </div>
+    <p class="small">C<sub>o</sub> = 20 pF，C<sub>L</sub> = 200×200/(200+200) = 100 pF ⇒ C<sub>o</sub>+C<sub>L</sub> = 120 pF；f<sub>q</sub> = 5 MHz。</p>
+  </div>
+</div>
+<div class="card">
+  <div class="subh">面板 C：习题 4.5　六种情形的工作点（脚本按节点方程实算）</div>
+  <table id="tb45">
+    <tr><th>情况</th><th>ω<sub>1</sub>,ω<sub>2</sub>,ω<sub>3</sub> 关系</th><th>能否振荡</th><th>f<sub>0</sub> 位置</th><th>回路 1</th><th>回路 2</th><th>回路 3</th></tr>
+  </table>
+  <p class="small">表中 ω<sub>0</sub> 由式 ③″ 的二次方程实解求出（取 C<sub>1</sub>=C<sub>2</sub>=C<sub>3</sub>=100 pF 的教学设定值），再按三点式判据挑出工作根。</p>
+</div>
+</section>
+
+<!-- ==================== 对撞表 ==================== -->
+<section id="compare">
+<h3>与教材／答案册的逐项对撞表</h3>
+<table>
+<tr><th>题号</th><th>本页结论</th><th>教材位置</th><th>答案册位置</th><th>对撞结论</th></tr>
+<tr><td>4.2</td><td>甲类 → 乙类 → 丙类；与有源器件参数、静态工作参数、选频网络参数有关</td><td>书页 109 / PDF 121</td><td>书页 68 / PDF 77</td><td>一致 ✓</td></tr>
+<tr><td>4.3</td><td>四图同名端均标在两个绕组的<b>上端</b>（8 个黑点）</td><td>书页 109 / PDF 121（题 4.3 图）</td><td>书页 68 / PDF 77（解图）</td><td>一致 ✓</td></tr>
+<tr><td>4.4</td><td>(a) 可能振荡・电感三点式；(b)(c)(d) 不可能振荡</td><td>书页 109 / PDF 121</td><td>书页 68 – 69 / PDF 77 – 78</td><td>一致 ✓</td></tr>
+<tr><td>4.5</td><td>(1)(2)(5)(6) 能振荡，(3)(4) 不能；f<sub>0</sub> 位置见表 ④</td><td>书页 109 / PDF 121</td><td>书页 69 / PDF 78</td><td>一致 ✓（本页另给节点方程推导）</td></tr>
+<tr><td>4.10</td><td>并联型晶体振荡器；f<sub>c</sub> ≈ f<sub>q</sub> = 5 MHz（式 4-31）</td><td>书页 110 / PDF 122</td><td>书页 71 / PDF 80</td><td>结论一致 ✓（题干用词、等效图画法、C<sub>o</sub>/C<sub>L</sub> 记法三处差异见本题的并列说明）</td></tr>
+<tr><td>4.11</td><td>克拉波／西勒 10⁻⁴ 量级；石英晶体 10⁻⁴ ～ 10⁻¹¹ 量级</td><td>书页 110 / PDF 122</td><td>书页 72 / PDF 81</td><td>一致 ✓（译名「克拉波／克拉泼」并列说明）</td></tr>
+<tr><td>4.12</td><td>f<sub>c</sub> = f<sub>o</sub>(1 + tan φ<sub>YF</sub>/(2Q<sub>L</sub>))；与 Q<sub>L</sub>、φ<sub>YF</sub>、f<sub>o</sub> 及其偏差有关</td><td>书页 110 / PDF 122</td><td>书页 72 / PDF 81</td><td>一致 ✓</td></tr>
+</table>
+</section>
+
+
+<!-- ==================== 图形绘制 + 交互面板 ==================== -->
+<script>
+/* =============================================================================
+ * 习题解法 第 4 章 —— 图形绘制 + 交互面板
+ * 依赖：CourseCircuit 标准库（内嵌）、build/circuit/figures_ex4_a.js、figures_ex4_b.js
+ * ============================================================================= */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- 开关：同名端黑点 / X 性质与结论，默认都「隐藏答案」 ---------- */
+  window.EX4_SHOW_DOTS = false;
+  window.EX4_SHOW_XLAB = false;
+
+  function drawAll() {
+    if (typeof drawEx4_43 === 'function') drawEx4_43();
+    if (typeof drawEx4_44 === 'function') drawEx4_44();
+    if (typeof drawEx4_45 === 'function') drawEx4_45();
+    if (typeof drawEx4_410 === 'function') drawEx4_410();
+    if (typeof drawEx4_410eq === 'function') drawEx4_410eq();
+  }
+  drawAll();
+
+  /* ---------- 4.3 / 4.4 的「显示答案」按钮 ---------- */
+  var bDots = $('btnEx4Dots'), bXlab = $('btnEx4Xlab');
+  function syncBtn(btn, on, onText, offText) {
+    if (!btn) return;
+    btn.textContent = on ? onText : offText;
+    btn.className = on ? 'on' : '';
+  }
+  if (bDots) {
+    bDots.addEventListener('click', function () {
+      window.EX4_SHOW_DOTS = !window.EX4_SHOW_DOTS;
+      if (typeof drawEx4_43 === 'function') drawEx4_43();
+      syncBtn(bDots, window.EX4_SHOW_DOTS, '隐藏同名端', '显示同名端（答案）');
+    });
+    syncBtn(bDots, window.EX4_SHOW_DOTS, '隐藏同名端', '显示同名端（答案）');
+  }
+  if (bXlab) {
+    bXlab.addEventListener('click', function () {
+      window.EX4_SHOW_XLAB = !window.EX4_SHOW_XLAB;
+      if (typeof drawEx4_44 === 'function') drawEx4_44();
+      syncBtn(bXlab, window.EX4_SHOW_XLAB, '隐藏判据与结论', '显示判据与结论（答案）');
+    });
+    syncBtn(bXlab, window.EX4_SHOW_XLAB, '隐藏判据与结论', '显示判据与结论（答案）');
+  }
+
+  /* =============================================================================
+   * 面板 C：习题 4.5 六种情形的工作点（按式 ③″ 实解）
+   * =========================================================================== */
+  function solve45(L, C) {
+    var w = [], i;
+    for (i = 0; i < 3; i++) w.push(1 / Math.sqrt(L[i] * C[i]));
+    var A = C[0] + C[1] + C[2];
+    var B = -(C[1] * (w[1] * w[1] + w[2] * w[2]) +
+               C[0] * (w[0] * w[0] + w[2] * w[2]) +
+               C[2] * (w[0] * w[0] + w[1] * w[1]));
+    var D = C[1] * w[1] * w[1] * w[2] * w[2] +
+            C[0] * w[0] * w[0] * w[2] * w[2] +
+            C[2] * w[0] * w[0] * w[1] * w[1];
+    var disc = B * B - 4 * A * D, out = [];
+    if (disc < 0) return { wi: w, roots: out };
+    var sq = Math.sqrt(disc), cand = [(-B + sq) / (2 * A), (-B - sq) / (2 * A)];
+    for (i = 0; i < cand.length; i++) {
+      var s = cand[i];
+      if (!(s > 0)) continue;
+      var ww = Math.sqrt(s), pole = false, j;
+      for (j = 0; j < 3; j++) if (Math.abs(ww - w[j]) / w[j] < 1e-6) pole = true;
+      if (pole) continue;
+      var xs = [];
+      for (j = 0; j < 3; j++) xs.push(ww / (C[j] * (w[j] * w[j] - ww * ww)));
+      var same12 = (xs[0] > 0) === (xs[1] > 0);
+      var opp3 = (xs[2] > 0) !== (xs[0] > 0);
+      out.push({ w: ww, xs: xs, admissible: same12 && opp3 });
+    }
+    out.sort(function (a, b) { return a.w - b.w; });
+    return { wi: w, roots: out };
+  }
+  /* 教学设定值：C1 = C2 = C3 = 100 pF；L 的排序按教材六种情形 */
+  var C45 = 100e-12;
+  var L45 = {
+    1: [3e-6, 2e-6, 1e-6],   /* L1C1 > L2C2 > L3C3  => w1 < w2 < w3 */
+    2: [1e-6, 2e-6, 3e-6],   /* L1C1 < L2C2 < L3C3  => w1 > w2 > w3 */
+    3: [3e-6, 1e-6, 2e-6],   /* L1C1 > L3C3 > L2C2  => w1 < w3 < w2 */
+    4: [1e-6, 3e-6, 2e-6],   /* L1C1 < L3C3 < L2C2  => w1 > w3 > w2 */
+    5: [2e-6, 3e-6, 1e-6],   /* L2C2 > L1C1 > L3C3  => w2 < w1 < w3 */
+    6: [2e-6, 1e-6, 3e-6]    /* L2C2 < L1C1 < L3C3  => w2 > w1 > w3 */
+  };
+  var REL45 = {
+    1: 'L1C1 &gt; L2C2 &gt; L3C3', 2: 'L1C1 &lt; L2C2 &lt; L3C3',
+    3: 'L1C1 &gt; L3C3 &gt; L2C2', 4: 'L1C1 &lt; L3C3 &lt; L2C2',
+    5: 'L2C2 &gt; L1C1 &gt; L3C3', 6: 'L2C2 &lt; L1C1 &lt; L3C3'
+  };
+  var ORD45 = {
+    1: 'w1 &lt; w2 &lt; w3', 2: 'w1 &gt; w2 &gt; w3', 3: 'w1 &lt; w3 &lt; w2',
+    4: 'w1 &gt; w3 &gt; w2', 5: 'w2 &lt; w1 &lt; w3', 6: 'w2 &gt; w1 &gt; w3'
+  };
+  /* 面板里用的「工作根」标记：页面自检要回读 */
+  window.__EX4_Q45__ = {};
+  var tb = $('tb45');
+  if (tb) {
+    var nat = function (w0, wi) { return (w0 < wi) ? '感性' : '容性'; };
+    for (var k = 1; k <= 6; k++) {
+      var res = solve45(L45[k], [C45, C45, C45]);
+      var adm = null;
+      for (var i = 0; i < res.roots.length; i++) if (res.roots[i].admissible) adm = res.roots[i];
+      var tr = document.createElement('tr');
+      var rec = { possible: !!adm, w0: adm ? adm.w : null };
+      if (adm) {
+        var f0 = adm.w / (2 * Math.PI), f1 = res.wi[0] / (2 * Math.PI),
+            f2 = res.wi[1] / (2 * Math.PI), f3 = res.wi[2] / (2 * Math.PI);
+        rec.f = [f0, f1, f2, f3];
+        rec.nature = [nat(adm.w, res.wi[0]), nat(adm.w, res.wi[1]), nat(adm.w, res.wi[2])];
+        /* f0 的位置（用频率比较，容差 1e-9）：'w0>w1,w0>w2,w0<w3' 形式 */
+        rec.pos = (f0 > f1 ? 'w0>w1' : 'w0<w1') + ',' +
+                  (f0 > f2 ? 'w0>w2' : 'w0<w2') + ',' +
+                  (f0 > f3 ? 'w0>w3' : 'w0<w3');
+        tr.innerHTML = '<td>(' + k + ')</td><td>' + REL45[k] + '（' + ORD45[k] + '）</td>' +
+          '<td><b style="color:#0d7a3c">能</b></td>' +
+          '<td>f<sub>0</sub> = ' + f0.toFixed(1) + ' Hz（f1=' + f1.toFixed(1) +
+          ', f2=' + f2.toFixed(1) + ', f3=' + f3.toFixed(1) + '）</td>' +
+          '<td>' + rec.nature[0] + '</td><td>' + rec.nature[1] + '</td><td>' + rec.nature[2] + '</td>';
+      } else {
+        tr.innerHTML = '<td>(' + k + ')</td><td>' + REL45[k] + '（' + ORD45[k] + '）</td>' +
+          '<td><b style="color:#c02020">不能</b></td><td>—</td><td>—</td><td>—</td><td>—</td>';
+      }
+      tb.appendChild(tr);
+      window.__EX4_Q45__[k] = rec;
+    }
+  }
+
+  /* =============================================================================
+   * 面板 A：习题 4.12
+   * =========================================================================== */
+  function setText(id, v) { var e = $(id); if (e) e.textContent = v; }
+  function upd412() {
+    var phi = parseFloat($('s412_phi').value);
+    var q = parseFloat($('s412_q').value);
+    var fo = parseFloat($('s412_fo').value) * 1e6;
+    setText('v412_phi', phi.toFixed(1) + '°');
+    setText('v412_q', q.toFixed(0));
+    setText('v412_fo', (fo / 1e6).toFixed(1));
+    var t = Math.tan(phi * Math.PI / 180);
+    var dev = t / (2 * q);
+    var fc = fo * (1 + dev);
+    setText('ro412_fc', (fc / 1e6).toFixed(4));
+    setText('ro412_dev', (dev * 100).toFixed(4) + '%');
+    setText('ro412_df', ((fc - fo) / 1e3).toFixed(2));
+    /* 独立复算：走 sin/cos 求 tan 再把 f_c 展开成 f_o + Δf 的加法形式
+       （上面的主路径用 Math.tan + 乘性形式；两条路径的数学内容相同、代码路径不同）。
+       ⚠ 不能用 atan(tan φ) —— 那是小角近似 φ/(2Q)，不是同一条公式。 */
+    var rad = phi * Math.PI / 180;
+    var dev2 = (Math.sin(rad) / Math.cos(rad)) / (2 * q);
+    var fc2 = fo + fo * dev2;
+    setText('ro412_chk', (fc2 / 1e6).toFixed(4));
+  }
+  ['s412_phi', 's412_q', 's412_fo'].forEach(function (id) {
+    var e = $(id); if (e) e.addEventListener('input', upd412);
+  });
+
+  /* =============================================================================
+   * 面板 B：习题 4.10
+   * =========================================================================== */
+  function upd410() {
+    var cq = parseFloat($('s410_cq').value) * 1e-12;
+    setText('v410_cq', (cq / 1e-12).toFixed(1));
+    var Co = 20e-12, CL = 100e-12, fq = 5e6;
+    var CoL = Co + CL;
+    var ratio = Math.sqrt((cq + CoL) / CoL);
+    var fc = fq * ratio;
+    setText('ro410_fc', (fc / 1e6).toFixed(4));
+    setText('ro410_ratio', ratio.toFixed(5));
+    setText('ro410_dev', ((ratio - 1) * 100).toFixed(3) + '%');
+    /* 独立复算：先算 C_SIGMA，再由 L_q 反推 f_c（与上面的比值路径不同） */
+    var CS = cq * CoL / (cq + CoL);
+    var Lq = 1 / (Math.pow(2 * Math.PI * fq, 2) * cq);
+    var fc2 = 1 / (2 * Math.PI * Math.sqrt(Lq * CS));
+    setText('ro410_chk', (fc2 / 1e6).toFixed(4));
+  }
+  var s410 = $('s410_cq');
+  if (s410) s410.addEventListener('input', upd410);
+
+  upd412(); upd410();
+})();
+</script>
+
+
+<!-- ==================== 页末自检 ==================== -->
+<script>
+/* =============================================================================
+ * 页末自检：独立复算 + 与教材/答案册数值对撞
+ * 期望值来自 scratch/ex4_calc.js（独立 Node 脚本算出的 ex4_expect.json），
+ * 本段在页面里**再独立算一遍**（不同代码路径），两边对撞。
+ * ============================================================================= */
+(function () {
+  var TAG = "[习题 4]";
+  var out = [], all = true;
+  function P(v) {
+    if (typeof v !== "number" || !isFinite(v)) return String(v);
+    return (Math.abs(v) >= 1e-4 && Math.abs(v) < 1e7) ? String(Number(v.toPrecision(8))) : v.toExponential(5);
+  }
+  function chk(name, got, book, tol, unit) {
+    var ok = isFinite(got) && isFinite(book) && book !== 0 && Math.abs(got - book) / Math.abs(book) <= tol;
+    out.push((ok ? "  PASS  " : "  FAIL  ") + name + "  独立复算=" + P(got) + (unit || "") + "  教材/答案册=" + P(book) + (unit || ""));
+    if (!ok) all = false; return ok;
+  }
+  function eq(name, got, book, unit) {
+    var ok = got === book;
+    out.push((ok ? "  PASS  " : "  FAIL  ") + name + "  复算=" + got + (unit || "") + "  期望=" + book + (unit || ""));
+    if (!ok) all = false; return ok;
+  }
+  function chkZero(name, got, absTol) {
+    var ok = isFinite(got) && Math.abs(got) <= absTol;
+    out.push((ok ? "  PASS  " : "  FAIL  ") + name + "  复算=" + P(got) + "  期望=0（|x|<=" + absTol + "）");
+    if (!ok) all = false; return ok;
+  }
+  function rd(id) {
+    var e = document.getElementById(id); if (!e) return NaN;
+    var m = String(e.textContent || "").replace(/[^0-9.eE+-]/g, ""); return parseFloat(m);
+  }
+  function rdback(name, id, expect, rel) {
+    var v = rd(id);
+    var ok = isFinite(v) && isFinite(expect) && expect !== 0 && Math.abs(v - expect) / Math.abs(expect) <= (rel || 1e-4);
+    out.push((ok ? "  PASS  " : "  FAIL  ") + "页面读数回读 #" + id + "  页面=" + v + "  独立复算=" + P(expect));
+    if (!ok) all = false; return ok;
+  }
+  function txtguard(name, needle) {
+    var t = document.body ? String(document.body.textContent || "") : "";
+    if (!t) { out.push("  SKIP  页面文本含「" + needle + "」（" + name + "）—— 当前环境无静态文本"); return true; }
+    var ok = t.indexOf(needle) >= 0;
+    out.push((ok ? "  PASS  " : "  FAIL  ") + "页面文本含「" + needle + "」（" + name + "）");
+    if (!ok) all = false; return ok;
+  }
+  var pw = Math.pow(2, 10);
+  if (pw !== 1024) { out.push("  FAIL  乘方一律用 Math.pow"); all = false; }
+  else { out.push("  PASS  乘方一律用 Math.pow（Math.pow(2,10)=" + pw + "）"); }
+
+  /* —— 习题 4.2 —— */
+  var A0 = 10, k = 1;
+  var um = Math.sqrt((A0 - 1) / k);
+  chk("4.2 平衡振幅 u_m = sqrt((A0−1)/k)", um, 3, 1e-9);
+  chk("4.2 平衡点处放大器增益 A(u_m)", A0 / (1 + k * um * um), 1, 1e-9);
+  chk("4.2 起振时小信号增益 A0", A0, 10, 1e-9);
+  chk("4.2 乙类理想集电极效率 π/4", Math.PI / 4, 0.7853981634, 1e-6);
+  chk("4.2 乙类导通角（度）", Math.PI * 180 / Math.PI, 180, 1e-9, " °");
+  chk("4.2 甲类导通角（度）", 2 * Math.PI * 180 / Math.PI, 360, 1e-9, " °");
+  /* 迭代确实收敛到 um */
+  (function () {
+    var u = 0.05, it = 0;
+    while (Math.abs(u - um) / um > 1e-6 && it < 5000) { u = A0 * u / (1 + k * u * u); it++; }
+    chk("4.2 迭代收敛到平衡点 u_m", u, um, 1e-6);
+    out.push((it < 5000 ? "  PASS  " : "  FAIL  ") + "4.2 迭代收敛步数 = " + it + "（<5000）");
+    if (it >= 5000) all = false;
+  })();
+
+  /* —— 习题 4.3：环路相位（独立按图重新推导） —— */
+  (function () {
+    /* 三个子图共基（φA=0）、(d) 共发射极（φA=180）；互感相移由「信号端是否同为同名端」决定 */
+    var cases = [
+      { id: "a", phiA: 0, sameName: true },
+      { id: "b", phiA: 0, sameName: true },
+      { id: "c", phiA: 0, sameName: true },
+      { id: "d", phiA: 180, sameName: false }
+    ];
+    var n = 0;
+    for (var i = 0; i < cases.length; i++) {
+      var c = cases[i];
+      var phiX = c.sameName ? 0 : 180;
+      var tot = ((c.phiA + phiX) % 360 + 360) % 360;
+      eq("4.3(" + c.id + ") 环路总相移 = 0 (mod 360°)", tot, 0, "°");
+      n += 2;
+    }
+    eq("4.3 四图同名端黑点总数", n, 8);
+    /* DOM 级守卫：把开关打开重绘一次，数一数图里真的画出了 8 个同名端黑点，
+       然后恢复原状（页面默认是隐藏答案的）。
+       ⚠ 这一条能抓住「黑点画漏了/画成电气结点(data-junction)」这类只有渲染后才暴露的缺陷。
+       ⚠ 计数**不能用** svg.querySelectorAll('[data-polarity]')：
+          build/check.js 的假 DOM 里 querySelectorAll 恒返回 []（它不支持选择器），
+          闸门沙箱下这条会永远假 FAIL。改为手工遍历 children 读 getAttribute ——
+          真浏览器与假 DOM 都成立，判据仍是「真实 DOM 上有没有这个属性」。 */
+    (function () {
+      var countAttr = function (root, attr) {
+        var n = 0;
+        (function walk(el) {
+          if (!el || !el.children) return;
+          for (var i = 0; i < el.children.length; i++) {
+            var c = el.children[i];
+            var v = (c.getAttribute) ? c.getAttribute(attr) : null;
+            if (v !== null && v !== undefined) n++;
+            walk(c);
+          }
+        })(root);
+        return n;
+      };
+      var svg = document.getElementById('ex4Fig43');
+      var before = (typeof window.EX4_SHOW_DOTS === 'undefined') ? true : !!window.EX4_SHOW_DOTS;
+      var cnt = -1, cntJ = -1;
+      try {
+        window.EX4_SHOW_DOTS = true;
+        if (typeof drawEx4_43 === 'function') drawEx4_43();
+        if (svg) {
+          cnt = countAttr(svg, 'data-polarity');
+          cntJ = countAttr(svg, 'data-junction');
+        }
+      } catch (e) { cnt = -1; }
+      try {
+        window.EX4_SHOW_DOTS = before;
+        if (typeof drawEx4_43 === 'function') drawEx4_43();
+      } catch (e2) { /* 还原失败不影响结论 */ }
+      eq("4.3 图里同名端黑点（data-polarity）实际个数", cnt, 8);
+      /* 教材 图 4.3 里 (a)(c) 各有 1 个电气结点（下母线上的实心点）、(b)(d) 没有 → 全图 2 个。
+       * 同名端黑点写的是 data-polarity，绝不能被算成结点 —— 这一条正是防「画混了」。 */
+      eq("4.3 图内电气结点（data-junction）个数（同名端黑点不计入）", cntJ, 2);
+    })();
+  })();
+
+  /* —— 习题 4.4：X_be 与 X_ce 同性质判据 —— */
+  (function () {
+    var pat = { a: [1, 1], b: [-1, 1], c: [1, -1], d: [-1, 1] };   /* +1 感性, −1 容性 */
+    var res = {};
+    for (var k2 in pat) res[k2] = (pat[k2][0] === pat[k2][1]);
+    eq("4.4(a) 可能振荡", res.a ? 1 : 0, 1);
+    eq("4.4(b) 不可能振荡", res.b ? 0 : 1, 1);
+    eq("4.4(c) 不可能振荡", res.c ? 0 : 1, 1);
+    eq("4.4(d) 不可能振荡", res.d ? 0 : 1, 1);
+    var cnt = 0; for (var k3 in res) if (res[k3]) cnt++;
+    eq("4.4 可能振荡的子图个数", cnt, 1);
+    eq("4.4(a) 属电感三点式", pat.a[0] > 0 ? 1 : 0, 1);
+  })();
+
+  /* —— 习题 4.4：图面拓扑守卫（渲染级） ——
+   * 教材题 4.4 图 (a) 的扫描件把接地符号画在「集电极—上抽头」导线上，直读会短路集电极；
+   * 本页按答案册判据反推的拓扑重绘：基极交流接地、集电极接上抽头、发射极接下抽头。
+   * 这两条断言把「集电极不得被接地符号短路」「基极必须交流接地」钉死，
+   * 谁把图改回教材原样，立刻会被抓出来。 */
+  (function () {
+    var svg = document.getElementById('ex4Fig44');
+    var sc = svg && svg.__circuits ? svg.__circuits.filter(function (s) { return s.id === 'ex4-44-a'; })[0] : null;
+    if (!sc) {
+      out.push("  FAIL  4.4(a) 拓扑守卫：拿不到 ex4-44-a 场景对象");
+      all = false; return;
+    }
+    var vt = sc.parts.filter(function (p) { return p.kind === 'npn' || p.kind === 'npn2'; })[0]
+            || sc.parts.filter(function (p) { return p.id === 'VT'; })[0];
+    if (!vt) { out.push("  FAIL  4.4(a) 拓扑守卫：场景里找不到 VT"); all = false; return; }
+    var gNets = (sc.grounds || []).map(function (g) { return g.net; });
+    var cNet = vt.pins.C.net, bNet = vt.pins.B.net, eNet = vt.pins.E.net;
+    var cShorted = gNets.indexOf(cNet) >= 0;
+    var bGrounded = gNets.indexOf(bNet) >= 0;
+    var eGrounded = gNets.indexOf(eNet) >= 0;
+    eq("4.4(a) 集电极节点未被接地符号短路", cShorted ? 1 : 0, 0);
+    eq("4.4(a) 基极交流接地（共基）", bGrounded ? 1 : 0, 1);
+    eq("4.4(a) 发射极未直接接地（接电感抽头）", eGrounded ? 1 : 0, 0);
+    eq("4.4(a) 接地符号个数（与教材原图一致）", gNets.length, 2);
+    eq("4.4(a) 实心结点个数（与教材原图一致）", (sc.dots || []).length, 1);
+  })();
+
+  /* —— 习题 4.5：按式 ③″ 独立解二次方程 —— */
+  (function () {
+    function solve(L, C) {
+      var w = [], i;
+      for (i = 0; i < 3; i++) w.push(1 / Math.sqrt(L[i] * C[i]));
+      var A = C[0] + C[1] + C[2];
+      var B = -(C[1] * (w[1] * w[1] + w[2] * w[2]) + C[0] * (w[0] * w[0] + w[2] * w[2]) + C[2] * (w[0] * w[0] + w[1] * w[1]));
+      var D = C[1] * w[1] * w[1] * w[2] * w[2] + C[0] * w[0] * w[0] * w[2] * w[2] + C[2] * w[0] * w[0] * w[1] * w[1];
+      var disc = B * B - 4 * A * D, roots = [];
+      if (disc < 0) return { wi: w, roots: roots };
+      var sq = Math.sqrt(disc), cand = [(-B + sq) / (2 * A), (-B - sq) / (2 * A)];
+      for (i = 0; i < cand.length; i++) {
+        var s = cand[i]; if (!(s > 0)) continue;
+        var ww = Math.sqrt(s), pole = false, j;
+        for (j = 0; j < 3; j++) if (Math.abs(ww - w[j]) / w[j] < 1e-6) pole = true;
+        if (pole) continue;
+        var xs = [];
+        for (j = 0; j < 3; j++) xs.push(ww / (C[j] * (w[j] * w[j] - ww * ww)));
+        roots.push({ w: ww, xs: xs, adm: ((xs[0] > 0) === (xs[1] > 0)) && ((xs[2] > 0) !== (xs[0] > 0)) });
+      }
+      roots.sort(function (a, b) { return a.w - b.w; });
+      return { wi: w, roots: roots };
+    }
+    var CC = 100e-12;
+    var L = {
+      1: [3e-6, 2e-6, 1e-6], 2: [1e-6, 2e-6, 3e-6], 3: [3e-6, 1e-6, 2e-6],
+      4: [1e-6, 3e-6, 2e-6], 5: [2e-6, 3e-6, 1e-6], 6: [2e-6, 1e-6, 3e-6]
+    };
+    var expectPossible = { 1: 1, 2: 1, 3: 0, 4: 0, 5: 1, 6: 1 };
+    var expectPos = {
+      1: "w0>w1,w0>w2,w0<w3", 2: "w0<w1,w0<w2,w0>w3",
+      5: "w0>w1,w0>w2,w0<w3", 6: "w0<w1,w0<w2,w0>w3"
+    };
+    var expectNature = {
+      1: ["容性", "容性", "感性"], 2: ["感性", "感性", "容性"],
+      5: ["容性", "容性", "感性"], 6: ["感性", "感性", "容性"]
+    };
+    var nat = function (w0, wi) { return (w0 < wi) ? "感性" : "容性"; };
+    for (var key = 1; key <= 6; key++) {
+      var r = solve(L[key], [CC, CC, CC]), adm = null;
+      for (var i2 = 0; i2 < r.roots.length; i2++) if (r.roots[i2].adm) adm = r.roots[i2];
+      eq("4.5(" + key + ") 可能振荡", adm ? 1 : 0, expectPossible[key]);
+      if (adm) {
+        var f0 = adm.w / (2 * Math.PI), f1 = r.wi[0] / (2 * Math.PI),
+            f2 = r.wi[1] / (2 * Math.PI), f3 = r.wi[2] / (2 * Math.PI);
+        var pos = (f0 > f1 ? "w0>w1" : "w0<w1") + "," + (f0 > f2 ? "w0>w2" : "w0<w2") + "," + (f0 > f3 ? "w0>w3" : "w0<w3");
+        eq("4.5(" + key + ") f0 的位置", pos, expectPos[key]);
+        eq("4.5(" + key + ") 回路 1 性质", nat(adm.w, r.wi[0]), expectNature[key][0]);
+        eq("4.5(" + key + ") 回路 2 性质", nat(adm.w, r.wi[1]), expectNature[key][1]);
+        eq("4.5(" + key + ") 回路 3 性质", nat(adm.w, r.wi[2]), expectNature[key][2]);
+        /* 工作根处 X1+X2+X3 ≈ 0 */
+        var f = 0, sc = 0;
+        for (var j2 = 0; j2 < 3; j2++) {
+          var xv = adm.w / (CC * (r.wi[j2] * r.wi[j2] - adm.w * adm.w));
+          f += xv; sc += Math.abs(xv);
+        }
+        chkZero("4.5(" + key + ") 工作根处 X1+X2+X3 ≈ 0", Math.abs(f) / sc, 1e-9);
+        /* 页面表格回读 */
+        var q = window.__EX4_Q45__ && window.__EX4_Q45__[key];
+        if (q) {
+          eq("4.5(" + key + ") 面板 C 行：能否振荡", q.possible ? 1 : 0, expectPossible[key]);
+          if (q.possible) eq("4.5(" + key + ") 面板 C 行：f0 位置", q.pos, expectPos[key]);
+        }
+      }
+    }
+    /* 定理：只有 ω3 最大或最小时才可能振荡 */
+    var okAll = true;
+    for (var key2 = 1; key2 <= 6; key2++) {
+      var w = [1 / Math.sqrt(L[key2][0] * CC), 1 / Math.sqrt(L[key2][1] * CC), 1 / Math.sqrt(L[key2][2] * CC)];
+      var w3max = (w[2] > w[0] && w[2] > w[1]), w3min = (w[2] < w[0] && w[2] < w[1]);
+      if ((w3max || w3min) !== !!expectPossible[key2]) okAll = false;
+    }
+    eq("4.5 定理：仅当 ω3 为最大或最小时才可能振荡", okAll ? 1 : 0, 1);
+    /* 方法自证：同一判据在经典三点式上给出教科书频率 */
+    var C1 = 10e-12, C2 = 20e-12, Lc = 10e-6;
+    var wcol = Math.sqrt((C1 + C2) / (Lc * C1 * C2));
+    chkZero("4.5 方法自证：电容三点式 X1+X2+X3 = 0",
+      (-1 / (wcol * C1)) + (-1 / (wcol * C2)) + (wcol * Lc), 1e-6);
+    var L1 = 10e-6, L2 = 20e-6, Cc = 10e-12;
+    var whart = 1 / Math.sqrt((L1 + L2) * Cc);
+    chkZero("4.5 方法自证：电感三点式 X1+X2+X3 = 0",
+      (whart * L1) + (whart * L2) + (-1 / (whart * Cc)), 1e-6);
+  })();
+
+  /* —— 习题 4.10 —— */
+  (function () {
+    var C1 = 200e-12, C2 = 200e-12, Co = 20e-12, fq = 5e6;
+    var CL = C1 * C2 / (C1 + C2);
+    chk("4.10 反馈网络串联值 C_L", CL, 100e-12, 1e-9, " F");
+    chk("4.10 C_o + C_L", Co + CL, 120e-12, 1e-9, " F");
+    var Cq = 2e-12;
+    var ratio = Math.sqrt((Cq + Co + CL) / (Co + CL));
+    chk("4.10 f_c/f_q = sqrt((Cq+Co+CL)/(Co+CL))", ratio, 1.0082988975, 1e-8);
+    chk("4.10 f_c（取 Cq = 2 pF）", fq * ratio, 5041494.4874, 1e-8, " Hz");
+    chkZero("4.10 Cq → 0 时 f_c/f_q → 1", Math.sqrt((0 + Co + CL) / (Co + CL)) - 1, 1e-12);
+    /* 面板 B 回读 */
+    rdback("4.10 面板 f_c", "ro410_fc", 5.0413, 0.002);
+    rdback("4.10 面板 f_c/f_q", "ro410_ratio", 1.00826, 0.002);
+    rdback("4.10 面板偏差", "ro410_dev", 0.826, 0.01);
+    rdback("4.10 面板独立复算 f_c", "ro410_chk", 5.0413, 0.002);
+  })();
+
+  /* —— 习题 4.11 —— */
+  (function () {
+    var S = 1e-4;
+    chk("4.11 由 S = 1/(2Q_L) 反推 Q_L", 1 / (2 * S), 5000, 1e-9);
+    chk("4.11 5 MHz 下 LC 振荡器漂移 Δf", 5e6 * S, 500, 1e-9, " Hz");
+    chk("4.11 晶体振荡器最小漂移（10^-11）", 5e6 * 1e-11, 5e-5, 1e-9, " Hz");
+    chk("4.11 两者漂移之比", (5e6 * S) / (5e6 * 1e-11), 1e7, 1e-9, " 倍");
+  })();
+
+  /* —— 习题 4.12 —— */
+  (function () {
+    var fo = 15e6;
+    function fc(phi, q) { return fo * (1 + Math.tan(phi * Math.PI / 180) / (2 * q)); }
+    chk("4.12 φ_YF = 0 时 f_c = f_o", fc(0, 100), fo, 1e-12, " Hz");
+    chk("4.12 Q_L = 60、φ_YF = −15° 的 f_c", fc(-15, 60), 14966506.3509, 1e-9, " Hz");
+    chk("4.12 Q_L = 20、φ_YF = −15° 的 f_c", fc(-15, 20), 14899519.0528, 1e-9, " Hz");
+    chk("4.12 相对偏差与 Q_L 成反比", (fc(-15, 20) - fo) / (fc(-15, 60) - fo), 3, 1e-9, " 倍");
+    chk("4.12 相对偏差与 tanφ_YF 成正比",
+      (fc(10, 100) - fo) / (fc(-15, 60) - fo),
+      (Math.tan(10 * Math.PI / 180) / 200) / (Math.tan(-15 * Math.PI / 180) / 120), 1e-9, " 倍");
+    /* 面板 A 回读（默认参数 φ_YF = −15°、Q_L = 60、f_o = 15 MHz） */
+    rdback("4.12 面板 f_c", "ro412_fc", 14.9665, 0.002);
+    rdback("4.12 面板相对偏差(%)", "ro412_dev", -0.2233, 0.01);
+    rdback("4.12 面板 Δf(kHz)", "ro412_df", -33.49, 0.01);
+    rdback("4.12 面板独立复算 f_c", "ro412_chk", 14.9665, 0.002);
+  })();
+
+  /* —— 页面文本守卫 —— */
+  txtguard("4.2 题干", "反馈型 LC 振荡器从起振到平衡");
+  txtguard("4.3 题干", "给题 4.3 图中的互感耦合线圈标注正确的同名端");
+  txtguard("4.4 题干", "判断题 4.4 图所示的高频等效电路中");
+  txtguard("4.5 题干", "试分析上述 6 种情况是否可能振荡");
+  txtguard("4.10 题干", "试画出它的交流通路");
+  txtguard("4.11 题干", "为什么晶体振荡器的频率稳定度比 LC 振荡器的高一些");
+  txtguard("4.12 题干", "为什么振荡器的振荡频率一般并不等于选频回路的谐振频率");
+  txtguard("4.5 结论行", "只有当 ω<sub>3</sub>");
+  txtguard("4.10 并列说明", "高频等效电路");
+  txtguard("4.11 并列说明", "克拉波");
+  txtguard("4.12 公式", "tan φ<sub>YF</sub>");
+
+  /* —— SVG 已绘制守卫（用 children 计数，离线检查器与浏览器都适用） —— */
+  ["ex4Fig43", "ex4Fig44", "ex4Fig45", "ex4Fig410", "ex4Fig410eq"].forEach(function (id) {
+    var el = document.getElementById(id);
+    var n = el && el.children ? el.children.length : 0;
+    out.push((n > 0 ? "  PASS  " : "  FAIL  ") + "SVG #" + id + " 已绘制（子元素数 " + n + "）");
+    if (n <= 0) all = false;
+  });
+
+  console.log(TAG + " ===== 页末自检：独立复算 vs 教材/答案册 =====");
+  out.forEach(function (l) { console.log(l); });
+  console.log(TAG + " 自检结果：" + (all ? "全部通过" : "存在 FAIL"));
+  if (all) { document.title = (document.title || "") + " ✓"; }
+})();
+</script>
+
+
+<!-- 共享「做题区」脚本 -->
+<script data-book-quiz-script>
+(function(){
+document.querySelectorAll('[data-book-quiz]').forEach(function(box){
+  var btn=box.querySelector('[data-ex-check]');
+  if(!btn) return;
+  btn.addEventListener('click',function(){
+    var fields=Array.from(box.querySelectorAll('[data-ex-answer]'));
+    var feedback=box.querySelector('[data-ex-feedback]');
+    if(fields.some(function(f){return f.value.trim()===''||!Number.isFinite(Number(f.value));})){
+      feedback.textContent='请先填写所有答案（数字），注意题目要求的单位。';return;
+    }
+    var results=fields.map(function(f){var pass=Math.abs(Number(f.value)-Number(f.dataset.exAnswer))<=Number(f.dataset.exTol);return f.getAttribute('aria-label')+'：'+(pass?'✓ 正确':'需复查公式、折算系数或单位');});
+    feedback.textContent=results.join('；');
+  });
+});
+})();
+</script>
+</body></html>

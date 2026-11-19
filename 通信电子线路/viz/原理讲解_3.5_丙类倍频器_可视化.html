@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>原理讲解 · 3.5 丙类倍频器</title>
+<style>
+:root{
+  --ink:#1a1a1a; --mut:#6b6b6b; --line:#1f1f1f; --soft:#e9ecef;
+  --blue:#1a46b5; --red:#c02020; --green:#0d7a3c; --amber:#c07a00; --violet:#7a3fb0;
+  --bg:#fbfbf9; --card:#fff; --bd:#d8d8d2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC","Source Han Sans SC",sans-serif;
+  line-height:1.75;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px}
+header{background:linear-gradient(135deg,#12233f,#2a4a7d);color:#fff;padding:52px 0 44px;margin-bottom:36px}
+header .wrap{padding-bottom:0}
+.kicker{font-size:13px;letter-spacing:.22em;opacity:.72;margin:0 0 10px}
+h1{font-size:34px;margin:0 0 12px;line-height:1.3;font-weight:700}
+.sub{font-size:16px;opacity:.85;max-width:820px;margin:0}
+.meta{margin-top:22px;font-size:13px;opacity:.7;display:flex;gap:22px;flex-wrap:wrap}
+h2{font-size:23px;margin:52px 0 6px;padding-bottom:10px;border-bottom:2px solid var(--ink);font-weight:700}
+h2 .num{color:var(--blue);margin-right:10px}
+h3{font-size:17px;margin:28px 0 10px;color:#234}
+p{margin:10px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px 24px;margin:18px 0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+svg{width:100%;height:auto;display:block;background:#fff;border-radius:6px}
+.cap{font-size:13px;color:var(--mut);text-align:center;margin-top:8px}
+svg text{font-family:"Microsoft YaHei",sans-serif}
+.badge{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;background:#eef2f8;color:#234;margin-right:6px}
+kbd{background:#eef0f2;border:1px solid #ccd0d4;border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-size:13px;
+  font-family:Consolas,monospace}
+.formula{background:#f6f7f5;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;
+  font-family:"Cambria Math","Times New Roman",serif;font-size:17px;overflow-x:auto}
+.formula .no{float:right;color:var(--mut);font-size:14px}
+.ctrls{display:flex;flex-wrap:wrap;gap:26px;background:#f2f4f7;border:1px solid var(--bd);
+  border-radius:8px;padding:16px 20px;margin:16px 0}
+.ctrl{flex:1 1 210px}
+.ctrl label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.ctrl .row{display:flex;align-items:center;gap:10px}
+.ctrl input[type=range]{flex:1;accent-color:var(--blue);height:20px}
+.ctrl .val{font-family:Consolas,monospace;font-size:14px;font-weight:700;color:var(--blue);min-width:74px;text-align:right}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:16px 0}
+.ro{background:#fff;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:6px;padding:10px 14px}
+.ro .k{font-size:12px;color:var(--mut)}
+.ro .v{font-family:Consolas,monospace;font-size:19px;font-weight:700;color:var(--ink)}
+.ro.g{border-left-color:var(--green)} .ro.g .v{color:var(--green)}
+.ro.r{border-left-color:var(--red)} .ro.r .v{color:var(--red)}
+.ro.a{border-left-color:var(--amber)} .ro.a .v{color:var(--amber)}
+canvas{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--bd);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th,td{border:1px solid var(--bd);padding:8px 11px;text-align:left}
+th{background:#f2f4f7;font-weight:700}
+td.n{font-family:Consolas,monospace;white-space:nowrap}
+ul,ol{padding-left:24px}li{margin:7px 0}
+.hl{background:#fff6d8;padding:1px 4px;border-radius:3px;font-weight:600}
+.warn{background:#fff4f4;border-left:3px solid var(--red);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.steps{display:grid;gap:9px;margin:14px 0}
+.st{background:#f7f9fc;border-left:3px solid var(--blue);padding:10px 15px;border-radius:0 6px 6px 0;font-size:14.5px}
+.st b{color:var(--blue);margin-right:6px}
+.mono{font-family:Consolas,"Microsoft YaHei",monospace;background:#eef2f8;color:#12306e;
+      padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px;font-size:14px}
+.note{background:#f4f8ff;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.sym{font-size:14px;margin:12px 0}
+.sym td:first-child{width:120px}
+.why{display:block;margin-top:8px;font-size:13.5px;color:#444;line-height:1.72}
+.why::before{content:"↳ ";color:var(--amber);font-weight:700}
+.live{background:#fffaf0;border:1px dashed var(--amber);border-radius:8px;padding:13px 18px;margin:16px 0;font-size:14.5px}
+.live b{color:#9a5c00}
+.live .mono{background:#fff;margin-top:2px;margin-bottom:2px}
+.kv{font-family:Consolas,monospace;background:#eef2f8;color:#12306e;padding:1px 7px;border-radius:4px;font-size:14px}
+.eqno{color:var(--mut);font-size:12.5px;margin-left:6px;white-space:nowrap}
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);font-size:13px;color:var(--mut)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:8px 0 2px;align-items:center}
+.legend i{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:6px}
+button{font-family:inherit;font-size:14px;padding:7px 16px;border:1px solid var(--bd);background:#fff;
+  border-radius:6px;cursor:pointer;margin-right:8px}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* ==== 数学排版（ch3_fracify 注入） ==== */
+/* ==================== 数学排版：堆叠分式 / 根号 ====================
+   教材的分式、根号都是竖排写法，这里用纯 CSS 还原（不引外部字体/库）。
+   .frac  > .fn 分子 / .fd 分母（.fd 上边框即分式横线）
+   .sqrt > .sgn 根号 / .rad 被开方数（.rad 上边框即根号横线）
+   .fb 是视觉隐藏的 "/"：复制粘贴得到线性写法，静态抄写检查也靠它还原 */
+.mt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif}
+td.n.mt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;white-space:normal}
+.frac,.sqrt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif}
+.frac{display:inline-flex;flex-direction:column;align-items:stretch;position:relative;
+  margin:0 .2em;padding:0 .03em;text-align:center;line-height:1.15;vertical-align:middle}
+.frac>.fn{padding:0 .24em .04em}
+.frac>.fd{padding:.04em .24em 0;border-top:1px solid currentColor}
+.frac>.fb{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sqrt{display:inline-block;white-space:nowrap}
+.sqrt>.sgn{display:inline-block}
+.sqrt>.rad{display:inline-block;border-top:1px solid currentColor;
+  padding:0 .18em 0 .34em;margin-left:-.2em}
+/* 被开方数里含堆叠分式时，根号要罩住整个分式（照教材的写法）：
+   字形 "√" 罩不住两行高的分式，改用 mask 画一个**可任意拉伸**的钩，
+   SVG 直接写在 data URI 里 —— 页面仍然完全自包含，不引用任何外部资源。
+   横线（根号顶上的那一条）仍由 .rad 的上边框给出；
+   钩的笔画用普通 stroke（不加 non-scaling-stroke），随字号一起缩放。 */
+.sqrt.tall{display:inline-flex;align-items:stretch;vertical-align:middle}
+.sqrt.tall>.sgn{flex:0 0 auto;position:relative;width:.42em;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 100' preserveAspectRatio='none'><path d='M1 99 L6.5 82 L11 2' fill='none' stroke='black' stroke-width='4.5'/></svg>") no-repeat center/100% 100%;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 100' preserveAspectRatio='none'><path d='M1 99 L6.5 82 L11 2' fill='none' stroke='black' stroke-width='4.5'/></svg>") no-repeat center/100% 100%}
+.sqrt.tall>.sgn>.sg{position:absolute;left:0;top:0;font-size:0;line-height:0}
+.sqrt.tall>.rad{flex:0 0 auto;border-top:1px solid currentColor;padding:0 .18em 0 .06em}
+
+</style>
+<style id="pub-mobile">.pub-tw{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;min-width:0;margin:14px 0}.pub-tw table{width:auto;max-width:none}.pub-tw::-webkit-scrollbar{height:8px}.pub-tw::-webkit-scrollbar-thumb{background:#c9c9c0;border-radius:4px}@media (max-width:760px){.pub-tw>table{width:max-content;min-width:100%}}img{max-width:100%;height:auto}canvas{max-width:100%;height:auto}pre{overflow-x:auto;max-width:100%}body{overflow-wrap:anywhere;}code{overflow-wrap:anywhere;word-break:break-word}</style><style id="pub-mobile-css">/* ============================================================================
+   移动端适配样式（build/mobile.css，由 build.js 内联进每个页面）
+   ----------------------------------------------------------------------------
+   背景：共享样式里 `svg{width:100%;height:auto}` 是**等比缩放**——
+   800×210 的框图在 390px 手机上只剩 281px 宽，缩放 0.35，
+   9.8px 的图内标注实际渲染只有 **3.4~5px**，完全看不清。
+
+   方案：宽图由 runtime（build/mobile.js）包进 .fig 横滑容器并按 **1:1** 渲染，
+        文字保持设计字号；容器内左右滑动看全图。
+   ⚠ 桌面端零影响：包裹动作只在「图宽 > 视口宽」时触发，
+     视口够宽时页面 DOM 与样式与改造前完全一致。
+
+   规则清单：
+     ① .figwrap/.fig     宽图横滑容器 + 滑动提示 + 两侧渐隐阴影
+     ② .tbl-wrap         表格横滑（窄屏下按内容宽度排版，不压扁列）
+     ③ 触控尺寸          pointer:coarse 时放大滑块/按钮
+     ④ .mvis-lb-*        点图全屏灯箱（双指缩放 / 拖动平移 / 双击放大）
+   ========================================================================== */
+
+/* ---------- ① 宽图横滑 ---------- */
+/* ⚠ min-width:0 / max-width:100% 不能省：
+   .figwrap 常处在 flex / grid 卡片里，而 flex 项的默认 min-width:auto 会让它
+   **不肯收缩到内容宽度以下** —— SVG 按 1:1 渲染后（如 902px 宽的框图），
+   容器不肯缩 → 卡片被撑到 902px → 整页被顶出横向滚动条。
+   允许收缩后，.fig 自己的 overflow-x:auto 接管横滑，页面不再溢出。 */
+.figwrap{margin:12px 0;min-width:0;max-width:100%;
+  /* contain:inline-size：让本盒子的**行内尺寸不再由内容决定** →
+     它在父级（grid/flex 卡片）里的 min-content 贡献降为 0。
+     ⚠ 这是关键的一步：grid 项默认 min-width:auto = 内容最小宽度，
+     1:1 渲染的宽图（如 432px 的 SVG）会把卡片撑到 470px → 整页横向溢出。
+     min-width:0 只能让**自己**收缩，压不住父级由内容撑开的宽度。 */
+  contain:inline-size;
+}
+.fig{
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  background:#fff;border:1px solid var(--bd,#d8d8d2);border-radius:8px;
+  scrollbar-width:thin;min-width:0;max-width:100%;
+}
+.fig>svg{
+  width:auto;max-width:none;display:block;margin:0 auto;
+  background:#fff;border-radius:0;
+}
+/* 可横滑时两侧加渐隐阴影，提示「还有内容」 */
+.figwrap.is-scroll>.fig{
+  box-shadow:inset 16px 0 14px -16px rgba(0,0,0,.30),
+             inset -16px 0 14px -16px rgba(0,0,0,.30);
+}
+.fighint{display:none;font-size:12px;color:var(--mut,#6b6b6b);text-align:center;margin-top:6px;}
+.figwrap.is-scroll>.fighint{display:block;}
+/* 提示条上的「放大」按钮 */
+.fighint button{
+  font:inherit;font-size:12px;margin:0 0 0 10px;padding:3px 10px;
+  border:1px solid var(--bd,#d8d8d2);border-radius:12px;background:#fff;color:var(--blue,#1a46b5);
+  vertical-align:baseline;
+}
+
+/* ---------- ①·b grid / flex 子项允许收缩 ----------
+   grid 项与 flex 项的默认 min-width:auto = **内容最小宽度**，
+   里面放了 1:1 渲染的宽图（SVG 宽 778px）时，项不肯缩到轨道宽以下 →
+   卡片被撑破 → 整页横向滚动条。
+   下面的容器清单由 scratch/survey_grid_classes.js 从发布目录**实测**得出
+   （谁声明了 display:grid/flex 就收谁），不是拍脑袋写的。 */
+.grid2>*,.grid3>*,.grid4>*,.grid>*,.grid12>*,.grid21>*,.irow>*,
+.cols2>*,.cols3>*,.readout>*,.meta>*,.ctrls>*,.ctrl .row>*,.steps>*,
+.legend>*,.frac>*,.badge-row>*,.eyebrow>*,.meta-row>*,.sec-head>*,
+.purpose>*,.widget-h>*,.btnrow>*,.flow>*,.kv>*,.readouts>*,.item>*,
+.buttons>*,.tabs>*,.presets>*,.symrow>*,.wave-trio>*,.bench>*{min-width:0}
+
+/* ---------- ② 表格横滑 ---------- */
+/* 章节样式里通常已有 .tbl-wrap；这里补一份兜底，
+   窄屏下让表格按内容宽度排布（不把列压成一条缝），超宽时横滑。 */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;max-width:100%;}
+@media (max-width:760px){
+  .tbl-wrap>table{width:max-content;min-width:100%;}
+}
+
+/* ---------- ②·b Canvas 自适应 ----------
+   canvas 用 width/height **属性**定死像素尺寸（如 width="640"），
+   在窄屏上就是一块不肯收缩的替换元素 → 连带把卡片与整页撑破
+   （实测某页 canvas 432px 宽，卡片被撑到 470px）。
+   max-width:100% + height:auto 让它等比缩小（只改显示尺寸，
+   不动画布的绘制分辨率，页面脚本读 canvas.width 不受影响）。 */
+canvas{max-width:100%;height:auto;}
+
+/* ---------- ③ 触控尺寸 ---------- */
+@media (pointer:coarse){
+  input[type=range]{height:34px;margin:2px 0;}
+  input[type=range]::-webkit-slider-thumb{width:26px;height:26px;}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border:0;}
+  button{min-height:40px;padding:9px 18px;}
+  .ctrl .val{font-size:15px;}
+  .fighint{font-size:12.5px;}
+}
+
+/* ---------- ④ 全屏灯箱 ---------- */
+.mvis-lb{
+  position:fixed;inset:0;z-index:99999;background:rgba(10,14,24,.96);
+  display:none;flex-direction:column;touch-action:none;overscroll-behavior:contain;
+}
+.mvis-lb.on{display:flex;}
+.mvis-lb-stage{
+  flex:1 1 auto;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.mvis-lb-zoom{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  transform-origin:center center;will-change:transform;
+}
+.mvis-lb-zoom>svg{
+  width:100%;height:100%;max-width:none;max-height:none;
+  background:transparent;border-radius:0;
+}
+.mvis-lb-bar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  background:#101828;color:#e8eef9;font-size:14px;
+}
+.mvis-lb-bar button{
+  background:#1e2c47;color:#e8eef9;border:1px solid #34456b;border-radius:8px;
+  min-width:46px;min-height:42px;margin:0;padding:8px 14px;font-size:16px;
+}
+.mvis-lb-bar button:active{background:#2a3c60;}
+.mvis-lb-tip{width:100%;text-align:center;color:#93a4c4;font-size:12px;}
+.mvis-lb-x{
+  position:absolute;top:8px;right:10px;z-index:2;
+  background:rgba(30,44,71,.9);color:#e8eef9;border:1px solid #34456b;
+  border-radius:8px;min-width:42px;min-height:42px;margin:0;font-size:18px;
+}
+/* 桌面端灯箱按钮不需要那么大的触控区 */
+@media (pointer:fine){
+  .mvis-lb-bar button{min-height:34px;font-size:14px;padding:6px 12px;}
+  .mvis-lb-x{min-height:34px;min-height:34px;}
+}
+</style></head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="kicker">通信电子线路（第 3 版 · 陈启兴） 第 3 章 高频功率放大器</p>
+    <h1>3.5　丙类倍频器</h1>
+    <p class="sub">倍频器的功能是把频率为 f<sub>c</sub> 的输入信号变换成频率为 n f<sub>c</sub> 的输出信号（n 为正整数）。
+      在丙类放大器中，晶体管集电极的脉冲电流中含有丰富的谐波分量，把集电极谐振回路调谐在 n 次谐波上，
+      输出电压就只有 n 次谐波电压，也就实现了 n 次倍频。本页按教材 3.5 节的顺序，把式 (3-30)～(3-34) 全部拆开重绘，
+      并把分解系数 α<sub>n</sub>(θ<sub>c</sub>) 与倍频输出的估算做成可交互的。</p>
+    <div class="meta">
+      <span>教材页码：书页 70 – 71（PDF 页 82 – 83）</span>
+      <span>对应插图：无（3.5 节无插图，曲线按式 (3-17)～(3-19) 重绘）</span>
+      <span>交互：θ<sub>c</sub>、n、I<sub>CM</sub>、R<sub>p</sub>、V<sub>CC</sub> 可拖，实时重算</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===================== 1 倍频器是什么 ===================== -->
+<h2><span class="num">1</span>倍频器是什么、为什么需要（三条优点）</h2>
+
+<p>在无线电发射机、频率合成器等电子设备中，广泛地应用了倍频器。它的功能是将频率为 f<sub>c</sub> 的输入信号变换成频率为
+n f<sub>c</sub> 的输出信号（n 为正整数）。采用倍频器的优点有：</p>
+
+<div class="steps">
+  <div class="st"><b>(1)</b>能降低电子设备的主振荡器的频率，有利于提高频率稳定度。振荡器频率越高，频率稳定度越低，
+    一般情况下，<span class="hl">主振荡器频率不宜超过 5MHz</span>。因此，当要求输出频率超过 5MHz 的时候，通常采用倍频器。</div>
+  <div class="st"><b>(2)</b>在通信机的主振荡器工作频段不扩展的条件下，可以利用倍频器<span class="hl">扩展发射机输出级的工作波段</span>。</div>
+  <div class="st"><b>(3)</b>在调频和调相发射机中，倍频器可以用来<span class="hl">加大频偏或相移</span>。</div>
+</div>
+
+<div class="note">
+  <b>倍频器的前后关系：</b>输入信号频率 f<sub>c</sub> → 倍频器（n 次） → 输出信号频率 n f<sub>c</sub>。
+  主振荡器工作在较低的频率上（有利于频率稳定），再由倍频器把频率提高到需要的工作频率；
+  调频、调相发射机则借倍频把较小的频偏 Δf、相移 Δφ 放大 n 倍，得到 n Δf 的频偏、n Δφ 的相移。
+</div>
+
+<!-- ===================== 2 三类倍频器 ===================== -->
+<h2><span class="num">2</span>三类倍频器原理（丙类脉冲选频 / 模拟乘法器 / 参量倍频器）与频率划分</h2>
+
+<p>倍频器按其工作原理可分为 3 类：① 利用丙类放大器，从其电流脉冲中选频出谐波分量而获得倍频；② 模拟乘法器实现倍频；
+③ 利用 PN 结结电容的非线性变化，得到输入信号的谐波，经选频回路获得倍频，称为参量倍频器。</p>
+
+<div class="grid3">
+  <div class="card">
+    <p><span class="badge">① 丙类脉冲选频</span></p>
+    <p>利用丙类放大器，从其<span class="hl">电流脉冲中选频出谐波分量</span>而获得倍频。
+      晶体管集电极的脉冲电流中含有丰富的谐波分量，把集电极谐振回路调谐在 n 次谐波上即可取得 n 次倍频。</p>
+  </div>
+  <div class="card">
+    <p><span class="badge">② 模拟乘法器</span></p>
+    <p>模拟乘法器实现倍频。利用乘法运算产生输入信号频率的和频、差频分量，取出 n f<sub>c</sub> 分量即得倍频输出。</p>
+  </div>
+  <div class="card">
+    <p><span class="badge">③ 参量倍频器</span></p>
+    <p>利用 <span class="hl">PN 结结电容的非线性变化</span>，得到输入信号的谐波，经选频回路获得倍频，称为参量倍频器。</p>
+  </div>
+</div>
+
+<div class="note">
+  <b>按工作频率划分：</b>当工作频率为<span class="hl">几十兆赫及其以下</span>时，主要采用<span class="hl">三极管丙类倍频器</span>；
+  当工作频率<span class="hl">高于 1000MHz</span> 时，主要采用<span class="hl">参量倍频器</span>。
+</div>
+
+<p>在丙类放大器中，晶体管集电极的脉冲电流中含有丰富的谐波分量。如果集电极谐振回路调谐在 n 次谐波上，
+则放大器的输出电压只有 n 次谐波电压，也就实现了 n 次倍频。下面简单地定量分析丙类倍频器。</p>
+
+<!-- ===================== 3 定量分析 ===================== -->
+<h2><span class="num">3</span>丙类倍频器的定量分析（式 3-30～3-33）</h2>
+
+<p>设输入信号为 u<sub>b</sub>(t) = U<sub>bm</sub> cos(ω<sub>c</sub> t)，则输出信号为</p>
+
+<div class="formula">
+  u<sub>c</sub>(t) = U<sub>cm</sub> cos(n ω<sub>c</sub> t)
+  <span class="no">式 (3-30)</span>
+</div>
+
+<p>发射结电压和管压降电压分别为</p>
+
+<div class="formula">
+  u<sub>BE</sub>(t) = V<sub>BB</sub> + U<sub>bm</sub> cos(ω<sub>c</sub> t)，　
+  u<sub>CE</sub>(t) = V<sub>CC</sub> − U<sub>cm</sub> cos(n ω<sub>c</sub> t)
+</div>
+
+<p>利用高频谐振功率放大器的分析结果，n 次倍频器输出的电压振幅、功率和效率为</p>
+
+<div class="formula">
+  U<sub>cm</sub> = I<sub>cnm</sub> R<sub>p</sub> = I<sub>CM</sub> α<sub>n</sub>(θ<sub>c</sub>) R<sub>p</sub>
+  <span class="no">式 (3-31)</span>
+</div>
+
+<p>式中：R<sub>p</sub> —— 负载回路谐振电阻；α<sub>n</sub>(θ<sub>c</sub>) —— <span class="hl">n 次谐波分解系数</span>
+（集电极电流脉冲中 n 次谐波分量振幅 I<sub>cnm</sub> = I<sub>CM</sub> α<sub>n</sub>(θ<sub>c</sub>)）。</p>
+
+<div class="formula">
+  P<sub>on</sub> = 0.5 U<sub>cm</sub> I<sub>cnm</sub> = 0.5 I<sub>cnm</sub><sup>2</sup> R<sub>p</sub>
+  <span class="no">式 (3-32)</span>
+</div>
+
+<div class="formula">
+  η<sub>c</sub> = <span class="frac"><span class="fn">P<sub>on</sub></span><span class="fb">/</span><span class="fd">P<sub>=</sub></span></span>
+  = <span class="frac"><span class="fn">0.5 U<sub>cm</sub> I<sub>CM</sub> α<sub>n</sub>(θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">V<sub>CC</sub> I<sub>c0</sub></span></span>
+  = <span class="frac"><span class="fn">U<sub>cm</sub> α<sub>n</sub>(θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">2 V<sub>CC</sub> α<sub>0</sub>(θ<sub>c</sub>)</span></span>
+  <span class="no">式 (3-33)</span>
+</div>
+
+<p>式中：θ<sub>c</sub> —— 丙类放大器的<span class="hl">通角（导通角）</span>；
+I<sub>c0</sub> —— 晶体管集电极电流脉冲中的直流分量（I<sub>c0</sub> = I<sub>CM</sub> α<sub>0</sub>(θ<sub>c</sub>)）；
+I<sub>CM</sub> —— 晶体管集电极电流脉冲的最大值。</p>
+
+<h3>分解系数 α<sub>0</sub>、α<sub>1</sub>、α<sub>n</sub> 的闭式</h3>
+
+<p>式 (3-31)、式 (3-33) 中的分解系数由集电极余弦脉冲电流的傅里叶分解得到（教材式 (3-17)～(3-19)）。
+α<sub>0</sub>、α<sub>1</sub> 及 n ≥ 2 的 α<sub>n</sub> 的闭式分别为</p>
+
+<div class="formula">
+  α<sub>0</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">sin θ<sub>c</sub> − θ<sub>c</sub> cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">π(1 − cos θ<sub>c</sub>)</span></span><br>
+  α<sub>1</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">θ<sub>c</sub> − sin θ<sub>c</sub> cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">π(1 − cos θ<sub>c</sub>)</span></span><br>
+  α<sub>n</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">sin(n θ<sub>c</sub>) cos θ<sub>c</sub> − n sin θ<sub>c</sub> cos(n θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">0.5πn(n<sup>2</sup> − 1)(1 − cos θ<sub>c</sub>)</span></span>，n ≥ 2
+  <span class="no">式 (3-17) ～ (3-19)</span>
+</div>
+
+<div class="formula">
+  α<sub>3</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">sin(3θ<sub>c</sub>) cos θ<sub>c</sub> − 3 sin θ<sub>c</sub> cos(3θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">12π(1 − cos θ<sub>c</sub>)</span></span>
+  <span class="no">n = 3 代入式 (3-19)</span>
+</div>
+
+<div class="note">
+  式 (3-19) 的分式对 n ≥ 2 成立（n = 1 时分母中的 n<sup>2</sup> − 1 无定义，α<sub>1</sub> 由式 (3-18) 单独给出）。
+  α<sub>3</sub> 的闭式即取 n = 3 的结果。这些系数都是通角 θ<sub>c</sub> 的函数，计算比较烦琐，通常可以查表（本书附录 A）。
+</div>
+
+<div class="card">
+  <h3>交互 A：α<sub>n</sub>(θ<sub>c</sub>) 曲线 —— 拖 θ<sub>c</sub>，按 n = 1…5 选谐波次数，实时重算</h3>
+  <div class="ctrls">
+    <div class="ctrl">
+      <label>θ<sub>c</sub>　半导通角 (°)</label>
+      <div class="row"><input type="range" id="sThA" min="0" max="180" step="1" value="60"><span class="val" id="vThA">60</span></div>
+    </div>
+    <div class="ctrl">
+      <label>n　谐波次数（按钮选取）</label>
+      <div class="row">
+        <button id="btnN1" type="button">n = 1</button>
+        <button id="btnN2" type="button" class="on">n = 2</button>
+        <button id="btnN3" type="button">n = 3</button>
+        <button id="btnN4" type="button">n = 4</button>
+        <button id="btnN5" type="button">n = 5</button>
+      </div>
+    </div>
+  </div>
+  <div class="legend">
+    <span><i style="background:#1a46b5"></i>α<sub>1</sub></span>
+    <span><i style="background:#0d7a3c"></i>α<sub>2</sub></span>
+    <span><i style="background:#c07a00"></i>α<sub>3</sub></span>
+    <span><i style="background:#c02020"></i>α<sub>4</sub></span>
+    <span><i style="background:#7a3fb0"></i>α<sub>5</sub></span>
+    <span><i style="background:#c9ccd1"></i>未选中曲线</span>
+  </div>
+  <canvas id="cvAlpha" width="1040" height="400"></canvas>
+  <p class="cap">横轴 θ<sub>c</sub>（0°～180°），纵轴 α<sub>n</sub>(θ<sub>c</sub>)：按式 (3-17)、(3-18)、(3-19) 实时计算的分解系数曲线；
+    竖虚线为当前 θ<sub>c</sub>，实心点为当前值，空心点为该次谐波的最大值位置。</p>
+  <div class="readout">
+    <div class="ro"><div class="k">α<sub>n</sub>(θ<sub>c</sub>)　当前值</div><div class="v" id="roAcur">—</div></div>
+    <div class="ro a"><div class="k">最大值位置　θ<sub>c</sub> = 120°/n</div><div class="v" id="roAth">—</div></div>
+    <div class="ro g"><div class="k">α<sub>n</sub> 最大值</div><div class="v" id="roAmax">—</div></div>
+    <div class="ro"><div class="k">当前值 / 最大值</div><div class="v" id="roAratio">—</div></div>
+  </div>
+  <div class="live" id="liveA">
+    <b>最大值位置一览：</b><span class="kv">n=1:120°，n=2:60°，n=3:40°，n=4:30°，n=5:24°</span>
+    <br><span class="mono">n = 1 → 120°　n = 2 → 60°　n = 3 → 40°　n = 4 → 30°　n = 5 → 24°</span>
+    <br><b>旁注：</b>θ<span style="font-size:0">_</span><sub>c</sub> = 120°/n 才保证 α<span style="font-size:0">_</span><sub>n</sub> 最大 —— 这正是下面式 (3-34) 的选取原则。
+    n 越大，α<sub>n</sub> 的最大值越小，倍频器的输出振幅、功率和效率也越小。
+  </div>
+</div>
+
+<div class="card">
+  <h3>交互 B：倍频输出估算 —— 拖 I<sub>CM</sub>、R<sub>p</sub>、V<sub>CC</sub>、θ<sub>c</sub>、n，按式 (3-31)～(3-33) 实时重算</h3>
+  <div class="ctrls">
+    <div class="ctrl">
+      <label>I<sub>CM</sub>　脉冲最大值 (A)</label>
+      <div class="row"><input type="range" id="sIcm" min="0.1" max="5" step="0.05" value="1"><span class="val" id="vIcm">1.00</span></div>
+    </div>
+    <div class="ctrl">
+      <label>R<sub>p</sub>　负载回路谐振电阻 (Ω)</label>
+      <div class="row"><input type="range" id="sRp" min="1" max="200" step="1" value="50"><span class="val" id="vRp">50</span></div>
+    </div>
+    <div class="ctrl">
+      <label>V<sub>CC</sub>　集电极电源 (V)</label>
+      <div class="row"><input type="range" id="sVcc" min="1" max="50" step="0.5" value="24"><span class="val" id="vVcc">24.0</span></div>
+    </div>
+    <div class="ctrl">
+      <label>θ<sub>c</sub>　半导通角 (°)</label>
+      <div class="row"><input type="range" id="sThB" min="5" max="180" step="1" value="60"><span class="val" id="vThB">60</span></div>
+    </div>
+    <div class="ctrl">
+      <label>n　倍频次数</label>
+      <div class="row"><input type="range" id="sNB" min="1" max="5" step="1" value="2"><span class="val" id="vNB">2</span></div>
+    </div>
+  </div>
+  <canvas id="cvEst" width="1040" height="380"></canvas>
+  <p class="cap">当前 n、I<sub>CM</sub>、R<sub>p</sub>、V<sub>CC</sub> 下，P<sub>on</sub>(θ<sub>c</sub>)（左轴）与
+    η<sub>c</sub>(θ<sub>c</sub>)（右轴）随 θ<sub>c</sub> 的变化；竖虚线为当前 θ<sub>c</sub>，实心点为当前值。</p>
+  <div class="readout">
+    <div class="ro"><div class="k">I<sub>cnm</sub> = I<sub>CM</sub> α<sub>n</sub>(θ<sub>c</sub>)　(A)</div><div class="v" id="roIcnm">—</div></div>
+    <div class="ro"><div class="k">U<sub>cm</sub> = I<sub>cnm</sub> R<sub>p</sub>　(V)</div><div class="v" id="roUcm">—</div></div>
+    <div class="ro g"><div class="k">P<sub>on</sub> = 0.5 U<sub>cm</sub> I<sub>cnm</sub>　(W)</div><div class="v" id="roPon">—</div></div>
+    <div class="ro g"><div class="k">η<sub>c</sub> = U<sub>cm</sub> α<sub>n</sub> /(2 V<sub>CC</sub> α<sub>0</sub>)</div><div class="v" id="roEta">—</div></div>
+    <div class="ro a"><div class="k">α<sub>n</sub>(θ<sub>c</sub>)</div><div class="v" id="roAnB">—</div></div>
+    <div class="ro a"><div class="k">α<sub>0</sub>(θ<sub>c</sub>)</div><div class="v" id="roA0B">—</div></div>
+  </div>
+  <div class="live" id="liveEst">
+    <b>代入过程：</b><span class="kv" id="kvAn">—</span>
+  </div>
+  <div class="warn" id="warnEst" style="display:none">
+    U<sub>cm</sub> &gt; V<sub>CC</sub>：电压振幅超过电源电压，放大器进入过压状态，
+    式 (3-31)～(3-33) 的欠压临界估算不再适用，请减小 I<sub>CM</sub> 或 R<sub>p</sub>，或增大 V<sub>CC</sub>。
+  </div>
+</div>
+
+<!-- ===================== 4 通角选取与倍频次数限制 ===================== -->
+<h2><span class="num">4</span>通角选取与倍频次数限制（式 3-34 θ<span style="font-size:0">_</span><sub>c</sub>=120°/n）</h2>
+
+<p>由于 n 的增加，集电极电流谐波分量的振幅越来越小，倍频器输出的电压振幅、功率和效率也越来越小。
+因此，单级丙类倍频器一般只能用于二倍频或三倍频。如果要提高倍频次数，可以将多级倍频器级联。</p>
+
+<div class="warn">
+  <b>倍频次数的限制：</b>随着 n 增加，α<sub>n</sub> 的最大值依次减小（交互 A 中 n = 1…5 的曲线一目了然），
+  倍频器输出的电压振幅、功率和效率也随之下降。<span class="hl">单级丙类倍频器一般只能用于二倍频或三倍频</span>；
+  如果要提高倍频次数，可以将多级倍频器级联。
+</div>
+
+<p>为了提高 n 次丙类倍频器的功率和效率，选取通角时必须满足</p>
+
+<div class="formula">
+  θ<sub>c</sub> = 120° / n
+  <span class="no">式 (3-34)</span>
+</div>
+
+<p>才能保证 α<sub>n</sub>(θ<sub>c</sub>) 为最大值。</p>
+
+<div class="pub-tw"><table>
+  <tr><th>倍频次数 n</th><td class="n">1</td><td class="n">2</td><td class="n">3</td><td class="n">4</td><td class="n">5</td></tr>
+  <tr><th>最佳通角 θ<sub>c</sub> = 120°/n</th>
+    <td class="n">120°</td><td class="n">60°</td><td class="n">40°</td><td class="n">30°</td><td class="n">24°</td></tr>
+  <tr><th>α<sub>n</sub> 最大值（式 3-17～3-19）</th>
+    <td class="n" id="roT1">—</td><td class="n" id="roT2">—</td><td class="n" id="roT3">—</td>
+    <td class="n" id="roT4">—</td><td class="n" id="roT5">—</td></tr>
+</table></div>
+
+<div class="note">
+  <b>式 (3-34) 的含义：</b>把通角取为 θ<sub>c</sub> = 120°/n，n 次谐波分解系数 α<sub>n</sub>(θ<sub>c</sub>) 恰好达到最大值，
+  从而在给定 I<sub>CM</sub>、R<sub>p</sub> 的条件下得到最大的输出电压振幅、功率和效率。
+  例如二倍频取 θ<sub>c</sub> = 60°，三倍频取 θ<sub>c</sub> = 40° —— 可在交互 A 中把 n 切到 2、3 验证：
+  此时曲线的空心点（最大值位置）恰与 θ<sub>c</sub> = 120°/n 重合。
+</div>
+
+<!-- ===================== 5 要点小结 ===================== -->
+<h2><span class="num">5</span>要点小结</h2>
+
+<div class="steps">
+  <div class="st"><b>1</b>倍频器的功能是将频率为 f<sub>c</sub> 的输入信号变换成频率为 n f<sub>c</sub> 的输出信号（n 为正整数）。
+    三条优点：降低主振荡器频率以提高频率稳定度（主振荡器频率不宜超过 5MHz）；不扩展主振荡器工作频段即可扩展发射机输出级工作波段；
+    在调频、调相发射机中加大频偏或相移。</div>
+  <div class="st"><b>2</b>倍频器按工作原理分 3 类：丙类放大器从电流脉冲中选频出谐波分量；模拟乘法器；参量倍频器（PN 结结电容的非线性变化）。
+    几十兆赫及其以下主要用三极管丙类倍频器，高于 1000MHz 主要用参量倍频器。</div>
+  <div class="st"><b>3</b>丙类倍频器的原理：集电极脉冲电流中含有丰富的谐波分量，谐振回路调谐在 n 次谐波上，
+    输出电压只有 n 次谐波电压，即实现 n 次倍频。输出信号 u<sub>c</sub>(t) = U<sub>cm</sub> cos(n ω<sub>c</sub> t)。</div>
+  <div class="st"><b>4</b>定量结果：U<sub>cm</sub> = I<sub>cnm</sub> R<sub>p</sub> = I<sub>CM</sub> α<sub>n</sub>(θ<sub>c</sub>) R<sub>p</sub>；
+    P<sub>on</sub> = 0.5 U<sub>cm</sub> I<sub>cnm</sub> = 0.5 I<sub>cnm</sub><sup>2</sup> R<sub>p</sub>；
+    η<sub>c</sub> = [U<sub>cm</sub> α<sub>n</sub>(θ<sub>c</sub>)] / [2 V<sub>CC</sub> α<sub>0</sub>(θ<sub>c</sub>)]。</div>
+  <div class="st"><b>5</b>限制与选取：n 增加则谐波振幅、输出电压振幅、功率和效率都减小，单级一般只用于二倍频或三倍频，更高倍频次数用多级级联；
+    为提高功率和效率，通角必须取 θ<sub>c</sub> = 120°/n，才能保证 α<sub>n</sub>(θ<sub>c</sub>) 为最大值。</div>
+</div>
+
+<div class="live">
+  <b>自检（对照交互 A、B）：</b>把 n 切到 2、θ<sub>c</sub> 拖到 <span class="kv">60°</span>，α<sub>2</sub> 应达到最大值
+  <span class="kv" id="kvA2max">—</span>；把 n 切到 3、θ<sub>c</sub> 拖到 <span class="kv">40°</span>，α<sub>3</sub> 应达到最大值
+  <span class="kv" id="kvA3max">—</span>。在交互 B 中固定其余参数，把 n 从 1 加到 3，
+  <span class="kv">I<sub>cnm</sub></span>、<span class="kv">P<sub>on</sub></span>、<span class="kv">η<sub>c</sub></span> 都会随之减小。
+</div>
+
+<div class="foot">
+  <p>内容来源：《通信电子线路》（第 3 版 · 陈启兴）第 3 章 · 3.5 节（书页 70 – 71，PDF 页 82 – 83）。
+  交互图中的曲线由本页脚本按教材式 (3-17)～(3-19) 的分解系数闭式与式 (3-30)～(3-34) 实时计算；
+  3.5 节无插图，曲线为按公式重绘的示意。分解系数闭式引自 3.3 节式 (3-17)～(3-19)。</p>
+  <p>相关页面：<a href="00_学习入口.html">返回学习入口</a>　｜　<a href="原理讲解_3.3_谐振功率放大器的折线分析法_可视化.html">3.3 折线分析法</a></p>
+</div>
+</div>
+
+
+
+
+<!--COURSE-SUBSCRIPT-LIB-->
+<script>
+/* =======================================================================
+ * build/subscript.js —— 「真下标」（教材式竖排下标）唯一来源
+ *
+ * 目标：把标注里的「X_y」渲染成教材式的**真下标**（基线右下方的小字），
+ *       而不是字面上的下划线。
+ *
+ * 关键设计：**textContent 保持逐字不变**
+ *   下划线以「零宽」方式保留在文本里（font-size:0 的 tspan / span），
+ *   于是：
+ *     ① 页末自检里按字面串比对 document.body.textContent 的断言（txtguard）不受影响；
+ *     ② build/check_text.js 的线性抄写比对基线不变（PASS 数必须保持）；
+ *     ③ build/check_geom.js 用 textContent 估文字宽 → 几何判定结果不变；
+ *     ④ 复制粘贴得到的仍是线性写法 "Q_L"，与课程文档的线性记法一致。
+ *   若改成「删掉下划线」，textContent 会变 → 上述三处全部要跟着改，
+ *   且教材式线性写法在页面上就消失了。
+ *
+ * 本文件是**唯一来源**：build/lib.js 与 build/circuit/svg_components.js 里
+ * 各有一份**逐字节相同**的副本（标记 SUBSCRIPT-REGION），
+ * 由 scratch/sync_subscript.js 同步、scratch/test_subscript.js 核对。
+ *
+ * ⚠ 宿主文件（lib.js / svg_components.js）须在本区域**之后**补一行
+ *   `var CourseSubscript = window.CourseSubscript;`
+ *   —— 标准库的整段代码包在 IIFE 里，区域内的 var 会被 IIFE 吞掉、拿不到全局。
+ * ======================================================================= */
+(function (g) {
+  'use strict';
+
+  var NS = 'http://www.w3.org/2000/svg';
+
+  /* 下标字号比例与基线位移（教材式：基线右下方的小字） */
+  var RATIO = 0.68;   /* 下标字号 = 基准字号 × RATIO */
+  var SHIFT = 0.22;   /* 下标基线相对父基线下移 = 基准字号 × SHIFT（em） */
+
+  /* --- 字符分类 ---------------------------------------------------------
+   * isSym：可作「基字符」也可作「下标字符」的符号字符。
+   *   字母（A-Z a-z）、拉丁扩展（Ā Ĩ Ũ ī İ / Ȧ Ȱ Ȯ）、希腊字母（Δ Σ Ω ω φ π μ）、
+   *   组合记号（◌̇ ◌̅ ◌́）、撇号（’ ′ ″）、数字。
+   *   ⚠ 排除 Latin-1 里的 × (U+00D7) 与 ÷ (U+00F7) —— 它们是运算符不是符号。
+   *   ⚠ Unicode 下标数字（₁ ₂ …）本身已经是下标，只当基字符、不再拆。
+   */
+  function isSym(c) {
+    if (!c) return false;
+    var k = c.charCodeAt(0);
+    if (k >= 48 && k <= 57) return true;                         /* 0-9 */
+    if (k >= 65 && k <= 90) return true;                         /* A-Z */
+    if (k >= 97 && k <= 122) return true;                        /* a-z */
+    if (k >= 0x00C0 && k <= 0x00FF && k !== 0x00D7 && k !== 0x00F7) return true; /* Latin-1 字母 */
+    if (k >= 0x0100 && k <= 0x017F) return true;                 /* Latin Extended-A */
+    if (k >= 0x0180 && k <= 0x024F) return true;                 /* Latin Extended-B */
+    if (k >= 0x0300 && k <= 0x036F) return true;                 /* 组合记号 */
+    if (k >= 0x0370 && k <= 0x03FF) return true;                 /* 希腊字母 */
+    if (k === 0x2019 || k === 0x2032 || k === 0x2033) return true; /* ’ ′ ″ */
+    if (k >= 0x2080 && k <= 0x2089) return true;                 /* Unicode 下标数字 */
+    return false;
+  }
+  /* 下标的**首字符**：符号字符，外加单独的 +/−（教材的 F₊ / F₋ / u₊(t)） */
+  function isSubStart(c) {
+    if (isSym(c)) return true;
+    if (!c) return false;
+    var k = c.charCodeAt(0);
+    return k === 0x2B /* + */ || k === 0x2212 /* − */ || k === 0x2D /* - */;
+  }
+  /* 下标的**后续字符**：符号字符；小数点仅在「前后都是数字」时并入
+   * （教材的 f₀.₇ / K_r0.1 —— 那个点属于下标，不是句点） */
+  function isSubCont(c, prev, next) {
+    if (isSym(c)) return true;
+    if (!c) return false;
+    var k = c.charCodeAt(0);
+    if (k === 0x2E /* . */) {
+      var p = prev ? prev.charCodeAt(0) : 0, nx = next ? next.charCodeAt(0) : 0;
+      return p >= 48 && p <= 57 && nx >= 48 && nx <= 57;
+    }
+    return false;
+  }
+
+  /* ======================================================================
+   * 覆盖表（教材歧义标注）
+   *
+   * 「最长下标段」规则会把下面这些标注并成一段下标，但它们在教材里
+   * 是**两个（或三个）独立符号的乘积**。
+   * 这类写法在语法上**无法用规则区分**（C_jQ 与 feUi 结构完全相同），
+   * 唯一可靠的办法是逐条对照教材原式后写死。
+   *
+   * ⚠ 新增条目必须：① 先看教材页图核对；② 在 ref 里写明书页/式号；
+   *   ③ 保证 parts 拼接后与 from **逐字相同**（textContent 守恒）。
+   * ==================================================================== */
+  var ovTable = [
+    { from: 'ω_cCR_L', parts: ['ω_c', 'C', 'R_L'],
+      ref: '教材例 3-1（书页 54）：|Z_pn| 分母印作 1+j(nωCR_L−R_L/(nωL))' },    { from: 'U_LmU_Sm', parts: ['U_Lm', 'U_Sm'],
+      ref: '教材习题 9.4/9.5（书页 221）：U_Sm（输入幅值）与 U_Lm（本振幅值）是两个独立量' },
+    { from: 'U_SmU_Lm', parts: ['U_Sm', 'U_Lm'],
+      ref: '教材习题 9.4/9.5（书页 221）：变频跨导 ∝ a₂·U_Sm·U_Lm' },
+    { from: 'U_nmU_Lm', parts: ['U_nm', 'U_Lm'],
+      ref: '教材习题 9.4/9.5（书页 221）' },
+    { from: 'U_cmU_o', parts: ['U_cm', 'U_o'],
+      ref: '第 5 章振幅调制：输出功率 ∝ U_cm·U_o' },
+    { from: 'y_feU_i', parts: ['y_fe', 'U_i'],
+      ref: '教材 §2.3 高频等效电路：受控电流源 y_fe·U̇_i' },
+    { from: 'L_qC_q', parts: ['L_q', 'C_q'],
+      ref: '教材式 (4-26)（书页 103）：ω_q = 1/√(L_qC_q)' },
+    { from: 'C_qC_o', parts: ['C_q', 'C_o'],
+      ref: '教材式 (4-27)（书页 103）：ω_p = 1/√(L_q·C_qC_o/(C_q+C_o))' },
+    { from: 'K_fU_Ωm', parts: ['K_f', 'U_Ωm'],
+      ref: '教材式 (7-37)：K_f = f_c/(U_D+V_Q)' },
+    { from: 'L_1C_ΣQ', parts: ['L_1', 'C_ΣQ'],
+      ref: '教材式 (7-39)：f_c = 1/(2π√(L_1C_ΣQ))' },
+    { from: 'Q_Lγ', parts: ['Q_L', 'γ'],
+      ref: '教材式 (7-45)：K_p = −Q_Lγ/[2(U_D+V_Q)]' },
+    { from: 'C_qr_q', parts: ['C_q', 'r_q'],
+      ref: '教材图 4-13（书页 103）：L_q、C_q、r_q 串联，是三个独立元件' },
+    { from: 'ω_cC', parts: ['ω_c', 'C'],
+      ref: '教材例 3-1（书页 54）：ωC 是容性电纳项' },
+    { from: 'ω_cL', parts: ['ω_c', 'L'],
+      ref: '教材例 3-1（书页 54）：1/(ωL) 是感性电纳项' }
+  ];
+
+  /* 覆盖表按 from 长度倒序建正则 → 长的先匹配（「ω_cCR_L」先于「ω_cC」） */
+  var OVERRIDE_RE = null;
+  function overrideRe() {
+    if (OVERRIDE_RE) return OVERRIDE_RE;
+    if (!ovTable.length) return null;      /* ⚠ 空表不能建空正则：空模式会原地匹配 → 死循环 */
+    var list = ovTable.slice().sort(function (a, b) { return b.from.length - a.from.length; });
+    var src = list.map(function (o) {
+      return o.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('|');
+    OVERRIDE_RE = new RegExp(src, 'g');
+    return OVERRIDE_RE;
+  }
+
+  /* 把字符串切成原子段：[{text, parts|null}]
+   * parts=null → 普通文本；parts!=null → 覆盖命中（parts 为教材式分段） */
+  function splitByOverride(str) {
+    if (str === undefined || str === null) return [];
+    str = String(str);
+    if (str.indexOf('_') < 0) return [{ text: str, parts: null }];
+    var re = overrideRe();
+    if (!re) return [{ text: str, parts: null }];
+    re.lastIndex = 0;
+    var atoms = [], last = 0, m;
+    while ((m = re.exec(str)) !== null) {
+      if (!m[0].length) { re.lastIndex++; continue; }   /* 防御：空匹配必须推进 */
+      if (m.index > last) atoms.push({ text: str.slice(last, m.index), parts: null });
+      var parts = null;
+      for (var i = 0; i < ovTable.length; i++) {
+        if (ovTable[i].from === m[0]) { parts = ovTable[i].parts; break; }
+      }
+      atoms.push({ text: m[0], parts: parts });
+      last = m.index + m[0].length;
+      re.lastIndex = last;
+    }
+    if (last < str.length) atoms.push({ text: str.slice(last), parts: null });
+    return atoms;
+  }
+
+  /* --- 拆串 -------------------------------------------------------------
+   * 返回 [{s:文字, sub:是否下标段, pre:本段前紧邻的下划线数, us:段内下划线位置}]
+   * 规则：只有「符号字符 + _ + 可作下标的字符」才算下标分隔。
+   *   "Q_L"      → base "Q" / sub "L"
+   *   "P′_no1"   → base "P′" / sub "no1"
+   *   "U̇_b′e"    → base "U̇" / sub "b′e"
+   *   "K_r0.1"   → base "K" / sub "r0.1"（点属于下标）
+   *   "u_o(t)"   → base "u" / sub "o" / base "(t)"
+   *   "f_c + F"  → base "f" / sub "c" / base " + F"
+   *   "A _B"     → 空格前不是符号字符 → 整串当普通文字（不拆）
+   *   "a_b_c"    → base "a" / sub "b"(pre 1) / sub "c"(pre 1)
+   *                （两个下划线都保留：linearize 必须能还原成 "a_b_c"）
+   */
+  function splitRaw(str) {
+    var runs = [];
+    if (str === undefined || str === null) return runs;
+    str = String(str);
+    var n = str.length, plainStart = 0, i = 0;
+    while (i < n) {
+      if (str[i] === '_' && i > plainStart && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+        runs.push({ s: str.slice(plainStart, i), sub: false, pre: 0, us: [] });
+        var k = i + 2;                     /* 第一个字符已由 isSubStart 认可 */
+        while (k < n && isSubCont(str[k], str[k - 1], str[k + 1])) k++;
+        var run = { s: str.slice(i + 1, k), sub: true, pre: 1, us: [] };
+        runs.push(run);
+        plainStart = k; i = k;
+        /* 连续下划线（a_b_c）→ 并入同一段下标；**每个下划线都要保留**，
+           否则 textContent 会少一个 "_"（守恒被破坏）。
+           段内下划线的位置记在 us[] 里，linearize 据此还原。 */
+        while (i < n && str[i] === '_' && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+          var m = i + 2;
+          while (m < n && isSubCont(str[m], str[m - 1], str[m + 1])) m++;
+          run.us.push(run.s.length);
+          run.s += str.slice(i + 1, m);
+          plainStart = m; i = m;
+        }
+        continue;
+      }
+      i++;
+    }
+    if (plainStart < n) runs.push({ s: str.slice(plainStart), sub: false, pre: 0, us: [] });
+    return runs;
+  }
+
+  /* 覆盖表感知的拆串（对外主入口） */
+  function splitAll(str) {
+    var atoms = splitByOverride(str);
+    var runs = [];
+    for (var i = 0; i < atoms.length; i++) {
+      if (atoms[i].parts) {
+        for (var j = 0; j < atoms[i].parts.length; j++) {
+          runs = runs.concat(splitRaw(atoms[i].parts[j]));
+        }
+      } else {
+        runs = runs.concat(splitRaw(atoms[i].text));
+      }
+    }
+    return runs;
+  }
+
+  /* 还原成线性写法（用于守恒校验）：
+   * 普通段原样；下标段前面补回它的下划线；段内下划线按 us[] 位置插回 */
+  function linearize(runs) {
+    var out = '';
+    for (var i = 0; i < runs.length; i++) {
+      var r = runs[i];
+      var p = r.pre || 0;
+      for (var k = 0; k < p; k++) out += '_';
+      if (r.us && r.us.length) {
+        var at = 0;
+        for (var q = 0; q < r.us.length; q++) {
+          out += r.s.slice(at, r.us[q]);
+          out += '_';
+          at = r.us[q];
+        }
+        out += r.s.slice(at);
+      } else out += r.s;
+    }
+    return out;
+  }
+
+  function hasSub(str) {
+    if (str === undefined || str === null) return false;
+    var runs = splitAll(String(str));
+    for (var i = 0; i < runs.length; i++) if (runs[i].sub) return true;
+    return false;
+  }
+
+  /* --- SVG 渲染 ---------------------------------------------------------
+   * node：<text> 元素；baseSize：基准字号（数字）。
+   * 结构（全部用 <tspan> 承载，不依赖 document.createTextNode ——
+   *       标准库自己的回归测试用的最小 DOM 桩没有那个方法）：
+   *   普通文字 tspan（无属性）→ 零宽下划线 tspan → 下标 tspan → 复位 tspan
+   *   零宽下划线：font-size="0" → 不渲染、不占宽，但 textContent 里保留 "_"
+   *   下标 tspan：font-size = baseSize×RATIO，dy = baseSize×SHIFT（下移）
+   *   复位 tspan：dy = −baseSize×SHIFT → 其后的普通文字回到原基线
+   */
+  function renderSvg(node, str, baseSize) {
+    var runs = splitAll(str);
+    var has = false;
+    for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+    if (!has) { node.textContent = (str === undefined || str === null) ? '' : String(str); return node; }
+
+    var B = (typeof baseSize === 'number' && isFinite(baseSize) && baseSize > 0) ? baseSize : 16;
+    var subSize = Math.round(B * RATIO * 100) / 100;
+    var dy = Math.round(B * SHIFT * 100) / 100;
+
+    function zwSpan() {
+      var z = document.createElementNS(NS, 'tspan');
+      z.setAttribute('font-size', '0');
+      z.textContent = '_';
+      return z;
+    }
+
+    node.textContent = '';
+    var shifted = false;
+    for (var j = 0; j < runs.length; j++) {
+      var r = runs[j];
+      var p = r.pre || 0;
+      for (var z2 = 0; z2 < p; z2++) node.appendChild(zwSpan());
+      if (!r.sub) {
+        if (!r.s) continue;
+        var bs = document.createElementNS(NS, 'tspan');
+        if (shifted) { bs.setAttribute('dy', String(-dy)); shifted = false; }
+        bs.textContent = r.s;
+        node.appendChild(bs);
+      } else {
+        /* 段内下划线（合并下标 a_b_c）：按 us[] 把本段切成若干片 */
+        var pieces = [], at = 0;
+        if (r.us && r.us.length) {
+          for (var q = 0; q < r.us.length; q++) {
+            pieces.push(r.s.slice(at, r.us[q]));
+            pieces.push(null);                 /* null = 段内零宽下划线 */
+            at = r.us[q];
+          }
+        }
+        pieces.push(r.s.slice(at));
+        for (var k = 0; k < pieces.length; k++) {
+          if (pieces[k] === null) { node.appendChild(zwSpan()); continue; }
+          if (!pieces[k]) continue;
+          var ts = document.createElementNS(NS, 'tspan');
+          ts.setAttribute('font-size', String(subSize));
+          ts.setAttribute('dy', shifted ? '0' : String(dy));
+          ts.textContent = pieces[k];
+          node.appendChild(ts);
+          shifted = true;
+        }
+      }
+    }
+    return node;
+  }
+
+  /* --- HTML 渲染（正文侧） ---------------------------------------------
+   * toHtml(str)：把「X_y」转成「X<sub>…</sub>」，下划线以零宽 span 保留在
+   * <sub> **之前**（下划线是「分隔标记」，不属于下标本身）。
+   * 供源码级转换器使用（页面正文是静态 HTML，源级改写比运行时改 DOM 更稳）。
+   */
+  function innerHtml(run) {
+    if (!run.us || !run.us.length) return run.s;
+    var out = '', at = 0;
+    for (var q = 0; q < run.us.length; q++) {
+      out += run.s.slice(at, run.us[q]) + '<span style="font-size:0">_</span>';
+      at = run.us[q];
+    }
+    return out + run.s.slice(at);
+  }
+  function toHtml(str) {
+    var runs = splitAll(str);
+    var has = false;
+    for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+    if (!has) return str;
+    var out = '';
+    for (var j = 0; j < runs.length; j++) {
+      var r = runs[j];
+      var p = r.pre || 0;
+      for (var z = 0; z < p; z++) out += '<span style="font-size:0">_</span>';
+      if (r.sub) out += '<sub>' + innerHtml(r) + '</sub>';
+      else out += r.s;
+    }
+    return out;
+  }
+
+  /* --- HTML 片段转真下标（供页面**运行时**写标签用） -------------------
+   * 页面上有一部分标签是运行时生成的（读数面板的键名、动态说明文字），
+   * 源级改写碰不到它们 → 运行时用 subHtml() 转一下再写进 HTML 文本节点。
+   *   · 标签片段（<b>、<sup> …）原样保留，只转**文本部分**；
+   *   · 下划线以零宽 span 保留 → textContent 逐字不变，
+   *     页末自检里按字面串比对 document.body.textContent 的断言不受影响。
+   * ⚠ 只用于**固定标签字符串**，不接受用户输入（它会写 innerHTML）。
+   */
+  function subHtml(str) {
+    if (str === undefined || str === null) return '';
+    str = String(str);
+    if (str.indexOf('_') < 0) return str;
+    return str.split(/(<[^>]*>)/g).map(function (seg) {
+      if (!seg) return '';
+      if (seg.charAt(0) === '<') return seg;
+      return toHtml(seg);
+    }).join('');
+  }
+
+  var api = {
+    split: splitAll,
+    splitRaw: splitRaw,
+    splitAll: splitAll,
+    linearize: linearize,
+    hasSub: hasSub,
+    renderSvg: renderSvg,
+    toHtml: toHtml,
+    subHtml: subHtml,
+    setOverrides: function (list) {
+      ovTable = (list || []).slice();
+      OVERRIDE_RE = null;                 /* 正则缓存必须失效 */
+      return ovTable;
+    },
+    RATIO: RATIO,
+    SHIFT: SHIFT
+  };
+  /* 覆盖表用 getter 暴露：直接改 api.OVERRIDES 不起作用（内部读的是 ovTable） */
+  Object.defineProperty(api, 'OVERRIDES', {
+    get: function () { return ovTable; },
+    enumerable: true
+  });
+  g.CourseSubscript = api;
+  /* 裸全局别名：让**没有 lib.js** 的手工页也能直接写 subHtml('…')
+     （lib.js 里的同名函数是本函数的一层薄封装，行为一致） */
+  g.subHtml = subHtml;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
+var CourseSubscript = window.CourseSubscript;
+var subHtml;
+if (typeof subHtml !== 'function') { subHtml = window.subHtml || function (s) { return s; }; }
+</script>
+<script>
+/* =========================================================================
+   基础数学 —— 分解系数按教材式 (3-17)、(3-18)、(3-19) 的闭式
+   α_0(θ) = (sin θ − θ cos θ) / [π(1 − cos θ)]
+   α_1(θ) = (θ − sin θ cos θ) / [π(1 − cos θ)]
+   α_n(θ) = [sin(nθ) cos θ − n sin θ cos(nθ)] / [0.5πn(n² − 1)(1 − cos θ)]，n ≥ 2
+   ========================================================================= */
+const D2R=Math.PI/180;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function fmt(v){
+  const a=Math.abs(v);
+  if(a===0)return '0';
+  if(!isFinite(v))return '—';
+  if(a>=1000||a<0.001)return v.toExponential(1);
+  if(a>=100)return v.toFixed(0);
+  if(a>=10)return v.toFixed(1);
+  if(a>=1)return v.toFixed(2);
+  return v.toFixed(3);
+}
+/* 式 (3-17) 直流分量分解系数 */
+function alpha0(th){
+  if(th<=1e-9)return 0;
+  if(th<0.01)return 2*th/(3*Math.PI);
+  const c=Math.cos(th),s=Math.sin(th);
+  return (s-th*c)/(Math.PI*(1-c));
+}
+/* 式 (3-18) 基波分量分解系数 */
+function alpha1(th){
+  if(th<=1e-9)return 0;
+  if(th<0.01)return 4*th/(3*Math.PI);
+  const c=Math.cos(th),s=Math.sin(th);
+  return (th-s*c)/(Math.PI*(1-c));
+}
+/* 式 (3-19) n 次谐波分量分解系数（n ≥ 2；n = 3 时即 α_3 闭式） */
+function alphaN(th,n){
+  if(n===0)return alpha0(th);
+  if(n===1)return alpha1(th);
+  if(th<=1e-9)return 0;
+  const c=Math.cos(th),s=Math.sin(th);
+  return (Math.sin(n*th)*c-n*s*Math.cos(n*th))/(0.5*Math.PI*n*(n*n-1)*(1-c));
+}
+
+/* =========================================================================
+   Canvas 绘图工具
+   ========================================================================= */
+function drawAxes(ctx,x,y,w,h,xmin,xmax,ymin,ymax,xlabel,ylabel,title,opts){
+  opts=opts||{};
+  ctx.save();
+  ctx.font='13px "Microsoft YaHei",sans-serif';
+  ctx.strokeStyle='#e6e6e6'; ctx.lineWidth=1;
+  const ny=opts.ny||4, nx=opts.nx||6;
+  for(let i=0;i<=ny;i++){
+    const yy=y+h-h*i/ny;
+    ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+w,yy);ctx.stroke();
+  }
+  for(let i=0;i<=nx;i++){
+    const xx=x+w*i/nx;
+    ctx.beginPath();ctx.moveTo(xx,y);ctx.lineTo(xx,y+h);ctx.stroke();
+  }
+  ctx.strokeStyle='#222';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+w,y+h);ctx.moveTo(x,y);ctx.lineTo(x,y+h);ctx.stroke();
+  ctx.fillStyle='#666';ctx.textAlign='center';
+  const fx=opts.xfmt||fmt, fy=opts.yfmt||fmt;
+  for(let i=0;i<=nx;i++){
+    const xx=x+w*i/nx, v=xmin+(xmax-xmin)*i/nx;
+    ctx.fillText(fx(v),xx,y+h+16);
+  }
+  ctx.textAlign='right';
+  for(let i=0;i<=ny;i++){
+    const yy=y+h-h*i/ny, v=ymin+(ymax-ymin)*i/ny;
+    ctx.fillText(fy(v),x-6,yy+4);
+  }
+  ctx.fillStyle='#111';ctx.textAlign='left';
+  if(title){ctx.font='bold 14px "Microsoft YaHei"';ctx.fillText(title,x+6,y-12);}
+  if(ylabel){ctx.fillStyle='#777';ctx.font='12px "Microsoft YaHei"';ctx.fillText(ylabel,x+6,y+16);}
+  if(xlabel){ctx.fillStyle='#111';ctx.font='12px "Microsoft YaHei"';ctx.textAlign='center';ctx.fillText(xlabel,x+w/2,y+h+36);}
+  ctx.restore();
+}
+function poly(ctx,pts,color,lw,dash){
+  if(pts.length<2)return;
+  ctx.save();
+  ctx.strokeStyle=color;ctx.lineWidth=lw||2;
+  if(dash)ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.stroke();
+  ctx.restore();
+}
+function dot(ctx,x,y,r,color,stroke){
+  ctx.save();
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}
+  ctx.restore();
+}
+function label(ctx,x,y,s,color,size,align){
+  ctx.save();ctx.fillStyle=color;ctx.font='bold '+(size||12)+'px "Microsoft YaHei"';
+  ctx.textAlign=align||'left';ctx.fillText(s,x,y);ctx.restore();
+}
+function dashLine(ctx,x1,y1,x2,y2,color,lw,dash){
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=lw||1.2;
+  ctx.setLineDash(dash||[5,4]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.restore();
+}
+
+/* =========================================================================
+   交互 A：α_n(θ_c) 曲线
+   ========================================================================= */
+let nSel=2;
+const ACOL={1:'#1a46b5',2:'#0d7a3c',3:'#c07a00',4:'#c02020',5:'#7a3fb0'};
+const ASUB={1:'α₁',2:'α₂',3:'α₃',4:'α₄',5:'α₅'};
+function drawAlpha(){
+  const cv=document.getElementById('cvAlpha');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  const L=70,R=W-30,T=40,B=H-58,PW=R-L,PH=B-T;
+  const X=function(t){return L+PW*t/180;};
+  const Y=function(v){return B-PH*(v+0.1)/0.7;};
+  drawAxes(ctx,L,T,PW,PH,0,180,-0.1,0.6,'θ_c (°)','α_n(θ_c)','分解系数 α_n(θ_c)（式 3-17～3-19）',
+    {xfmt:function(v){return v.toFixed(0);},yfmt:function(v){return v.toFixed(2);},ny:7,nx:6});
+  /* 全部 n = 1…5 曲线，选中的加粗高亮 */
+  for(let n=1;n<=5;n++){
+    const pts=[];
+    for(let t=0;t<=180;t+=0.5)pts.push([X(t),Y(alphaN(t*D2R,n))]);
+    poly(ctx,pts,n===nSel?ACOL[n]:'#c9ccd1',n===nSel?2.8:1.2);
+  }
+  /* 各次谐波的最大值位置（空心点） */
+  for(let n=1;n<=5;n++){
+    const tm=120/n, vm=alphaN(tm*D2R,n);
+    dot(ctx,X(tm),Y(vm),n===nSel?5:3,'#fff',ACOL[n]);
+    if(n===nSel){
+      dashLine(ctx,X(tm),Y(vm),X(tm),B,ACOL[n],1.2,[3,3]);
+      label(ctx,X(tm)+8,Y(vm)-10,'α'+['₀','₁','₂','₃','₄','₅'][n]+' 最大 '+fmt(vm)+' @ '+tm.toFixed(0)+'°',ACOL[n],12,'left');
+    }
+  }
+  /* 当前 θ_c 与当前点 */
+  const thD=+document.getElementById('sThA').value;
+  document.getElementById('vThA').textContent=thD.toFixed(0);
+  const th=thD*D2R, an=alphaN(th,nSel);
+  dashLine(ctx,X(thD),T,X(thD),B,'#c07a00',1.8,[4,3]);
+  dot(ctx,X(thD),Y(an),6,ACOL[nSel]);
+  label(ctx,X(thD)+8,T+18,'θ_c = '+thD.toFixed(0)+'°','#c07a00',12,'left');
+  label(ctx,X(thD)+8,T+36,'α'+['₀','₁','₂','₃','₄','₅'][nSel]+' = '+fmt(an),ACOL[nSel],12,'left');
+  /* 读数 */
+  const tm=120/nSel, vm=alphaN(tm*D2R,nSel);
+  document.getElementById('roAcur').textContent=fmt(an);
+  document.getElementById('roAth').textContent=tm.toFixed(0)+'°';
+  document.getElementById('roAmax').textContent=fmt(vm);
+  document.getElementById('roAratio').textContent=(Math.abs(vm)>1e-12?(an/vm*100).toFixed(1)+'%':'—');
+}
+
+/* =========================================================================
+   交互 B：倍频输出估算（式 3-31～3-33）
+   ========================================================================= */
+function drawEst(){
+  const Icm=+document.getElementById('sIcm').value;
+  const Rp=+document.getElementById('sRp').value;
+  const Vcc=+document.getElementById('sVcc').value;
+  const thD=+document.getElementById('sThB').value;
+  const n=+document.getElementById('sNB').value;
+  document.getElementById('vIcm').textContent=Icm.toFixed(2);
+  document.getElementById('vRp').textContent=Rp.toFixed(0);
+  document.getElementById('vVcc').textContent=Vcc.toFixed(1);
+  document.getElementById('vThB').textContent=thD.toFixed(0);
+  document.getElementById('vNB').textContent=n.toFixed(0);
+  const th=thD*D2R;
+  const an=alphaN(th,n), a0=alpha0(th);
+  /* 式 (3-31) → (3-32) → (3-33) */
+  const Icnm=Icm*an;                 /* I_cnm = I_CM · α_n(θ_c) */
+  const Ucm=Icnm*Rp;                 /* U_cm = I_cnm · R_p */
+  const Pon=0.5*Ucm*Icnm;            /* P_on = 0.5 · U_cm · I_cnm */
+  const eta=a0>1e-12?(0.5*Ucm*an)/(Vcc*a0):0;   /* η_c = 0.5·U_cm·α_n/(V_CC·α_0) */
+  document.getElementById('roIcnm').textContent=fmt(Icnm)+' A';
+  document.getElementById('roUcm').textContent=fmt(Ucm)+' V';
+  document.getElementById('roPon').textContent=fmt(Pon)+' W';
+  document.getElementById('roEta').textContent=(eta*100).toFixed(1)+'%';
+  document.getElementById('roAnB').textContent=fmt(an);
+  document.getElementById('roA0B').textContent=fmt(a0);
+  document.getElementById('kvAn').innerHTML = subHtml('I_cnm = '+Icm.toFixed(2)+' A × '+fmt(an)+' = '+fmt(Icnm)+' A；'+
+    'U_cm = '+fmt(Icnm)+' A × '+Rp.toFixed(0)+' Ω = '+fmt(Ucm)+' V；'+
+    'P_on = 0.5 × '+fmt(Ucm)+' V × '+fmt(Icnm)+' A = '+fmt(Pon)+' W；'+
+    'η_c = 0.5 × '+fmt(Ucm)+' V × '+fmt(an)+' / ('+Vcc.toFixed(1)+' V × '+fmt(a0)+') = '+(eta*100).toFixed(1)+'%');
+  document.getElementById('warnEst').style.display=(Ucm>Vcc+1e-9)?'block':'none';
+  /* 曲线：P_on(θ_c) 与 η_c(θ_c) */
+  const cv=document.getElementById('cvEst');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  const L=80,R=W-70,T=30,B=H-55,PW=R-L,PH=B-T;
+  const t0=5, t1=180;
+  const X=function(t){return L+PW*(t-t0)/(t1-t0);};
+  let Pmax=0;
+  const Ps=[],Es=[];
+  for(let t=t0;t<=t1;t+=1){
+    const a=alphaN(t*D2R,n), z=alpha0(t*D2R);
+    const u=Icm*a*Rp, p=0.5*u*Icm*a;
+    const e=z>1e-12?(0.5*u*a)/(Vcc*z):0;
+    if(p>Pmax)Pmax=p;
+    Ps.push([t,p]);Es.push([t,e]);
+  }
+  if(Pmax<=0)Pmax=1;
+  Pmax=Pmax*1.15;
+  const Yp=function(p){return B-PH*p/Pmax;};
+  const Ye=function(e){return B-PH*clamp(e,0,1.05)/1.05;};
+  drawAxes(ctx,L,T,PW,PH,t0,t1,0,Pmax,'θ_c (°)','P_on (W)',
+    'P_on(θ_c) 与 η_c(θ_c)　（当前 n = '+n+'）',
+    {xfmt:function(v){return v.toFixed(0);},yfmt:function(v){return fmt(v);},ny:4,nx:6});
+  /* 右轴：η_c 0～100% */
+  ctx.save();
+  ctx.strokeStyle='#e6e6e6';ctx.lineWidth=1;
+  ctx.fillStyle='#0d7a3c';ctx.textAlign='left';ctx.font='12px "Microsoft YaHei"';
+  for(let i=0;i<=4;i++){
+    const yy=B-PH*i/4;
+    ctx.beginPath();ctx.moveTo(R,yy);ctx.lineTo(R+5,yy);ctx.stroke();
+    ctx.fillText((i*25)+'%',R+8,yy+4);
+  }
+  ctx.strokeStyle='#222';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(R,T);ctx.lineTo(R,B);ctx.stroke();
+  ctx.fillStyle='#0d7a3c';ctx.font='12px "Microsoft YaHei"';
+  ctx.fillText('η_c',R+8,T+14);
+  ctx.restore();
+  /* 两条曲线 */
+  poly(ctx,Ps.map(function(d){return [X(d[0]),Yp(d[1])];}),'#1a46b5',2.4);
+  poly(ctx,Es.map(function(d){return [X(d[0]),Ye(d[1])];}),'#0d7a3c',2.4);
+  label(ctx,X(120),Yp(Ps[75][1])-10,'P_on','#1a46b5',12,'center');
+  label(ctx,X(150),Ye(Es[145][1])+18,'η_c','#0d7a3c',12,'center');
+  /* 当前点 */
+  dashLine(ctx,X(thD),T,X(thD),B,'#c07a00',1.8,[4,3]);
+  dot(ctx,X(thD),Yp(Pon),5.5,'#1a46b5');
+  dot(ctx,X(thD),Ye(eta),5.5,'#0d7a3c');
+  label(ctx,X(thD)+8,T+18,'θ_c = '+thD.toFixed(0)+'°','#c07a00',12,'left');
+}
+
+/* =========================================================================
+   控件绑定与初绘
+   ========================================================================= */
+function bind(id,fn){
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('input',fn);
+}
+function bindClick(id,fn){
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('click',fn);
+}
+function setN(k){
+  nSel=k;
+  for(let i=1;i<=5;i++){
+    const b=document.getElementById('btnN'+i);
+    if(b){if(i===k)b.classList.add('on');else b.classList.remove('on');}
+  }
+  drawAlpha();
+}
+function init(){
+  bind('sThA',drawAlpha);
+  bindClick('btnN1',function(){setN(1);});
+  bindClick('btnN2',function(){setN(2);});
+  bindClick('btnN3',function(){setN(3);});
+  bindClick('btnN4',function(){setN(4);});
+  bindClick('btnN5',function(){setN(5);});
+  ['sIcm','sRp','sVcc','sThB','sNB'].forEach(function(id){bind(id,drawEst);});
+  /* 第 4 节表格：各次谐波 α_n 最大值 */
+  for(let n=1;n<=5;n++){
+    const cell=document.getElementById('roT'+n);
+    if(cell)cell.textContent=fmt(alphaN(120/n*D2R,n));
+  }
+  const m2=document.getElementById('kvA2max');
+  if(m2)m2.textContent=fmt(alphaN(60*D2R,2));
+  const m3=document.getElementById('kvA3max');
+  if(m3)m3.textContent=fmt(alphaN(40*D2R,3));
+  drawAlpha();
+  drawEst();
+}
+init();
+</script>
+
+<!-- CH3-SELFCHECK:BEGIN -->
+<script>
+/* ================= 3.5 页末自检（独立复算 + 教材数值对撞） =================
+   教材出处：3.5 丙类倍频器，书页 72 – 73
+   （式 3-30 ~ 3-34；式 3-17 ~ 3-19 的分解系数）
+   本段完全独立于页面脚本：不引用页面内部任何函数，
+   分解系数按式 (3-17) / (3-18) / (3-19) 重新实现。
+   ======================================================================== */
+(function(){
+  'use strict';
+  var ok=true, msg=[];
+  function chk(name,got,exp,tol){
+    var t=(tol===undefined)?Math.abs(exp)*1e-9+1e-12:tol;
+    var pass=Math.abs(got-exp)<=t; if(!pass) ok=false;
+    msg.push((pass?'PASS':'FAIL')+'  '+name+'   got='+got+'   exp='+exp);
+  }
+  function chkTrue(name,cond,detail){
+    var pass=!!cond; if(!pass) ok=false;
+    msg.push((pass?'PASS':'FAIL')+'  '+name+(detail?('   '+detail):''));
+  }
+  /* 离线闸门的 DOM 桩没有真实 DOM（querySelectorAll 恒返回 []、body.textContent 为空）
+   * → 依赖 DOM 的断言在离线桩下必然误报；按 AGENTS 的口径先判环境能力，不可用就 SKIP。 */
+  var HAS_STATIC=!!(document.body&&document.body.textContent&&document.body.textContent.length>50);
+  function T(id){ var e=document.getElementById(id); return e?e.textContent:''; }
+
+  var D2R=Math.PI/180;
+  /* 式 (3-17) α₀(θc) */
+  function alpha0(th){
+    if(th<=0) return 0;
+    var c=Math.cos(th), s=Math.sin(th);
+    return (s-th*c)/(Math.PI*(1-c));
+  }
+  /* 式 (3-18) α₁(θc) */
+  function alpha1(th){
+    if(th<=0) return 0;
+    var c=Math.cos(th), s=Math.sin(th);
+    return (th-s*c)/(Math.PI*(1-c));
+  }
+  /* 式 (3-19) αₙ(θc)，n ≥ 2 */
+  function alphaN(th,n){
+    if(n===0) return alpha0(th);
+    if(n===1) return alpha1(th);
+    if(th<=0) return 0;
+    var c=Math.cos(th), s=Math.sin(th);
+    return (Math.sin(n*th)*c-n*s*Math.cos(n*th))/(0.5*Math.PI*n*(n*n-1)*(1-c));
+  }
+
+  /* ---------- 式 (3-30)：u_c(t) = U_cm·cos(nω_c t) ---------- */
+  var ftexts=[], fdivs=document.querySelectorAll('.formula');
+  for(var i=0;i<fdivs.length;i++){
+    ftexts.push(fdivs[i].textContent.replace(/[\s ]+/g,''));
+  }
+  if(HAS_STATIC) chkTrue('页式 (3-30)：u_c(t) = U_cm·cos(nω_c t)',
+          ftexts.join('|').indexOf('uc(t)=Ucmcos(nωct)')>=0, '');
+
+  /* ---------- 式 (3-31) ~ (3-33)：用页面默认参数整链复算 ---------- */
+  var Icm=1, Rp=50, Vcc=24, thB=60, nB=2;
+  var AN=alphaN(thB*D2R,nB), A0=alpha0(thB*D2R);
+  var Icnm=Icm*AN;                              /* I_cnm = I_CM·α_n(θc)      */
+  var Ucm=Icnm*Rp;                              /* U_cm  = I_cnm·R_p        */
+  var Pon=0.5*Ucm*Icnm;                         /* P_on  = 0.5·U_cm·I_cnm   */
+  var eta=0.5*Ucm*AN/(Vcc*A0);                  /* η_c   = 0.5·U_cm·α_n/(V_CC·α_0) */
+
+  chk('(3-31) I_cnm = I_CM·α_n(60°) = 0.2757 A', Icnm, 0.2757, 1e-3);
+  chk('(3-31) U_cm = I_cnm·R_p = 13.78 V', Ucm, 13.78, 0.02);
+  chk('(3-31) U_cm = I_CM·α_n(θc)·R_p（与上式同值）', Icm*AN*Rp, Ucm, 1e-12);
+  chk('(3-32) P_on = 0.5·U_cm·I_cnm = 1.90 W', Pon, 1.90, 0.02);
+  chk('(3-32) P_on = 0.5·I_cnm²·R_p（与上式同值）', 0.5*Icnm*Icnm*Rp, Pon, 1e-12);
+  chk('(3-33) η_c = 0.5·U_cm·α_n/(V_CC·α_0) = 36.3%', eta*100, 36.3, 0.1);
+  chk('(3-33) η_c = P_on/P_=（P_= = V_CC·I_CM·α_0）', Pon/(Vcc*Icm*A0)*100, eta*100, 1e-9);
+
+  /* ---------- 式 (3-34)：θ_c = 120°/n ---------- */
+  chk('(3-34) n=2 → θc = 120°/2 = 60°', 120/2, 60, 1e-12);
+  chk('(3-34) n=3 → θc = 120°/3 = 40°', 120/3, 40, 1e-12);
+  chk('(3-34) n=4 → θc = 120°/4 = 30°', 120/4, 30, 1e-12);
+  chk('(3-34) n=5 → θc = 120°/5 = 24°', 120/5, 24, 1e-12);
+
+  /* ---------- 教材结论：α_n 在 θc = 120°/n 处取最大 ---------- */
+  for(var n=2;n<=5;n++){
+    var bm=-1, bt=0;
+    for(var d=2; d<=180; d+=0.05){
+      var v=alphaN(d*D2R,n); if(v>bm){ bm=v; bt=d; }
+    }
+    chkTrue('α'+n+' 的最大值位置 = 120°/'+n+' = '+(120/n)+'°（教材式 3-34）',
+            Math.abs(bt-120/n)<=0.4, '扫描得 '+bt.toFixed(2)+'°');
+  }
+
+  /* ---------- 页面第 4 节表格：各次谐波 α_n 的最大值逐格对撞 ---------- */
+  for(var n2=1;n2<=5;n2++){
+    var thm=120/n2, want=alphaN(thm*D2R,n2);
+    chk('表格 α'+n2+'('+thm+'°) 显示值与独立复算一致',
+        parseFloat(T('roT'+n2)), want, 1e-3);
+  }
+  chk('页面 kvA2max = α₂(60°) 的最大值', parseFloat(T('kvA2max')), alphaN(60*D2R,2), 1e-3);
+  chk('页面 kvA3max = α₃(40°) 的最大值', parseFloat(T('kvA3max')), alphaN(40*D2R,3), 1e-3);
+
+  /* ---------- 页面读数（式 3-31 ~ 3-33 的默认参数） ---------- */
+  chk('读数 roIcnm = I_cnm', parseFloat(T('roIcnm')), Icnm, 5e-3);
+  chk('读数 roUcm = U_cm', parseFloat(T('roUcm')), Ucm, 0.05);
+  chk('读数 roPon = P_on', parseFloat(T('roPon')), Pon, 0.01);
+  chk('读数 roEta = η_c（%）', parseFloat(T('roEta')), eta*100, 0.1);
+  chk('读数 roAnB = α_n(θc)', parseFloat(T('roAnB')), AN, 1e-3);
+  chk('读数 roA0B = α_0(θc)', parseFloat(T('roA0B')), A0, 1e-3);
+  chk('读数 roAcur = 当前 α₂（n=2，θc=60°）', parseFloat(T('roAcur')), alphaN(60*D2R,2), 1e-3);
+  chk('读数 roAth = 最大值位置 120°/2', parseFloat(T('roAth')), 60, 1e-9);
+  chk('读数 roAmax = α₂ 的最大值', parseFloat(T('roAmax')), alphaN(60*D2R,2), 1e-3);
+
+  console.log(msg.join('\n'));
+  if(ok) document.title=document.title+' ✓';
+  else console.error('3.5 自检未通过');
+})();
+</script>
+<!-- CH3-SELFCHECK:END -->
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>原理讲解 · 3.3 谐振功率放大器的折线分析法</title>
+<style>
+:root{
+  --ink:#1a1a1a; --mut:#6b6b6b; --line:#1f1f1f; --soft:#e9ecef;
+  --blue:#1a46b5; --red:#c02020; --green:#0d7a3c; --amber:#c07a00; --violet:#7a3fb0;
+  --bg:#fbfbf9; --card:#fff; --bd:#d8d8d2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC","Source Han Sans SC",sans-serif;
+  line-height:1.75;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px}
+header{background:linear-gradient(135deg,#12233f,#2a4a7d);color:#fff;padding:52px 0 44px;margin-bottom:36px}
+header .wrap{padding-bottom:0}
+.kicker{font-size:13px;letter-spacing:.22em;opacity:.72;margin:0 0 10px}
+h1{font-size:34px;margin:0 0 12px;line-height:1.3;font-weight:700}
+.sub{font-size:16px;opacity:.85;max-width:820px;margin:0}
+.meta{margin-top:22px;font-size:13px;opacity:.7;display:flex;gap:22px;flex-wrap:wrap}
+h2{font-size:23px;margin:52px 0 6px;padding-bottom:10px;border-bottom:2px solid var(--ink);font-weight:700}
+h2 .num{color:var(--blue);margin-right:10px}
+h3{font-size:17px;margin:28px 0 10px;color:#234}
+p{margin:10px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px 24px;margin:18px 0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+svg{width:100%;height:auto;display:block;background:#fff;border-radius:6px}
+.cap{font-size:13px;color:var(--mut);text-align:center;margin-top:8px}
+svg text{font-family:"Microsoft YaHei",sans-serif}
+.badge{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;background:#eef2f8;color:#234;margin-right:6px}
+kbd{background:#eef0f2;border:1px solid #ccd0d4;border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-size:13px;
+  font-family:Consolas,monospace}
+.formula{background:#f6f7f5;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;
+  font-family:"Cambria Math","Times New Roman",serif;font-size:17px;overflow-x:auto}
+.formula .no{float:right;color:var(--mut);font-size:14px}
+.ctrls{display:flex;flex-wrap:wrap;gap:26px;background:#f2f4f7;border:1px solid var(--bd);
+  border-radius:8px;padding:16px 20px;margin:16px 0}
+.ctrl{flex:1 1 210px}
+.ctrl label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.ctrl .row{display:flex;align-items:center;gap:10px}
+.ctrl input[type=range]{flex:1;accent-color:var(--blue);height:20px}
+.ctrl .val{font-family:Consolas,monospace;font-size:14px;font-weight:700;color:var(--blue);min-width:74px;text-align:right}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:16px 0}
+.ro{background:#fff;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:6px;padding:10px 14px}
+.ro .k{font-size:12px;color:var(--mut)}
+.ro .v{font-family:Consolas,monospace;font-size:19px;font-weight:700;color:var(--ink)}
+.ro.g{border-left-color:var(--green)} .ro.g .v{color:var(--green)}
+.ro.r{border-left-color:var(--red)} .ro.r .v{color:var(--red)}
+.ro.a{border-left-color:var(--amber)} .ro.a .v{color:var(--amber)}
+canvas{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--bd);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th,td{border:1px solid var(--bd);padding:8px 11px;text-align:left}
+th{background:#f2f4f7;font-weight:700}
+td.n{font-family:Consolas,monospace;white-space:nowrap}
+ul,ol{padding-left:24px}li{margin:7px 0}
+.hl{background:#fff6d8;padding:1px 4px;border-radius:3px;font-weight:600}
+.warn{background:#fff4f4;border-left:3px solid var(--red);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.steps{display:grid;gap:9px;margin:14px 0}
+.st{background:#f7f9fc;border-left:3px solid var(--blue);padding:10px 15px;border-radius:0 6px 6px 0;font-size:14.5px}
+.st b{color:var(--blue);margin-right:6px}
+.mono{font-family:Consolas,"Microsoft YaHei",monospace;background:#eef2f8;color:#12306e;
+      padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px;font-size:14px}
+.note{background:#f4f8ff;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.sym{font-size:14px;margin:12px 0}
+.sym td:first-child{width:120px}
+.why{display:block;margin-top:8px;font-size:13.5px;color:#444;line-height:1.72}
+.why::before{content:"↳ ";color:var(--amber);font-weight:700}
+.live{background:#fffaf0;border:1px dashed var(--amber);border-radius:8px;padding:13px 18px;margin:16px 0;font-size:14.5px}
+.live b{color:#9a5c00}
+.live .mono{background:#fff;margin-top:2px;margin-bottom:2px}
+.kv{font-family:Consolas,monospace;background:#eef2f8;color:#12306e;padding:1px 7px;border-radius:4px;font-size:14px}
+.eqno{color:var(--mut);font-size:12.5px;margin-left:6px;white-space:nowrap}
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);font-size:13px;color:var(--mut)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:8px 0 2px;align-items:center}
+.legend i{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:6px}
+button{font-family:inherit;font-size:14px;padding:7px 16px;border:1px solid var(--bd);background:#fff;
+  border-radius:6px;cursor:pointer;margin-right:8px}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* ==== 数学排版（ch3_fracify 注入） ==== */
+/* ==================== 数学排版：堆叠分式 / 根号 ====================
+   教材的分式、根号都是竖排写法，这里用纯 CSS 还原（不引外部字体/库）。
+   .frac  > .fn 分子 / .fd 分母（.fd 上边框即分式横线）
+   .sqrt > .sgn 根号 / .rad 被开方数（.rad 上边框即根号横线）
+   .fb 是视觉隐藏的 "/"：复制粘贴得到线性写法，静态抄写检查也靠它还原 */
+.mt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif}
+td.n.mt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;white-space:normal}
+.frac,.sqrt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif}
+.frac{display:inline-flex;flex-direction:column;align-items:stretch;position:relative;
+  margin:0 .2em;padding:0 .03em;text-align:center;line-height:1.15;vertical-align:middle}
+.frac>.fn{padding:0 .24em .04em}
+.frac>.fd{padding:.04em .24em 0;border-top:1px solid currentColor}
+.frac>.fb{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sqrt{display:inline-block;white-space:nowrap}
+.sqrt>.sgn{display:inline-block}
+.sqrt>.rad{display:inline-block;border-top:1px solid currentColor;
+  padding:0 .18em 0 .34em;margin-left:-.2em}
+/* 被开方数里含堆叠分式时，根号要罩住整个分式（照教材的写法）：
+   字形 "√" 罩不住两行高的分式，改用 mask 画一个**可任意拉伸**的钩，
+   SVG 直接写在 data URI 里 —— 页面仍然完全自包含，不引用任何外部资源。
+   横线（根号顶上的那一条）仍由 .rad 的上边框给出；
+   钩的笔画用普通 stroke（不加 non-scaling-stroke），随字号一起缩放。 */
+.sqrt.tall{display:inline-flex;align-items:stretch;vertical-align:middle}
+.sqrt.tall>.sgn{flex:0 0 auto;position:relative;width:.42em;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 100' preserveAspectRatio='none'><path d='M1 99 L6.5 82 L11 2' fill='none' stroke='black' stroke-width='4.5'/></svg>") no-repeat center/100% 100%;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 100' preserveAspectRatio='none'><path d='M1 99 L6.5 82 L11 2' fill='none' stroke='black' stroke-width='4.5'/></svg>") no-repeat center/100% 100%}
+.sqrt.tall>.sgn>.sg{position:absolute;left:0;top:0;font-size:0;line-height:0}
+.sqrt.tall>.rad{flex:0 0 auto;border-top:1px solid currentColor;padding:0 .18em 0 .06em}
+
+</style>
+<style id="pub-mobile">.pub-tw{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;min-width:0;margin:14px 0}.pub-tw table{width:auto;max-width:none}.pub-tw::-webkit-scrollbar{height:8px}.pub-tw::-webkit-scrollbar-thumb{background:#c9c9c0;border-radius:4px}@media (max-width:760px){.pub-tw>table{width:max-content;min-width:100%}}img{max-width:100%;height:auto}canvas{max-width:100%;height:auto}pre{overflow-x:auto;max-width:100%}body{overflow-wrap:anywhere;}code{overflow-wrap:anywhere;word-break:break-word}</style><style id="pub-mobile-css">/* ============================================================================
+   移动端适配样式（build/mobile.css，由 build.js 内联进每个页面）
+   ----------------------------------------------------------------------------
+   背景：共享样式里 `svg{width:100%;height:auto}` 是**等比缩放**——
+   800×210 的框图在 390px 手机上只剩 281px 宽，缩放 0.35，
+   9.8px 的图内标注实际渲染只有 **3.4~5px**，完全看不清。
+
+   方案：宽图由 runtime（build/mobile.js）包进 .fig 横滑容器并按 **1:1** 渲染，
+        文字保持设计字号；容器内左右滑动看全图。
+   ⚠ 桌面端零影响：包裹动作只在「图宽 > 视口宽」时触发，
+     视口够宽时页面 DOM 与样式与改造前完全一致。
+
+   规则清单：
+     ① .figwrap/.fig     宽图横滑容器 + 滑动提示 + 两侧渐隐阴影
+     ② .tbl-wrap         表格横滑（窄屏下按内容宽度排版，不压扁列）
+     ③ 触控尺寸          pointer:coarse 时放大滑块/按钮
+     ④ .mvis-lb-*        点图全屏灯箱（双指缩放 / 拖动平移 / 双击放大）
+   ========================================================================== */
+
+/* ---------- ① 宽图横滑 ---------- */
+/* ⚠ min-width:0 / max-width:100% 不能省：
+   .figwrap 常处在 flex / grid 卡片里，而 flex 项的默认 min-width:auto 会让它
+   **不肯收缩到内容宽度以下** —— SVG 按 1:1 渲染后（如 902px 宽的框图），
+   容器不肯缩 → 卡片被撑到 902px → 整页被顶出横向滚动条。
+   允许收缩后，.fig 自己的 overflow-x:auto 接管横滑，页面不再溢出。 */
+.figwrap{margin:12px 0;min-width:0;max-width:100%;
+  /* contain:inline-size：让本盒子的**行内尺寸不再由内容决定** →
+     它在父级（grid/flex 卡片）里的 min-content 贡献降为 0。
+     ⚠ 这是关键的一步：grid 项默认 min-width:auto = 内容最小宽度，
+     1:1 渲染的宽图（如 432px 的 SVG）会把卡片撑到 470px → 整页横向溢出。
+     min-width:0 只能让**自己**收缩，压不住父级由内容撑开的宽度。 */
+  contain:inline-size;
+}
+.fig{
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  background:#fff;border:1px solid var(--bd,#d8d8d2);border-radius:8px;
+  scrollbar-width:thin;min-width:0;max-width:100%;
+}
+.fig>svg{
+  width:auto;max-width:none;display:block;margin:0 auto;
+  background:#fff;border-radius:0;
+}
+/* 可横滑时两侧加渐隐阴影，提示「还有内容」 */
+.figwrap.is-scroll>.fig{
+  box-shadow:inset 16px 0 14px -16px rgba(0,0,0,.30),
+             inset -16px 0 14px -16px rgba(0,0,0,.30);
+}
+.fighint{display:none;font-size:12px;color:var(--mut,#6b6b6b);text-align:center;margin-top:6px;}
+.figwrap.is-scroll>.fighint{display:block;}
+/* 提示条上的「放大」按钮 */
+.fighint button{
+  font:inherit;font-size:12px;margin:0 0 0 10px;padding:3px 10px;
+  border:1px solid var(--bd,#d8d8d2);border-radius:12px;background:#fff;color:var(--blue,#1a46b5);
+  vertical-align:baseline;
+}
+
+/* ---------- ①·b grid / flex 子项允许收缩 ----------
+   grid 项与 flex 项的默认 min-width:auto = **内容最小宽度**，
+   里面放了 1:1 渲染的宽图（SVG 宽 778px）时，项不肯缩到轨道宽以下 →
+   卡片被撑破 → 整页横向滚动条。
+   下面的容器清单由 scratch/survey_grid_classes.js 从发布目录**实测**得出
+   （谁声明了 display:grid/flex 就收谁），不是拍脑袋写的。 */
+.grid2>*,.grid3>*,.grid4>*,.grid>*,.grid12>*,.grid21>*,.irow>*,
+.cols2>*,.cols3>*,.readout>*,.meta>*,.ctrls>*,.ctrl .row>*,.steps>*,
+.legend>*,.frac>*,.badge-row>*,.eyebrow>*,.meta-row>*,.sec-head>*,
+.purpose>*,.widget-h>*,.btnrow>*,.flow>*,.kv>*,.readouts>*,.item>*,
+.buttons>*,.tabs>*,.presets>*,.symrow>*,.wave-trio>*,.bench>*{min-width:0}
+
+/* ---------- ② 表格横滑 ---------- */
+/* 章节样式里通常已有 .tbl-wrap；这里补一份兜底，
+   窄屏下让表格按内容宽度排布（不把列压成一条缝），超宽时横滑。 */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;max-width:100%;}
+@media (max-width:760px){
+  .tbl-wrap>table{width:max-content;min-width:100%;}
+}
+
+/* ---------- ②·b Canvas 自适应 ----------
+   canvas 用 width/height **属性**定死像素尺寸（如 width="640"），
+   在窄屏上就是一块不肯收缩的替换元素 → 连带把卡片与整页撑破
+   （实测某页 canvas 432px 宽，卡片被撑到 470px）。
+   max-width:100% + height:auto 让它等比缩小（只改显示尺寸，
+   不动画布的绘制分辨率，页面脚本读 canvas.width 不受影响）。 */
+canvas{max-width:100%;height:auto;}
+
+/* ---------- ③ 触控尺寸 ---------- */
+@media (pointer:coarse){
+  input[type=range]{height:34px;margin:2px 0;}
+  input[type=range]::-webkit-slider-thumb{width:26px;height:26px;}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border:0;}
+  button{min-height:40px;padding:9px 18px;}
+  .ctrl .val{font-size:15px;}
+  .fighint{font-size:12.5px;}
+}
+
+/* ---------- ④ 全屏灯箱 ---------- */
+.mvis-lb{
+  position:fixed;inset:0;z-index:99999;background:rgba(10,14,24,.96);
+  display:none;flex-direction:column;touch-action:none;overscroll-behavior:contain;
+}
+.mvis-lb.on{display:flex;}
+.mvis-lb-stage{
+  flex:1 1 auto;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.mvis-lb-zoom{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  transform-origin:center center;will-change:transform;
+}
+.mvis-lb-zoom>svg{
+  width:100%;height:100%;max-width:none;max-height:none;
+  background:transparent;border-radius:0;
+}
+.mvis-lb-bar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  background:#101828;color:#e8eef9;font-size:14px;
+}
+.mvis-lb-bar button{
+  background:#1e2c47;color:#e8eef9;border:1px solid #34456b;border-radius:8px;
+  min-width:46px;min-height:42px;margin:0;padding:8px 14px;font-size:16px;
+}
+.mvis-lb-bar button:active{background:#2a3c60;}
+.mvis-lb-tip{width:100%;text-align:center;color:#93a4c4;font-size:12px;}
+.mvis-lb-x{
+  position:absolute;top:8px;right:10px;z-index:2;
+  background:rgba(30,44,71,.9);color:#e8eef9;border:1px solid #34456b;
+  border-radius:8px;min-width:42px;min-height:42px;margin:0;font-size:18px;
+}
+/* 桌面端灯箱按钮不需要那么大的触控区 */
+@media (pointer:fine){
+  .mvis-lb-bar button{min-height:34px;font-size:14px;padding:6px 12px;}
+  .mvis-lb-x{min-height:34px;min-height:34px;}
+}
+</style></head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="kicker">通信电子线路（第 3 版 · 陈启兴） 第 3 章 高频功率放大器</p>
+    <h1>3.3　谐振功率放大器的折线分析法</h1>
+    <p class="sub">折线分析法就是把晶体管特性曲线理想化成一条或几条射线（折线），再写出理想化曲线的数学解析式，
+      从而把非线性问题变成可积的解析问题 —— 只要知道解析式中的晶体管参数，就能方便地求出直流分量 I<sub>C0</sub>
+      和基波分量的振幅 I<sub>c1m</sub>。本页按教材 3.3.1～3.3.6 的顺序，把式 (3-5)～(3-29)、图 3-4～图 3-12
+      全部拆开重绘，并把分解系数、输出功率与效率、动态特性、负载特性做成可交互的。</p>
+    <div class="meta">
+      <span>教材页码：书页 55 – 65（PDF 页 67 – 77）</span>
+      <span>对应插图：图 3-4 ~ 图 3-12</span>
+      <span>交互：θ<span style="font-size:0">_</span><sub>c</sub>、I<span style="font-size:0">_</span><sub>CM</sub>、ξ、R<span style="font-size:0">_</span><sub>L</sub>、V<span style="font-size:0">_</span><sub>CC</sub>、U<span style="font-size:0">_</span><sub>cm</sub> 等可拖，实时重算</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===================== 1 折线化 ===================== -->
+<h2><span class="num">1</span>折线化：晶体管特性曲线的理想化（3.3.1）</h2>
+
+<p>从集电极余弦脉冲电流 i<sub>C</sub>(t) 中求出直流分量 I<sub>C0</sub> 和基波分量的振幅 I<sub>c1m</sub>，
+是分析和计算丙类谐振高频功率放大器技术指标的关键。解决这个问题的方法有<span class="hl">图解法</span>和
+<span class="hl">解析近似分析法</span>两种。图解法是从晶体管的实际静态特性曲线入手，从图上取得若干个点，
+测量出直流分量 I<sub>C0</sub> 和基波分量的振幅 I<sub>c1m</sub>。图解法的准确度比较高，对电子管比较适用；
+而晶体管的特性曲线的个体差异很大，一般不能从手册上得到，只能从晶体管特性测试仪上测量出，难以进行概括性的理论分析，
+因此，图解法不适用于晶体管。鉴于此，对于晶体管高频功率放大器来说，可以使用解析近似分析法，即<span class="hl">折线分析法</span>。</p>
+
+<div class="note">
+  <b>折线分析法的做法：</b>首先是将晶体管的特性曲线理想化，每条曲线都用一条或几条射线来代替，
+  然后写出理想化曲线的数学解析式。只要知道这些数学解析式中晶体管的参数，就能够方便地求出直流分量 I<sub>C0</sub>
+  和基波分量的振幅 I<sub>c1m</sub>。这种方法比较简单，易于进行概括性的理论分析，其缺点是计算的准确度比较低，只能进行估算。
+</div>
+
+<p>晶体管特性曲线的理想化包括输入特性曲线的理想化、正向传输特性曲线的理想化和输出特性曲线的理想化。
+在大信号工作情况下，理想化特性曲线的原理认为：在放大区，集电极电流和基极电流不受集电极与发射极之间电压的影响，
+而与发射极电压呈线性关系；在饱和区，集电极电流与管压降呈线性关系。</p>
+
+<h3>1.1　输入特性曲线的理想化</h3>
+<p>输入特性的理想化曲线如图 3-4 中的虚线所示。对于晶体管的输入特性曲线来说，当集电极电压大于一定值时，
+集电极与发射极之间电压的改变对基极电流的影响不大，可以近似地认为基极电流与集电极和发射极之间的电压无关，
+可以用一条折线表示。延长该折线，与横轴的交点的横坐标为 U<sub>bz</sub>，它被称为理想化晶体管的
+<span class="hl">导通电压</span>或<span class="hl">截止电压</span>。</p>
+
+<div class="formula">
+  i<sub>B</sub> = 0，　　　　　　　　　　u<sub>BE</sub> &lt; U<sub>bz</sub><br>
+  i<sub>B</sub> = g<sub>b</sub>(u<sub>BE</sub> − U<sub>bz</sub>)，　u<sub>BE</sub> ≥ U<sub>bz</sub>
+  <span class="no">式 (3-5)</span>
+</div>
+<div class="formula">
+  g<sub>b</sub> = <span class="frac"><span class="fn">Δi<sub>B</sub></span><span class="fb">/</span><span class="fd">Δu<sub>BE</sub></span></span>
+  <span class="no">式 (3-6)</span>
+</div>
+<p>式中：g<sub>b</sub> —— 折线的斜率。由此可见，晶体管输入特性曲线的理想化曲线包括两段：
+一段对应晶体管截止的情况；另一段对应晶体管导通的情况。</p>
+
+<h3>1.2　正向传输特性曲线的理想化</h3>
+<p>理想化的晶体管的共射电流放大系数 β 被认为是常数，因此正向传输特性曲线的理想化与输入特性曲线的理想化是一致的。</p>
+<div class="formula">
+  i<sub>C</sub> = 0，　　　　　　　　　　u<sub>be</sub> &lt; U<sub>bz</sub><br>
+  i<sub>C</sub> = g<sub>c</sub>(u<sub>be</sub> − U<sub>bz</sub>)，　u<sub>be</sub> ≥ U<sub>bz</sub>
+  <span class="no">式 (3-7)</span>
+</div>
+<div class="formula">
+  g<sub>c</sub> = <span class="frac"><span class="fn">Δi<sub>C</sub></span><span class="fb">/</span><span class="fd">Δu<sub>be</sub></span></span> = β · <span class="frac"><span class="fn">Δi<sub>B</sub></span><span class="fb">/</span><span class="fd">Δu<sub>be</sub></span></span> = β g<sub>b</sub>
+  <span class="no">式 (3-8)</span>
+</div>
+<p>式中：g<sub>c</sub> —— 晶体管的跨导。由此可见，晶体管正向传输特性曲线的理想化曲线包括两段：
+一段对应晶体管截止的情况；另一段对应晶体管导通的情况。</p>
+
+<h3>1.3　输出特性曲线的理想化</h3>
+<p>输出特性曲线的理想化如图 3-5 中的虚线所示。在饱和区，理想化的折线是集电极电流与管压降成正比；
+在线性放大区，理想的折线与管压降 u<sub>CE</sub>(t) 无关，即一簇平行于横轴的折线。</p>
+<div class="formula">
+  i<sub>C</sub> = g<sub>cr</sub> · u<sub>CE</sub>，　u<sub>CE</sub> &lt; U<sub>CES</sub><br>
+  i<sub>C</sub> = β i<sub>B</sub>，　　　　u<sub>CE</sub> ≥ U<sub>CES</sub>
+  <span class="no">式 (3-9)</span>
+</div>
+<div class="formula">
+  g<sub>cr</sub> = <span class="frac"><span class="fn">Δi<sub>C</sub></span><span class="fb">/</span><span class="fd">Δu<sub>CE</sub></span></span>，　u<sub>CE</sub> &lt; U<sub>CES</sub>
+  <span class="no">式 (3-10)</span>
+</div>
+<p>式中：U<sub>CES</sub> —— 晶体管饱和时的管压降；g<sub>cr</sub> —— 饱和区集电极电流的斜率。
+由此可见，晶体管输出特性曲线的理想化曲线有多条，每条包括两段：一段对应晶体管饱和导通的情况；
+另一段对应晶体管工作于放大区的情况。其中，u<sub>CE</sub> &lt; U<sub>CES</sub> 时（在饱和区），
+对应的折线叫作<span class="hl">临界线</span>。</p>
+
+<div class="card">
+  <h3>交互：实际曲线（实线）与理想化折线（虚线）的偏差</h3>
+  <div class="ctrls">
+    <div class="ctrl">
+      <label>U<sub>bz</sub>　导通电压 (V)</label>
+      <div class="row"><input type="range" id="sUbz" min="0.2" max="1.2" step="0.05" value="0.6"><span class="val" id="vUbz">0.60</span></div>
+    </div>
+    <div class="ctrl">
+      <label>g<sub>b</sub>　输入折线斜率 (S)</label>
+      <div class="row"><input type="range" id="sGb" min="0.01" max="0.25" step="0.005" value="0.06"><span class="val" id="vGb">0.060</span></div>
+    </div>
+    <div class="ctrl">
+      <label>g<sub>c</sub>　跨导 (S)</label>
+      <div class="row"><input type="range" id="sGc" min="0.05" max="1.2" step="0.01" value="0.40"><span class="val" id="vGc">0.40</span></div>
+    </div>
+    <div class="ctrl">
+      <label>U<sub>CES</sub>　饱和管压降 (V)</label>
+      <div class="row"><input type="range" id="sUces" min="0.1" max="2.0" step="0.05" value="0.5"><span class="val" id="vUces">0.50</span></div>
+    </div>
+    <div class="ctrl">
+      <label>g<sub>cr</sub>　临界线斜率 (S)</label>
+      <div class="row"><input type="range" id="sGcr" min="0.1" max="2.0" step="0.05" value="0.8"><span class="val" id="vGcr">0.80</span></div>
+    </div>
+  </div>
+  <canvas id="cvChar" width="1040" height="430"></canvas>
+  <p class="cap">图 3-4 / 图 3-5 重绘：左为输入特性理想化，右为输出特性理想化（含临界线）。拖动滑块，观察折线相对实际曲线的偏差</p>
+  <div class="readout">
+    <div class="ro"><div class="k">β = g<span style="font-size:0">_</span><sub>c</sub> / g<span style="font-size:0">_</span><sub>b</sub></div><div class="v" id="roBeta">—</div></div>
+    <div class="ro g"><div class="k">临界线 i<span style="font-size:0">_</span><sub>C</sub> = g<span style="font-size:0">_</span><sub>cr</sub>·u<span style="font-size:0">_</span><sub>CE</sub></div><div class="v" id="roCrit">—</div></div>
+    <div class="ro a"><div class="k">U<span style="font-size:0">_</span><sub>CES</sub> 处临界电流 g<span style="font-size:0">_</span><sub>cr</sub>·U<span style="font-size:0">_</span><sub>CES</sub></div><div class="v" id="roIces">—</div></div>
+    <div class="ro r"><div class="k">折线拐点（β i<span style="font-size:0">_</span><sub>B</sub> / g<span style="font-size:0">_</span><sub>cr</sub>）</div><div class="v" id="roKnee">—</div></div>
+  </div>
+  <div class="live" id="liveChar"></div>
+</div>
+
+<!-- ===================== 2 脉冲分解 ===================== -->
+<h2><span class="num">2</span>集电极余弦电流脉冲的分解（3.3.2）</h2>
+
+<p>由图 3-3 可见，晶体管特性曲线理想化之后，集电极电流一般是一个<span class="hl">尖顶、周期脉冲</span>信号。
+集电极余弦电流脉冲的分解就是把周期性的集电极脉冲电流分解成如式 (3-3) 和式 (3-4) 所示的傅里叶级数形式，
+在已知脉冲最大值 I<sub>CM</sub> 和通角 θ<sub>c</sub> 的条件下，可以求出直流分量 I<sub>C0</sub>、
+基波分量的振幅 I<sub>c1m</sub> 和谐波分量的振幅 I<sub>cnm</sub>，以便计算放大器的技术指标。</p>
+
+<h3>2.1　集电极余弦电流脉冲的表达式</h3>
+<p>设 u<sub>b</sub>(t) = U<sub>bm</sub> cos(ω<sub>c</sub>t)，则 u<sub>BE</sub>(t) = V<sub>BB</sub> + u<sub>b</sub>(t)
+= V<sub>BB</sub> + U<sub>bm</sub> cos(ω<sub>c</sub>t)。将这个发射结电压代入式 (3-7)（仅考虑晶体管导通时的电流），
+可得晶体管集电极的电流 i<sub>C</sub>(t) 为</p>
+<div class="formula">
+  i<sub>C</sub>(t) = g<sub>c</sub>[u<sub>BE</sub>(t) − U<sub>bz</sub>]
+  = g<sub>c</sub>[V<sub>BB</sub> + U<sub>bm</sub> cos(ω<sub>c</sub>t) − U<sub>bz</sub>]
+  <span class="no">式 (3-11)</span>
+</div>
+<p>当 ωt = θ<sub>c</sub> 时，i<sub>C</sub>(t) = 0，代入式 (3-11) 可得</p>
+<div class="formula">
+  cos θ<sub>c</sub> = <span class="frac"><span class="fn">U<sub>bz</sub> − V<sub>BB</sub></span><span class="fb">/</span><span class="fd">U<sub>bm</sub></span></span>
+  <span class="no">式 (3-12)</span>
+</div>
+<p>式 (3-12) 是计算放大器的通角 θ<sub>c</sub> 的公式。把式 (3-12) 代入式 (3-11) 可得</p>
+<div class="formula">
+  i<sub>C</sub>(t) = g<sub>c</sub> U<sub>bm</sub> [cos(ω<sub>c</sub>t) − cos θ<sub>c</sub>]
+  <span class="no">式 (3-13)</span>
+</div>
+<p>当 ωt = 0 时，i<sub>C</sub>(t) = I<sub>CM</sub>，代入式 (3-13) 可得</p>
+<div class="formula">
+  I<sub>CM</sub> = g<sub>c</sub> U<sub>bm</sub> (1 − cos θ<sub>c</sub>)
+  <span class="no">式 (3-14)</span>
+</div>
+<p>将式 (3-14) 代入式 (3-13)，就得到集电极余弦电流脉冲 i<sub>C</sub>(t) 的表达式为</p>
+<div class="formula">
+  i<sub>C</sub>(t) = I<sub>CM</sub> · <span class="frac"><span class="fn">cos(ω<sub>c</sub>t) − cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">1 − cos θ<sub>c</sub></span></span>
+  <span class="no">式 (3-15)</span>
+</div>
+<p>式 (3-15) 是用脉冲最大值 I<sub>CM</sub> 和通角 θ<sub>c</sub> 来表示集电极电流的瞬时值。
+式 (3-12)、式 (3-14) 和式 (3-15) 是后面进行分析和计算常用的表达式。</p>
+<div class="formula">
+  i<sub>C</sub>(t) = 0，　　　　　　　　　　　　　　　　　　　　others<br>
+  i<sub>C</sub>(t) = I<sub>CM</sub> · <span class="frac"><span class="fn">cos(ω<sub>c</sub>t) − cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">1 − cos θ<sub>c</sub></span></span>，
+  ω<sub>c</sub>t ∈ [2kπ − θ<sub>c</sub>, 2kπ + θ<sub>c</sub>]
+  <span class="no">式 (3-16)</span>
+</div>
+<p>式中：k —— 整数。</p>
+
+<h3>2.2　集电极余弦电流脉冲的分解</h3>
+<p>集电极余弦电流脉冲的分解，就是把式 (3-16) 表达的周期信号变换成式 (3-4) 的形式。
+傅里叶级数的各个分解系数分别为</p>
+<div class="formula">
+  I<sub>C0</sub> = (<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">2π</span></span>) ∫<sub>−π</sub><sup>π</sup> i<sub>C</sub>(t) d(ω<sub>c</sub>t)
+  = I<sub>CM</sub> · <span class="frac"><span class="fn">sin θ<sub>c</sub> − θ<sub>c</sub> cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">π(1 − cos θ<sub>c</sub>)</span></span>
+  = I<sub>CM</sub> · α<sub>0</sub>(θ<sub>c</sub>)
+  <span class="no">式 (3-17)</span>
+</div>
+<div class="formula">
+  I<sub>c1m</sub> = (<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">π</span></span>) ∫<sub>−π</sub><sup>π</sup> i<sub>C</sub>(t) cos(ω<sub>c</sub>t) d(ω<sub>c</sub>t)
+  = I<sub>CM</sub> · <span class="frac"><span class="fn">θ<sub>c</sub> − sin θ<sub>c</sub> cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">π(1 − cos θ<sub>c</sub>)</span></span>
+  = I<sub>CM</sub> · α<sub>1</sub>(θ<sub>c</sub>)
+  <span class="no">式 (3-18)</span>
+</div>
+<div class="formula">
+  I<sub>cnm</sub> = (<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">π</span></span>) ∫<sub>−π</sub><sup>π</sup> i<sub>C</sub>(t) cos(n ω<sub>c</sub>t) d(ω<sub>c</sub>t)
+  = I<sub>CM</sub> · <span class="frac"><span class="fn">sin(n θ<sub>c</sub>) cos θ<sub>c</sub> − n sin θ<sub>c</sub> cos(n θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">0.5πn(n<sup>2</sup> − 1)(1 − cos θ<sub>c</sub>)</span></span>
+  = I<sub>CM</sub> · α<sub>n</sub>(θ<sub>c</sub>)
+  <span class="no">式 (3-19)</span>
+</div>
+<p>式中：α<sub>i</sub>(θ<sub>c</sub>)，i = 0, 1, ⋯, n，分别指直流分量的分解系数、基波分量的分解系数、
+n 次谐波分量的分解系数。这些系数都是通角 θ<sub>c</sub> 的函数，根据上面的公式进行计算是比较烦琐的，
+通常可以查表，如本书的附录 A 所示。</p>
+
+<div class="formula">
+  α<sub>0</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">sin θ<sub>c</sub> − θ<sub>c</sub> cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">π(1 − cos θ<sub>c</sub>)</span></span><br>
+  α<sub>1</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">θ<sub>c</sub> − sin θ<sub>c</sub> cos θ<sub>c</sub></span><span class="fb">/</span><span class="fd">π(1 − cos θ<sub>c</sub>)</span></span><br>
+  α<sub>n</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">sin(n θ<sub>c</sub>) cos θ<sub>c</sub> − n sin θ<sub>c</sub> cos(n θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">0.5πn(n<sup>2</sup> − 1)(1 − cos θ<sub>c</sub>)</span></span>，n ≥ 2<br>
+  g<sub>1</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">α<sub>1</sub>(θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">α<sub>0</sub>(θ<sub>c</sub>)</span></span> = <span class="frac"><span class="fn">I<sub>c1m</sub></span><span class="fb">/</span><span class="fd">I<sub>C0</sub></span></span>
+  <span class="no">分解系数定义</span>
+</div>
+
+<div class="note">
+  <b>图 3-6 的三条结论（教材原文）：</b>α<sub>0</sub>(θ<sub>c</sub>) 是单调上升函数。
+  α<sub>1</sub>(θ<sub>c</sub>) 在 θ<sub>c</sub> ≈ 120° 时有最大值，最大值为 <span class="hl">0.536</span>。
+  此时，如果最大值 I<sub>CM</sub> 和负载电阻 R<sub>L</sub> 为定值，则输出功率
+  P<sub>o</sub> = 0.5 I<sub>c1m</sub><sup>2</sup> R<sub>L</sub> 将达到最大值。但是，当通角 θ<sub>c</sub> = 120° 时，
+  放大器将工作于甲乙类状态，集电极效率则太低。因此，如果要兼顾输出功率和集电极效率，通角 θ<sub>c</sub> 需要另外取值。
+  通角 <span class="hl">θ<sub>c</sub> = 60°</span> 时，α<sub>2</sub>(θ<sub>c</sub>) 达到最大值。
+  <span class="hl">θ<sub>c</sub> = 40°</span> 时，α<sub>3</sub>(θ<sub>c</sub>) 达到最大值。
+</div>
+
+<div class="card">
+  <h3>交互（核心）：余弦脉冲波形 + 图 3-6 分解系数曲线族</h3>
+  <div class="ctrls">
+    <div class="ctrl">
+      <label>θ<sub>c</sub>　半导通角 (°)</label>
+      <div class="row"><input type="range" id="sTh2" min="5" max="180" step="1" value="70"><span class="val" id="vTh2">70</span></div>
+    </div>
+    <div class="ctrl">
+      <label>I<sub>CM</sub>　脉冲最大值 (A)</label>
+      <div class="row"><input type="range" id="sIcm" min="0.1" max="5" step="0.05" value="2.0"><span class="val" id="vIcm">2.00</span></div>
+    </div>
+    <div class="ctrl">
+      <label>快捷通角</label>
+      <div class="row">
+        <button type="button" id="bTh120">120°</button>
+        <button type="button" id="bTh80">80°</button>
+        <button type="button" id="bTh60">60°</button>
+        <button type="button" id="bTh40">40°</button>
+      </div>
+    </div>
+  </div>
+  <canvas id="cvPulse" width="1040" height="440"></canvas>
+  <p class="cap">左：i<sub>C</sub>(t) 余弦电流脉冲（式 3-15，一周期 −π ~ +π），标出 θ<sub>c</sub> 与 I<sub>CM</sub>；
+    右：图 3-6 复刻 —— α<sub>0</sub>、α<sub>1</sub>、α<sub>2</sub>、α<sub>3</sub>（左轴）与 g<sub>1</sub>(θ<sub>c</sub>)（右轴，虚线）随 θ<sub>c</sub> 的曲线族，竖线为当前 θ<sub>c</sub> 游标</p>
+  <div class="readout">
+    <div class="ro"><div class="k">α₀(θ<span style="font-size:0">_</span><sub>c</sub>)</div><div class="v" id="roA0">—</div></div>
+    <div class="ro"><div class="k">α₁(θ<span style="font-size:0">_</span><sub>c</sub>)</div><div class="v" id="roA1">—</div></div>
+    <div class="ro a"><div class="k">α₂(θ<span style="font-size:0">_</span><sub>c</sub>)</div><div class="v" id="roA2">—</div></div>
+    <div class="ro r"><div class="k">α₃(θ<span style="font-size:0">_</span><sub>c</sub>)</div><div class="v" id="roA3">—</div></div>
+    <div class="ro g"><div class="k">g₁ = α₁/α₀</div><div class="v" id="roG1">—</div></div>
+  </div>
+  <div class="readout">
+    <div class="ro"><div class="k">I<span style="font-size:0">_</span><sub>C0</sub> = I<span style="font-size:0">_</span><sub>CM</sub>·α₀　(A)</div><div class="v" id="roIc0">—</div></div>
+    <div class="ro"><div class="k">I<span style="font-size:0">_</span><sub>c1m</sub> = I<span style="font-size:0">_</span><sub>CM</sub>·α₁　(A)</div><div class="v" id="roIc1">—</div></div>
+    <div class="ro a"><div class="k">I<span style="font-size:0">_</span><sub>c2m</sub> = I<span style="font-size:0">_</span><sub>CM</sub>·α₂　(A)</div><div class="v" id="roIc2">—</div></div>
+    <div class="ro r"><div class="k">I<span style="font-size:0">_</span><sub>c3m</sub> = I<span style="font-size:0">_</span><sub>CM</sub>·α₃　(A)</div><div class="v" id="roIc3">—</div></div>
+  </div>
+  <div class="live" id="livePulse"></div>
+</div>
+
+<!-- ===================== 3 功率与效率 ===================== -->
+<h2><span class="num">3</span>输出功率与效率（3.3.3）</h2>
+
+<p>根据前面阐述的集电极余弦脉冲的分解和晶体管特性曲线的折线分析，可以方便地计算出放大器的输出功率和集电极效率。
+在图 3-2 中，设 u<sub>b</sub>(t) = U<sub>bm</sub> cos(ω<sub>c</sub>t)，则发射结两端的电压和管压降分别为</p>
+<div class="formula">
+  u<sub>BE</sub>(t) = V<sub>BB</sub> + U<sub>bm</sub> cos(ω<sub>c</sub>t)
+  <span class="no">式 (3-20)</span>
+</div>
+<div class="formula">
+  u<sub>CE</sub>(t) = V<sub>CC</sub> − U<sub>cm</sub> cos(ω<sub>c</sub>t)
+  <span class="no">式 (3-21)</span>
+</div>
+<p>集电极脉冲电流 i<sub>C</sub>(t) 可以分解成式 (3-4) 的形式，其中直流分量 I<sub>C0</sub>、
+基波分量的振幅 I<sub>c1m</sub> 和谐波分量的振幅 I<sub>cnm</sub> 可以由式 (3-17)、式 (3-18) 和式 (3-19) 求出。
+因此，直流电源 V<sub>CC</sub> 提供的直流功率为</p>
+<div class="formula">
+  P<sub>=</sub> = V<sub>CC</sub> · I<sub>C0</sub>
+  <span class="no">式 (3-22)</span>
+</div>
+<p>因为负载回路的谐振频率等于基波频率，回路两端的电压主要是集电极脉冲电流的基波分量在回路两端产生的，
+而直流分量和其余分量都可以忽略不计。因此，高频放大器的输出功率可以表示为</p>
+<div class="formula">
+  P<sub>o</sub> = (<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">2</span></span>) U<sub>cm</sub> I<sub>c1m</sub> = (<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">2</span></span>) I<sub>c1m</sub><sup>2</sup> R<sub>L</sub>
+  = <span class="frac"><span class="fn">U<sub>cm</sub><sup>2</sup></span><span class="fb">/</span><span class="fd">2 R<sub>L</sub></span></span>
+  <span class="no">式 (3-23)</span>
+</div>
+<p>根据能量守恒定律，忽略电阻或等效电阻的功率消耗，晶体管集电极耗散功率可以表示为</p>
+<div class="formula">
+  P<sub>c</sub> = P<sub>=</sub> − P<sub>o</sub>
+  <span class="no">式 (3-24)</span>
+</div>
+<p>根据集电极效率的定义，集电极效率可以表示为</p>
+<div class="formula">
+  η<sub>c</sub> = <span class="frac"><span class="fn">P<sub>o</sub></span><span class="fb">/</span><span class="fd">P<sub>=</sub></span></span>
+  = <span class="frac"><span class="fn">(<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">2</span></span>) × (U<sub>cm</sub> I<sub>c1m</sub>)</span><span class="fb">/</span><span class="fd">V<sub>CC</sub> I<sub>C0</sub></span></span>
+  = (<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">2</span></span>) ξ g<sub>1</sub>(θ<sub>c</sub>)
+  <span class="no">式 (3-25)</span>
+</div>
+<p>式中：ξ = U<sub>cm</sub>/V<sub>CC</sub> —— <span class="hl">集电极电压利用系数</span>；
+g<sub>1</sub>(θ<sub>c</sub>) = I<sub>c1m</sub>/I<sub>C0</sub> = α<sub>1</sub>(θ<sub>c</sub>)/α<sub>0</sub>(θ<sub>c</sub>)
+—— <span class="hl">波形系数</span>。波形系数 g<sub>1</sub>(θ<sub>c</sub>) 随通角 θ<sub>c</sub> 的变化情况如图 3-6 所示，
+可以看出，g<sub>1</sub>(θ<sub>c</sub>) 随着通角 θ<sub>c</sub> 的增大而逐渐下降。</p>
+
+<div class="note">
+  <b>教材结论（1）：</b>在电压利用系数为 1 的理想条件下，对于甲类放大器，θ<sub>c</sub> = π rad，
+  g<sub>1</sub>(θ<sub>c</sub>) = 1，效率为 η<sub>c</sub> = 50%；对于乙类放大器，θ<sub>c</sub> = 0.5π rad，
+  g<sub>1</sub>(θ<sub>c</sub>) = 1.57，效率为 η<sub>c</sub> = 78.5%；对于丙类放大器，θ<sub>c</sub> &lt; 0.5π rad，
+  g<sub>1</sub>(θ<sub>c</sub>) &gt; 1，效率 η<sub>c</sub> &gt; 78.5%，而且通角越小，效率越高。
+  <br><b>教材结论（2）：</b>在负载电阻 R<sub>L</sub> 一定的情况下，θ<sub>c</sub> = 120° 时，输出功率最大，
+  但效率只有 66%；θ<sub>c</sub> = 1°～15° 时，效率最高，但是输出功率很小。所以，在实际应用中，
+  为了兼顾输出功率和效率，通常选取 <span class="hl">θ<sub>c</sub> = 60°～80°</span>。
+</div>
+
+<div class="card">
+  <h3>交互：拖 θ<sub>c</sub> 与 ξ，重算 P<sub>=</sub>、P<sub>o</sub>、P<sub>c</sub>、η<sub>c</sub></h3>
+  <div class="ctrls">
+    <div class="ctrl">
+      <label>θ<sub>c</sub>　半导通角 (°)</label>
+      <div class="row"><input type="range" id="sTh3" min="10" max="180" step="1" value="70"><span class="val" id="vTh3">70</span></div>
+    </div>
+    <div class="ctrl">
+      <label>ξ = U<sub>cm</sub>/V<sub>CC</sub>　电压利用系数</label>
+      <div class="row"><input type="range" id="sXi" min="0.1" max="1" step="0.01" value="0.9"><span class="val" id="vXi">0.90</span></div>
+    </div>
+    <div class="ctrl">
+      <label>V<sub>CC</sub>　集电极电源 (V)</label>
+      <div class="row"><input type="range" id="sVcc3" min="5" max="40" step="0.5" value="24"><span class="val" id="vVcc3">24.0</span></div>
+    </div>
+    <div class="ctrl">
+      <label>I<sub>CM</sub>　脉冲最大值 (A)</label>
+      <div class="row"><input type="range" id="sIcm3" min="0.2" max="5" step="0.05" value="2.0"><span class="val" id="vIcm3">2.00</span></div>
+    </div>
+  </div>
+  <canvas id="cvEta3" width="1040" height="400"></canvas>
+  <p class="cap">左：η<sub>c</sub> = ½ ξ g<sub>1</sub>(θ<sub>c</sub>) 随 θ<sub>c</sub> 变化（当前 ξ 下），标出甲类 / 乙类 / 丙类关键点与当前位置；
+    右：P<sub>=</sub>、P<sub>o</sub>、P<sub>c</sub> 随 θ<sub>c</sub> 变化（当前 V<sub>CC</sub>、I<sub>CM</sub>、ξ 下）</p>
+  <div class="readout">
+    <div class="ro"><div class="k">I<span style="font-size:0">_</span><sub>C0</sub> (A)</div><div class="v" id="roI0c">—</div></div>
+    <div class="ro"><div class="k">I<span style="font-size:0">_</span><sub>c1m</sub> (A)</div><div class="v" id="roI1c">—</div></div>
+    <div class="ro g"><div class="k">g₁(θ<span style="font-size:0">_</span><sub>c</sub>)</div><div class="v" id="roG1c">—</div></div>
+    <div class="ro"><div class="k">P_= = V<span style="font-size:0">_</span><sub>CC</sub>·I<span style="font-size:0">_</span><sub>C0</sub> (W)</div><div class="v" id="roPdc">—</div></div>
+    <div class="ro g"><div class="k">P<span style="font-size:0">_</span><sub>o</sub> (W)</div><div class="v" id="roPo">—</div></div>
+    <div class="ro r"><div class="k">P<span style="font-size:0">_</span><sub>c</sub> = P_ − P<span style="font-size:0">_</span><sub>o</sub> (W)</div><div class="v" id="roPc">—</div></div>
+    <div class="ro a"><div class="k">η<span style="font-size:0">_</span><sub>c</sub> = ½ ξ g₁</div><div class="v" id="roEta">—</div></div>
+    <div class="ro"><div class="k">U<span style="font-size:0">_</span><sub>cm</sub> = ξ V<span style="font-size:0">_</span><sub>CC</sub> (V)</div><div class="v" id="roUcm3">—</div></div>
+  </div>
+  <div class="live" id="livePow"></div>
+</div>
+
+<!-- ===================== 4 动态特性 ===================== -->
+<h2><span class="num">4</span>动态特性（3.3.4）</h2>
+
+<p>高频谐振功率放大器的工作状态取决于晶体管的参数、负载电阻 R<sub>L</sub>、集电极电源电压 V<sub>CC</sub>、
+基极电源电压 V<sub>BB</sub> 和输入信号振幅 U<sub>bm</sub> 5 个参数。分析这 5 个参数的变化对高频功率放大器的性能影响，
+可以得到高频功率放大器的各种工作状态的优缺点以及正确调试放大器的方法。</p>
+<p>对于工作于丙类状态的高频功率放大器，其负载是等效的并联谐振回路，回路的谐振频率等于输入信号的频率，
+在其晶体管的型号、电源电压 V<sub>BB</sub> 和 V<sub>CC</sub>、输入信号振幅 U<sub>bm</sub>、谐振电阻 R<sub>L</sub>
+一定的条件下，集电极电流 i<sub>C</sub>(t) 与发射结电压 u<sub>BE</sub>、管压降 u<sub>CE</sub> 之间的关系，
+被称为<span class="hl">动态特性</span>，即 i<sub>C</sub> = f(u<sub>BE</sub>, u<sub>CE</sub>)。</p>
+
+<div class="formula">
+  u<sub>BE</sub>(t) = V<sub>BB</sub> + U<sub>bm</sub> · <span class="frac"><span class="fn">V<sub>CC</sub> − u<sub>CE</sub>(t)</span><span class="fb">/</span><span class="fd">U<sub>cm</sub></span></span>
+  <span class="no">式 (3-26)</span>
+</div>
+<div class="formula">
+  i<sub>C</sub>(t) = g<sub>c</sub>[V<sub>BB</sub> + U<sub>bm</sub> · <span class="frac"><span class="fn">V<sub>CC</sub> − u<sub>CE</sub>(t)</span><span class="fb">/</span><span class="fd">U<sub>cm</sub></span></span> − U<sub>bz</sub>]<br>
+  = −g<sub>c</sub> (<span class="frac"><span class="fn">U<sub>bm</sub></span><span class="fb">/</span><span class="fd">U<sub>cm</sub></span></span>)[u<sub>CE</sub>(t) − V<sub>CC</sub> + U<sub>cm</sub> cos θ<sub>c</sub>]<br>
+  = g<sub>d</sub> [u<sub>CE</sub>(t) − U<sub>o</sub>]
+  <span class="no">式 (3-27)</span>
+</div>
+<p>式中：<span class="hl">U<sub>o</sub> = V<sub>CC</sub> − U<sub>cm</sub> cos θ<sub>c</sub></span>
+—— 动态特性曲线在横轴 u<sub>CE</sub> 上的截距；
+<span class="hl">g<sub>d</sub> = −g<sub>c</sub> U<sub>bm</sub> / U<sub>cm</sub></span>
+—— 动态特性曲线的斜率（负值）。显然，式 (3-27) 是 i<sub>C</sub>(t) 与 u<sub>CE</sub>(t) 之间的直线方程，
+反映了当 u<sub>BE</sub>(t) ≥ U<sub>bz</sub> 时，i<sub>C</sub>(t) 随 u<sub>CE</sub>(t) 动态变化的对应关系。</p>
+
+<h3>4.1　截距法与虚拟电流法</h3>
+<p><b>截距法</b>是在已知截距 U<sub>o</sub> 和斜率 g<sub>d</sub> 的条件下，由式 (3-27) 确定的折线，
+连同 u<sub>BE</sub> &lt; U<sub>bz</sub> 时 i<sub>C</sub> = 0 的折线构成总的动态特性曲线，如图 3-7 中的 AB-BC 折线。
+其中，A 点的坐标是 (V<sub>CC</sub> − U<sub>cm</sub>, I<sub>CM</sub>)，B 点的坐标是 (U<sub>o</sub>, 0)，
+C 点的坐标是 (V<sub>CC</sub> + U<sub>cm</sub>, 0)。</p>
+<p><b>虚拟电流法</b>是在截距法的基础上扩展的一种较为简便的分析方法。在图 3-7 中，AB 的延长线与平行于纵轴、
+横坐标为 V<sub>CC</sub> 的直线的交点为 Q(V<sub>CC</sub>, I<sub>Q</sub>)。只要已知 AB 折线的斜率、A 点的坐标、
+B 点的坐标和 Q 点的坐标这 4 个值中的任意两个，就可以唯一确定 AB 折线；然后连同 C 点，得到完整的动态特性曲线
+AB-BC 折线。I<sub>Q</sub> 是虚拟的电流，实际上它是不存在的，但是可以被求出，即</p>
+<div class="formula">
+  I<sub>Q</sub> = g<sub>d</sub>[u<sub>CE</sub>(t) − U<sub>o</sub>]|<sub>u_CE=V_CC</sub>
+  = g<sub>d</sub>(V<sub>CC</sub> − V<sub>CC</sub> + U<sub>cm</sub> cos θ<sub>c</sub>)
+  = −g<sub>c</sub>(U<sub>bz</sub> − V<sub>BB</sub>)
+  <span class="no">式 (3-28)</span>
+</div>
+
+<h3>4.2　三种工作状态</h3>
+<p>高频谐振功率放大器有 3 种工作状态，即<span class="hl">欠压</span>、<span class="hl">临界</span>和
+<span class="hl">过压</span>。当高频谐振功率放大器的集电极电流都在临界线的右方时，交流输出电压比较低，
+称为<b>欠压</b>工作状态；当其集电极电流的最大值穿过了临界线，到达左方饱和区时，交流输出电压比较高，
+称为<b>过压</b>工作状态；当其集电极电流的最大值正好落在临界线上时，称为<b>临界</b>工作状态。</p>
+<p>在图 3-8 中，第一种动态特性曲线是折线 A<sub>1</sub>B<sub>1</sub>-B<sub>1</sub>C<sub>1</sub>，
+A<sub>1</sub> 点处于放大区，对应 U<sub>cm1</sub> 最小，集电极电流是尖顶脉冲，这种状态就是欠压状态；
+第二种动态特性曲线是折线 A<sub>2</sub>B<sub>2</sub>-B<sub>2</sub>C<sub>2</sub>，
+A<sub>2</sub> 点处于临界线上，对应 U<sub>cm2</sub> 中等，集电极电流也是尖顶脉冲，这种状态就是临界状态；
+第三种动态特性曲线是折线 A<sub>3</sub>B<sub>3</sub>-B<sub>3</sub>C<sub>3</sub>，
+虽然 A<sub>3</sub> 点也处于临界线上，但是此时 u<sub>BE</sub> = V<sub>BB</sub> + U<sub>bm</sub> 已经让晶体管饱和了，
+在 B<sub>3</sub>A<sub>3</sub> 延长线上的 A′<sub>3</sub> 点是一个虚拟点，对应 U<sub>cm3</sub> 最大，
+集电极电流是<span class="hl">凹顶脉冲</span>，这种状态就是过压状态。</p>
+<div class="warn">
+  <b>分解系数的适用范围：</b>对于<b>欠压和临界</b>状态，由于集电极电流为尖顶脉冲，可以用前面所述的分解系数；
+  对于<b>过压</b>状态，由于集电极电流为凹顶脉冲，<b>不能直接用</b>前述的分解系数，但仍然可以分解成傅里叶级数后，
+  用类似的方法计算。通过集电极电流脉冲的幅度和形状，就可以判断功率放大器工作在哪种状态。
+</div>
+
+<div class="card">
+  <h3>交互：输出特性上的动态负载线（图 3-7 / 图 3-8）</h3>
+  <div class="ctrls">
+    <div class="ctrl">
+      <label>R<sub>L</sub>　谐振电阻 (Ω)</label>
+      <div class="row"><input type="range" id="sRl4" min="4" max="60" step="0.5" value="22"><span class="val" id="vRl4">22.0</span></div>
+    </div>
+    <div class="ctrl">
+      <label>V<sub>CC</sub>　集电极电源 (V)</label>
+      <div class="row"><input type="range" id="sVcc4" min="8" max="36" step="0.5" value="20"><span class="val" id="vVcc4">20.0</span></div>
+    </div>
+    <div class="ctrl">
+      <label>U<sub>cm</sub>　输出电压振幅 (V)</label>
+      <div class="row"><input type="range" id="sUcm4" min="2" max="30" step="0.1" value="18"><span class="val" id="vUcm4">18.0</span></div>
+    </div>
+    <div class="ctrl">
+      <label>θ<sub>c</sub>（固定）　I<sub>CM</sub>（固定）</label>
+      <div class="row"><span class="kv">θ<span style="font-size:0">_</span><sub>c</sub> = 70°</span><span class="kv">I<span style="font-size:0">_</span><sub>CM</sub> = 2 A</span></div>
+    </div>
+  </div>
+  <canvas id="cvDyn" width="1040" height="440"></canvas>
+  <p class="cap">左：i<sub>C</sub> – u<sub>CE</sub> 平面上的动态特性折线 AB-BC、临界线 i<sub>C</sub> = g<sub>cr</sub>u<sub>CE</sub>
+    与虚拟点 Q；右：u<sub>CE</sub>(t) = V<sub>CC</sub> − U<sub>cm</sub> cos ω<sub>c</sub>t 在一个周期内的摆动范围（A 对应 ω<sub>c</sub>t = 0，C 对应 ω<sub>c</sub>t = ±π）</p>
+  <div class="readout">
+    <div class="ro"><div class="k">U<span style="font-size:0">_</span><sub>o</sub> = V<span style="font-size:0">_</span><sub>CC</sub> − U<span style="font-size:0">_</span><sub>cm</sub>·cosθ<span style="font-size:0">_</span><sub>c</sub> (V)</div><div class="v" id="roUo">—</div></div>
+    <div class="ro"><div class="k">g<span style="font-size:0">_</span><sub>d</sub> = −I<span style="font-size:0">_</span><sub>CM</sub>/[U<span style="font-size:0">_</span><sub>cm</sub>(1−cosθ<span style="font-size:0">_</span><sub>c</sub>)]</div><div class="v" id="roGd">—</div></div>
+    <div class="ro g"><div class="k">工作状态</div><div class="v" id="roState4">—</div></div>
+    <div class="ro a"><div class="k">I<span style="font-size:0">_</span><sub>Q</sub> = −g<span style="font-size:0">_</span><sub>c</sub>(U<span style="font-size:0">_</span><sub>bz</sub>−V<span style="font-size:0">_</span><sub>BB</sub>) (A)</div><div class="v" id="roIQ">—</div></div>
+    <div class="ro"><div class="k">临界 U<span style="font-size:0">_</span><sub>cm</sub> = V<span style="font-size:0">_</span><sub>CC</sub> − I<span style="font-size:0">_</span><sub>CM</sub>/g<span style="font-size:0">_</span><sub>cr</sub> (V)</div><div class="v" id="roUcmc">—</div></div>
+    <div class="ro r"><div class="k">A 点 u<span style="font-size:0">_</span><sub>CE</sub> = V<span style="font-size:0">_</span><sub>CC</sub> − U<span style="font-size:0">_</span><sub>cm</sub> (V)</div><div class="v" id="roUa">—</div></div>
+  </div>
+  <div class="live" id="liveDyn"></div>
+</div>
+
+<!-- ===================== 5 负载特性 ===================== -->
+<h2><span class="num">5</span>负载特性（3.3.5）</h2>
+
+<p>高频谐振放大器的<span class="hl">负载特性</span>是指在晶体管、V<sub>CC</sub>、V<sub>BB</sub> 和 U<sub>bm</sub>
+一定时，改变回路谐振电阻 R<sub>L</sub>，高频谐振功率放大器的工作状态、电流、电压、输出功率和效率随 R<sub>L</sub>
+的变化而变化的关系。此时，由式 (3-12)、式 (3-14) 和式 (3-28) 可知，θ<sub>c</sub>、I<sub>CM</sub>、
+u<sub>BEmax</sub> = V<sub>BB</sub> + U<sub>bm</sub> 和 I<sub>Q</sub> 是一定的，也就是说，Q 点的坐标也是一定的，而斜率 g<sub>d</sub> 为</p>
+<div class="formula">
+  g<sub>d</sub> = −<span class="frac"><span class="fn">g<sub>c</sub> U<sub>bm</sub></span><span class="fb">/</span><span class="fd">U<sub>cm</sub></span></span> = −<span class="frac"><span class="fn">g<sub>c</sub> U<sub>bm</sub></span><span class="fb">/</span><span class="fd">I<sub>c1m</sub> R<sub>L</sub></span></span>
+  = −<span class="frac"><span class="fn">g<sub>c</sub> U<sub>bm</sub></span><span class="fb">/</span><span class="fd">I<sub>CM</sub> α<sub>1</sub>(θ<sub>c</sub>) R<sub>L</sub></span></span><br>
+  = −<span class="frac"><span class="fn">g<sub>c</sub> U<sub>bm</sub></span><span class="fb">/</span><span class="fd">g<sub>c</sub> U<sub>bm</sub> (1 − cos θ<sub>c</sub>) α<sub>1</sub>(θ<sub>c</sub>) R<sub>L</sub></span></span>
+  = −<span class="frac"><span class="fn">1</span><span class="fb">/</span><span class="fd">(1 − cos θ<sub>c</sub>) α<sub>1</sub>(θ<sub>c</sub>) R<sub>L</sub></span></span>
+  <span class="no">式 (3-29)</span>
+</div>
+<p>由式 (3-29) 可见，由于 θ<sub>c</sub> 不变，随着谐振电阻 R<sub>L</sub> 的增大，g<sub>d</sub> 的绝对值逐渐变小
+（斜率 g<sub>d</sub> 本身是一个负数）。根据图 3-8 和上面的分析，不难发现，随着谐振电阻 R<sub>L</sub> 的增大，
+高频谐振功率放大器的工作状态变化过程是<span class="hl">由欠压到临界再到过压</span>，如图 3-9 所示。</p>
+
+<div class="note">
+  <b>欠压和临界状态：</b>集电极电流为尖顶脉冲，由于 θ<sub>c</sub>、I<sub>CM</sub> 不变，所以 I<sub>C0</sub>、
+  I<sub>c1m</sub> 都保持不变，P<sub>=</sub> = V<sub>CC</sub> I<sub>C0</sub> 也不变，而
+  U<sub>cm</sub> = I<sub>c1m</sub> R<sub>L</sub> 与 R<sub>L</sub> 成正比，
+  P<sub>o</sub> = (1/2) I<sub>c1m</sub><sup>2</sup> R<sub>L</sub> 与 R<sub>L</sub> 成正比，
+  η<sub>c</sub> = P<sub>o</sub>/P<sub>=</sub> 与 R<sub>L</sub> 成正比，
+  P<sub>c</sub> = P<sub>=</sub> − P<sub>o</sub> 随着谐振电阻 R<sub>L</sub> 的增大而减小。
+  <br><b>过压状态：</b>集电极电流为凹顶脉冲，随着谐振电阻 R<sub>L</sub> 的增大，I<sub>CM</sub> 逐渐减小，
+  I<sub>C0</sub>、I<sub>c1m</sub> 相应地减小，U<sub>cm</sub> = I<sub>c1m</sub> R<sub>L</sub> 缓慢地增大，
+  P<sub>=</sub> 和 P<sub>o</sub> 也减小，η<sub>c</sub> 先增加后减小，P<sub>c</sub> 也减小。
+</div>
+
+<h3>教材结论</h3>
+<div class="steps">
+  <div class="st"><b>（1）</b><b>欠压状态</b>：在欠压状态的大部分范围内，输出功率和效率都比较低，损耗也比较大，
+    而且随着谐振电阻的变化，输出电压的振幅波动比较大。因此，除了特殊情况外，很少采用这种状态。</div>
+  <div class="st"><b>（2）</b><b>临界状态</b>：输出功率最大，效率也比较高，常用于发射机的功率输出级，以获得最大输出功率。</div>
+  <div class="st"><b>（3）</b><b>过压状态</b>：当谐振电阻变化时，输出电压的振幅变化较小，多用于要求输出电压维持比较平稳的场合，
+    如发射机的中间级放大器。值得注意的是，在<span class="hl">弱过压区，效率最高</span>，而输出功率比较大。</div>
+</div>
+
+<div class="card">
+  <h3>交互：图 3-9 负载特性曲线（P<sub>o</sub>、η<sub>c</sub> 随 R<sub>L</sub> 变化）</h3>
+  <div class="ctrls">
+    <div class="ctrl">
+      <label>R<sub>L</sub>　谐振电阻 (Ω)</label>
+      <div class="row"><input type="range" id="sRl5" min="2" max="55" step="0.2" value="12"><span class="val" id="vRl5">12.0</span></div>
+    </div>
+    <div class="ctrl">
+      <label>工作点快捷</label>
+      <div class="row">
+        <button type="button" id="bRl5u">欠压</button>
+        <button type="button" id="bRl5c">临界</button>
+        <button type="button" id="bRl5o">过压</button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label>固定参数（教材口径）</label>
+      <div class="row"><span class="kv">θ<span style="font-size:0">_</span><sub>c</sub> = 70°</span><span class="kv">I<span style="font-size:0">_</span><sub>CM</sub> = 2 A</span><span class="kv">V<span style="font-size:0">_</span><sub>CC</sub> = 20 V</span><span class="kv">g<span style="font-size:0">_</span><sub>cr</sub> = 1 S</span></div>
+    </div>
+  </div>
+  <canvas id="cvLoad" width="1040" height="430"></canvas>
+  <p class="cap">图 3-9 复刻：左为 I<sub>C0</sub>、I<sub>c1m</sub>、U<sub>cm</sub> 随 R<sub>L</sub> 的变化；
+    右为 P<sub>=</sub>、P<sub>o</sub>、P<sub>c</sub>、η<sub>c</sub> 随 R<sub>L</sub> 的变化。竖虚线分隔欠压区 / 临界点 / 过压区，游标为当前 R<sub>L</sub></p>
+  <div class="readout">
+    <div class="ro g"><div class="k">工作状态</div><div class="v" id="roState5">—</div></div>
+    <div class="ro"><div class="k">I<span style="font-size:0">_</span><sub>C0</sub> (A)</div><div class="v" id="roI0e">—</div></div>
+    <div class="ro"><div class="k">I<span style="font-size:0">_</span><sub>c1m</sub> (A)</div><div class="v" id="roI1e">—</div></div>
+    <div class="ro"><div class="k">U<span style="font-size:0">_</span><sub>cm</sub> (V)</div><div class="v" id="roUcm5">—</div></div>
+    <div class="ro"><div class="k">P_= (W)</div><div class="v" id="roPdc5">—</div></div>
+    <div class="ro g"><div class="k">P<span style="font-size:0">_</span><sub>o</sub> (W)</div><div class="v" id="roPo5">—</div></div>
+    <div class="ro r"><div class="k">P<span style="font-size:0">_</span><sub>c</sub> (W)</div><div class="v" id="roPc5">—</div></div>
+    <div class="ro a"><div class="k">η<span style="font-size:0">_</span><sub>c</sub></div><div class="v" id="roEta5">—</div></div>
+    <div class="ro"><div class="k">临界 R<span style="font-size:0">_</span><sub>L</sub> (Ω)</div><div class="v" id="roRlc">—</div></div>
+    <div class="ro"><div class="k">|g<span style="font-size:0">_</span><sub>d</sub>| = 1/[(1−cosθ<span style="font-size:0">_</span><sub>c</sub>)α₁ R<span style="font-size:0">_</span><sub>L</sub>]</div><div class="v" id="roGd5">—</div></div>
+  </div>
+  <div class="live" id="liveLoad"></div>
+</div>
+
+<!-- ===================== 6 电源电压与输入信号的影响 ===================== -->
+<h2><span class="num">6</span>电源电压和输入信号对工作状态的影响（3.3.6）</h2>
+
+<h3>6.1　集电极电压 V<sub>CC</sub> 变化</h3>
+<p>在晶体管、R<sub>L</sub>、V<sub>BB</sub> 和 U<sub>bm</sub> 一定时，改变集电极电压 V<sub>CC</sub>，
+由式 (3-12)、式 (3-14)、式 (3-28) 和式 (3-29) 可知，θ<sub>c</sub>、I<sub>CM</sub>、
+u<sub>BEmax</sub> = V<sub>BB</sub> + U<sub>bm</sub>、I<sub>Q</sub> 和 g<sub>d</sub> 是一定的，
+Q 点在<span class="hl">水平方向</span>平移。随着 V<sub>CC</sub> 的增大，放大器的工作状态
+<span class="hl">由过压到临界再到欠压</span>，如图 3-10 所示。在欠压和临界状态，集电极电流为尖顶脉冲，
+由于 θ<sub>c</sub>、I<sub>CM</sub> 不变，所以 I<sub>C0</sub>、I<sub>c1m</sub> 保持不变，从而
+U<sub>cm</sub> = I<sub>c1m</sub> R<sub>L</sub> 不变，P<sub>o</sub> = 0.5 I<sub>c1m</sub><sup>2</sup> R<sub>L</sub> 不变，
+而 P<sub>=</sub> = V<sub>CC</sub> I<sub>C0</sub> 与 V<sub>CC</sub> 成正比，集电极耗散功率
+P<sub>c</sub> = P<sub>=</sub> − P<sub>o</sub> 随着 V<sub>CC</sub> 的增大而增大。在过压状态，集电极电流为凹顶脉冲，
+随着 V<sub>CC</sub> 的增大，I<sub>CM</sub> 逐渐增大，I<sub>C0</sub>、I<sub>c1m</sub> 相应增大，
+U<sub>cm</sub> = I<sub>c1m</sub> R<sub>L</sub> 增大，P<sub>=</sub> 和 P<sub>o</sub> 增大，P<sub>c</sub> 增大。
+由此可知，在过压状态和理想情况下，<b>输出信号的振幅正比于集电极电压</b>，这正是后面将要讨论的
+<span class="hl">集电极调幅</span>的工作原理。</p>
+
+<h3>6.2　基极电压 V<sub>BB</sub> 变化</h3>
+<p>在晶体管、R<sub>L</sub>、V<sub>CC</sub> 和 U<sub>bm</sub> 一定时，改变基极电源电压 V<sub>BB</sub>，
+随着 V<sub>BB</sub> 的增大，θ<sub>c</sub>、I<sub>CM</sub>、I<sub>Q</sub> 和 g<sub>d</sub>（θ<sub>c</sub> &lt; 120°）增大，
+Q 点在<span class="hl">垂直方向</span>平移，放大器的工作状态<span class="hl">由欠压到临界再到过压</span>，
+如图 3-11 所示。在这种情况下，参数的变化比较复杂，这里就不讨论了。
+由此可知，在欠压状态下，输出信号的振幅受控于基极电压，这正是后面将讨论的<span class="hl">基极调幅</span>的工作原理。</p>
+
+<h3>6.3　输入信号振幅 U<sub>bm</sub> 变化</h3>
+<p>在晶体管、R<sub>L</sub>、V<sub>BB</sub> 和 V<sub>CC</sub> 一定时，改变输入信号振幅 U<sub>bm</sub>，
+随着 U<sub>bm</sub> 的增大，Q 点不移动，θ<sub>c</sub>、I<sub>CM</sub>、u<sub>BEmax</sub> = V<sub>BB</sub> + U<sub>bm</sub>
+和 g<sub>d</sub> 都增大，放大器的工作状态<span class="hl">由欠压到临界再到过压</span>，
+I<sub>C0</sub>、I<sub>c1m</sub>、U<sub>cm</sub>、P<sub>=</sub>、P<sub>o</sub> 和 P<sub>c</sub> 也随之增加，如图 3-12 所示。</p>
+
+<div class="warn">
+  <b>图 3-10 横轴方向务必记牢：</b>横轴 V<sub>CC</sub> 向右为增大，区域标注顺序是
+  <span class="hl">「过压 | 临界 | 欠压」</span> —— 与图 3-9 的 R<sub>L</sub> 轴
+  <span class="hl">「欠压 | 临界 | 过压」</span> <b>正好相反</b>。正文写得很明确：
+  「随着 V<sub>CC</sub> 的增大……由过压到临界再到欠压」。V<sub>BB</sub> 轴与 U<sub>bm</sub> 轴则与 R<sub>L</sub> 轴同向
+  （欠压 → 临界 → 过压）。
+</div>
+
+<div class="card">
+  <h3>交互：三选一，看工作状态迁移方向（图 3-10 / 3-11 / 3-12）</h3>
+  <div class="ctrls">
+    <div class="ctrl" style="flex:1 1 100%">
+      <label>选择被改变的参数（↑ 表示增大）</label>
+      <div class="row">
+        <button type="button" id="btnVcc" class="on">V<span style="font-size:0">_</span><sub>CC</sub>↑</button>
+        <button type="button" id="btnVbb">V<span style="font-size:0">_</span><sub>BB</sub>↑</button>
+        <button type="button" id="btnUbm">U<span style="font-size:0">_</span><sub>bm</sub>↑</button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label>扫描量（从左端扫到右端 = 参数增大）</label>
+      <div class="row"><input type="range" id="sSweep" min="0" max="100" step="1" value="50"><span class="val" id="vSweep">50</span></div>
+    </div>
+    <div class="ctrl">
+      <label>当前状态迁移方向</label>
+      <div class="row"><span class="kv" id="roDir">—</span></div>
+    </div>
+  </div>
+  <canvas id="cvInf" width="1040" height="430"></canvas>
+  <p class="cap">左：i<sub>C</sub> – u<sub>CE</sub> 平面上三组动态特性折线与 Q 点平移方式；
+    右：I<sub>c1m</sub>、I<sub>C0</sub>、P<sub>=</sub>、P<sub>o</sub>、P<sub>c</sub> 随扫描参数的变化，竖虚线分隔工作状态区，游标为当前位置</p>
+  <div class="readout">
+    <div class="ro g"><div class="k">当前工作状态</div><div class="v" id="roState6">—</div></div>
+    <div class="ro"><div class="k">扫描参数值</div><div class="v" id="roSweepV">—</div></div>
+    <div class="ro a"><div class="k">Q 点移动</div><div class="v" id="roQmove">—</div></div>
+    <div class="ro r"><div class="k">i<span style="font-size:0">_</span><sub>C</sub> 脉冲形状</div><div class="v" id="roShape">—</div></div>
+  </div>
+  <div class="live" id="liveInf"></div>
+</div>
+
+<!-- ===================== 7 例题 ===================== -->
+<h2><span class="num">7</span>教材例题（例 3-2、例 3-3）</h2>
+
+<h3>例 3-2</h3>
+<div class="card">
+  <p><b>题：</b>某谐振高频功率放大器如图 3-2 所示，集电极直流电源 V<sub>CC</sub> = 30 V，输出功率 P<sub>o</sub> = 10 W，
+  晶体管集电极电流中的直流分量 I<sub>C0</sub> = 400 mA，输出电压振幅 U<sub>cm</sub> = 28 V。
+  试求：直流电源 V<sub>CC</sub> 提供的功率 P<sub>=</sub>、集电极效率 η<sub>c</sub>、谐振回路谐振电阻 R<sub>p</sub>、
+  基波电流振幅 I<sub>c1m</sub> 和导通角 θ<sub>c</sub>。</p>
+  <div class="steps">
+    <div class="st"><b>①</b><b>求直流电源 V<sub>CC</sub> 提供的功率 P<sub>=</sub></b>
+      <div class="formula">P<sub>=</sub> = V<sub>CC</sub> I<sub>C0</sub> = 30 × 0.4 = 12 (W)</div></div>
+    <div class="st"><b>②</b><b>求集电极效率 η<sub>c</sub></b>
+      <div class="formula">η<sub>c</sub> = <span class="frac"><span class="fn">P<sub>o</sub></span><span class="fb">/</span><span class="fd">P<sub>=</sub></span></span> = <span class="frac"><span class="fn">10</span><span class="fb">/</span><span class="fd">12</span></span> × 100% ≈ 83.3%</div></div>
+    <div class="st"><b>③</b><b>求谐振回路谐振电阻 R<sub>p</sub></b>
+      <div class="formula">R<sub>p</sub> = <span class="frac"><span class="fn">0.5 U<sub>cm</sub><sup>2</sup></span><span class="fb">/</span><span class="fd">P<sub>o</sub></span></span> = <span class="frac"><span class="fn">0.5 × 28<sup>2</sup></span><span class="fb">/</span><span class="fd">10</span></span> = 39.2 (Ω)</div></div>
+    <div class="st"><b>④</b><b>求基波电流振幅 I<sub>c1m</sub></b>
+      <div class="formula">I<sub>c1m</sub> = <span class="frac"><span class="fn">2 P<sub>o</sub></span><span class="fb">/</span><span class="fd">U<sub>cm</sub></span></span> = <span class="frac"><span class="fn">20</span><span class="fb">/</span><span class="fd">28</span></span> ≈ 0.72 (A)</div></div>
+    <div class="st"><b>⑤</b><b>求导通角 θ<sub>c</sub></b>。由
+      <div class="formula">η<sub>c</sub> = 0.5 ξ g<sub>1</sub>(θ<sub>c</sub>) = <span class="frac"><span class="fn">0.5 U<sub>cm</sub> g<sub>1</sub>(θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">V<sub>CC</sub></span></span>
+        = <span class="frac"><span class="fn">0.5 × 28 × g<sub>1</sub>(θ<sub>c</sub>)</span><span class="fb">/</span><span class="fd">30</span></span> = 83.3%</div>
+      可得 g<sub>1</sub>(θ<sub>c</sub>) = 1.79，查表可得 <span class="hl">θ<sub>c</sub> ≈ 60°</span>。</div>
+  </div>
+  <div class="warn">
+    <b>易错点：</b>(a) I<sub>C0</sub> = 400 mA 要先换成 0.4 A 再代入，否则 P<sub>=</sub> 差 1000 倍；
+    (b) 求 R<sub>p</sub> 用的是 P<sub>o</sub> = U<sub>cm</sub><sup>2</sup>/(2R<sub>p</sub>) 的反解式
+    R<sub>p</sub> = 0.5 U<sub>cm</sub><sup>2</sup>/P<sub>o</sub>，<b>不要漏掉 0.5</b>；
+    (c) I<sub>c1m</sub> = 2P<sub>o</sub>/U<sub>cm</sub> 同样来自 P<sub>o</sub> = 0.5 U<sub>cm</sub> I<sub>c1m</sub>；
+    (d) 由 g<sub>1</sub> 反查 θ<sub>c</sub> 用的是 g<sub>1</sub> = α<sub>1</sub>/α<sub>0</sub>，不是 α<sub>1</sub> 本身。
+  </div>
+  <details class="card">
+    <summary style="cursor:pointer;font-weight:bold">先自己算：输入答案后核对（不改变上面的教材解法）</summary>
+    <label style="display:block;margin:10px 0">直流功率 P_= (W)：<input type="number" step="any" data-ex-answer="12" data-ex-tol="0.05" aria-label="例3-2 直流功率 P_=" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">集电极效率 η<span style="font-size:0">_</span><sub>c</sub> (%)：<input type="number" step="any" data-ex-answer="83.3" data-ex-tol="0.3" aria-label="例3-2 集电极效率" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">谐振电阻 R<span style="font-size:0">_</span><sub>p</sub> (Ω)：<input type="number" step="any" data-ex-answer="39.2" data-ex-tol="0.15" aria-label="例3-2 谐振电阻 R_p" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">基波电流振幅 I<span style="font-size:0">_</span><sub>c1m</sub> (A)：<input type="number" step="any" data-ex-answer="0.714" data-ex-tol="0.01" aria-label="例3-2 基波电流振幅" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">波形系数 g<span style="font-size:0">_</span><sub>1</sub>：<input type="number" step="any" data-ex-answer="1.79" data-ex-tol="0.02" aria-label="例3-2 波形系数 g_1" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">导通角 θ<span style="font-size:0">_</span><sub>c</sub> (°)：<input type="number" step="any" data-ex-answer="60" data-ex-tol="3" aria-label="例3-2 导通角" style="width:135px;max-width:100%;padding:6px"></label>
+    <button type="button" data-ex-check>核对我的答案</button>
+    <p data-ex-feedback role="status" aria-live="polite">允许教材末位取舍造成的小误差；先统一单位再填写。</p>
+  </details>
+</div>
+
+<h3>例 3-3</h3>
+<div class="card">
+  <p><b>题：</b>某高频谐振功率放大器如图 3-2 所示，已知晶体管的饱和临界线斜率 g<sub>cr</sub> 为 1 S，
+  晶体管导通电压 U<sub>bz</sub> = 0.6 V，集电极直流电源 V<sub>CC</sub> = 20 V，基极直流电源 V<sub>BB</sub> = −0.5 V，
+  输入电压振幅 U<sub>bm</sub> = 2.5 V，集电极电流脉冲振幅 I<sub>CM</sub> = 2 A，且放大器工作于<span class="hl">临界状态</span>。
+  试求：直流电源 V<sub>CC</sub> 提供的功率 P<sub>=</sub>、集电极效率 η<sub>c</sub>、谐振回路谐振电阻 R<sub>p</sub>
+  和集电极耗散功率 P<sub>c</sub>。</p>
+  <div class="steps">
+    <div class="st"><b>①</b><b>求直流电源 V<sub>CC</sub> 提供的功率 P<sub>=</sub></b>。
+      由于放大器工作于临界状态，所以 I<sub>CM</sub> = g<sub>cr</sub> U<sub>CES</sub> = g<sub>cr</sub> (V<sub>CC</sub> − U<sub>cm</sub>)。因此
+      <div class="formula">U<sub>cm</sub> = V<sub>CC</sub> − <span class="frac"><span class="fn">I<sub>CM</sub></span><span class="fb">/</span><span class="fd">g<sub>cr</sub></span></span> = 20 − <span class="frac"><span class="fn">2</span><span class="fb">/</span><span class="fd">1</span></span> = 18 (V)</div>
+      由
+      <div class="formula">cos θ<sub>c</sub> = <span class="frac"><span class="fn">U<sub>bz</sub> − V<sub>BB</sub></span><span class="fb">/</span><span class="fd">U<sub>bm</sub></span></span> = <span class="frac"><span class="fn">0.6 + 0.5</span><span class="fb">/</span><span class="fd">2.5</span></span> = 0.44</div>
+      查表得到 θ<sub>c</sub> = 63.9°，而且 α<sub>0</sub>(63.9°) = 0.232，α<sub>1</sub>(63.9°) = 0.410。因此
+      <div class="formula">I<sub>C0</sub> = I<sub>CM</sub> α<sub>0</sub>(63.9°) = 2 × 0.232 = 0.464 (A)</div>
+      <div class="formula">I<sub>c1m</sub> = I<sub>CM</sub> α<sub>1</sub>(63.9°) = 2 × 0.410 = 0.820 (A)</div>
+      由此可得
+      <div class="formula">P<sub>=</sub> = V<sub>CC</sub> I<sub>C0</sub> = 20 × 0.464 = 9.28 (W)</div></div>
+    <div class="st"><b>②</b><b>求输出功率 P<sub>o</sub></b>
+      <div class="formula">P<sub>o</sub> = 0.5 U<sub>cm</sub> I<sub>c1m</sub> = 0.5 × 18 × 0.820 = 7.38 (W)</div></div>
+    <div class="st"><b>③</b><b>求集电极效率 η<sub>c</sub></b>
+      <div class="formula">η<sub>c</sub> = <span class="frac"><span class="fn">P<sub>o</sub></span><span class="fb">/</span><span class="fd">P<sub>=</sub></span></span> = <span class="frac"><span class="fn">7.38</span><span class="fb">/</span><span class="fd">9.28</span></span> × 100% ≈ 79.5%</div></div>
+    <div class="st"><b>④</b><b>求谐振回路谐振电阻 R<sub>p</sub></b>
+      <div class="formula">R<sub>p</sub> = <span class="frac"><span class="fn">0.5 U<sub>cm</sub><sup>2</sup></span><span class="fb">/</span><span class="fd">P<sub>o</sub></span></span> = <span class="frac"><span class="fn">0.5 × 18<sup>2</sup></span><span class="fb">/</span><span class="fd">7.38</span></span> = 21.95 (Ω)</div></div>
+    <div class="st"><b>⑤</b><b>求集电极耗散功率 P<sub>c</sub></b>
+      <div class="formula">P<sub>c</sub> = P<sub>=</sub> − P<sub>o</sub> = 9.28 − 7.38 = 1.90 (W)</div></div>
+  </div>
+  <div class="warn">
+    <b>易错点：</b>(a) <b>临界状态</b>的判据是 I<sub>CM</sub> = g<sub>cr</sub> U<sub>CES</sub> = g<sub>cr</sub>(V<sub>CC</sub> − U<sub>cm</sub>)，
+    由此先把 U<sub>cm</sub> 解出来，<b>不要直接拿 V<sub>CC</sub> 当 U<sub>cm</sub></b>；
+    (b) V<sub>BB</sub> = −0.5 V 是负值，代入 (U<sub>bz</sub> − V<sub>BB</sub>) 时变成 (0.6 − (−0.5)) = 1.1，符号别弄反；
+    (c) α<sub>0</sub>、α<sub>1</sub> 是在 θ<sub>c</sub> = 63.9° 处查表取的，不是在 60°；
+    (d) P<sub>o</sub> 用 0.5 U<sub>cm</sub> I<sub>c1m</sub>，不是 U<sub>cm</sub> I<sub>c1m</sub>；
+    (e) P<sub>c</sub> 是 P<sub>=</sub> 与 P<sub>o</sub> 之差，不是 P<sub>o</sub> 与 P<sub>=</sub> 之差。
+  </div>
+  <details class="card">
+    <summary style="cursor:pointer;font-weight:bold">先自己算：输入答案后核对（不改变上面的教材解法）</summary>
+    <label style="display:block;margin:10px 0">输出电压振幅 U<span style="font-size:0">_</span><sub>cm</sub> (V)：<input type="number" step="any" data-ex-answer="18" data-ex-tol="0.05" aria-label="例3-3 输出电压振幅" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">直流分量 I<span style="font-size:0">_</span><sub>C0</sub> (A)：<input type="number" step="any" data-ex-answer="0.464" data-ex-tol="0.005" aria-label="例3-3 直流分量 I_C0" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">基波电流振幅 I<span style="font-size:0">_</span><sub>c1m</sub> (A)：<input type="number" step="any" data-ex-answer="0.820" data-ex-tol="0.005" aria-label="例3-3 基波电流振幅" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">直流功率 P_= (W)：<input type="number" step="any" data-ex-answer="9.28" data-ex-tol="0.05" aria-label="例3-3 直流功率 P_=" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">输出功率 P<span style="font-size:0">_</span><sub>o</sub> (W)：<input type="number" step="any" data-ex-answer="7.38" data-ex-tol="0.05" aria-label="例3-3 输出功率" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">集电极效率 η<span style="font-size:0">_</span><sub>c</sub> (%)：<input type="number" step="any" data-ex-answer="79.5" data-ex-tol="0.3" aria-label="例3-3 集电极效率" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">谐振电阻 R<span style="font-size:0">_</span><sub>p</sub> (Ω)：<input type="number" step="any" data-ex-answer="21.95" data-ex-tol="0.15" aria-label="例3-3 谐振电阻 R_p" style="width:135px;max-width:100%;padding:6px"></label>
+    <label style="display:block;margin:10px 0">集电极耗散功率 P<span style="font-size:0">_</span><sub>c</sub> (W)：<input type="number" step="any" data-ex-answer="1.90" data-ex-tol="0.05" aria-label="例3-3 集电极耗散功率" style="width:135px;max-width:100%;padding:6px"></label>
+    <button type="button" data-ex-check>核对我的答案</button>
+    <p data-ex-feedback role="status" aria-live="polite">允许教材末位取舍造成的小误差；先统一单位再填写。</p>
+  </details>
+</div>
+
+<!-- ===================== 8 要点小结 ===================== -->
+<h2><span class="num">8</span>要点小结</h2>
+
+<div class="card">
+  <h3>折线分析法核心要点</h3>
+  <div class="steps">
+    <div class="st"><b>1</b>把晶体管特性曲线用折线（射线段）近似，得到分段线性解析式（式 3-5 ~ 3-10）。</div>
+    <div class="st"><b>2</b>集电极电流为尖顶余弦脉冲，用 I<sub>CM</sub> 和 θ<sub>c</sub> 两个参数唯一确定（式 3-12、3-14、3-15）。</div>
+    <div class="st"><b>3</b>脉冲经傅里叶分解为 I<sub>C0</sub>、I<sub>c1m</sub>、I<sub>cnm</sub>，对应分解系数
+      α<sub>0</sub>、α<sub>1</sub>、α<sub>n</sub>（式 3-17 ~ 3-19，图 3-6）。</div>
+    <div class="st"><b>4</b>动态特性是 i<sub>C</sub> 对 u<sub>CE</sub> 的折线（直线段），截距 U<sub>o</sub>、斜率 g<sub>d</sub>（式 3-27），
+      虚拟电流 I<sub>Q</sub> = −g<sub>c</sub>(U<sub>bz</sub> − V<sub>BB</sub>)（式 3-28）。</div>
+    <div class="st"><b>5</b>负载 R<sub>L</sub>、V<sub>CC</sub>、V<sub>BB</sub>、U<sub>bm</sub> 变化 → 动态折线平移/转动 → 工作状态改变。</div>
+  </div>
+
+  <h3>效率与通角关系（ξ = 1 理想条件）</h3>
+  <div class="pub-tw"><table>
+    <tr><th>工作状态</th><th>θ<span style="font-size:0">_</span><sub>c</sub></th><th>g₁</th><th>η<span style="font-size:0">_</span><sub>c</sub></th><th>教材结论</th></tr>
+    <tr><td>甲类</td><td class="n">180°</td><td class="n">1</td><td class="n">50%</td><td>理论上限 50%</td></tr>
+    <tr><td>甲乙类</td><td class="n">120°</td><td class="n">—</td><td class="n">66%</td><td>输出功率最大，但效率只有 66%</td></tr>
+    <tr><td>乙类</td><td class="n">90°</td><td class="n">1.57</td><td class="n">78.5%</td><td>效率 <span class="frac"><span class="fn">π</span><span class="fb">/</span><span class="fd">4</span></span> = 78.5%</td></tr>
+    <tr><td>丙类</td><td class="n">60° ~ 80°</td><td class="n">&gt; 1</td><td class="n">&gt; 78.5%</td><td>教材推荐：兼顾输出功率和效率</td></tr>
+    <tr><td>深丙类</td><td class="n">1° ~ 15°</td><td class="n">→ 2</td><td class="n">最高</td><td>效率最高，但输出功率很小</td></tr>
+  </table></div>
+
+  <h3>三种工作状态对比</h3>
+  <div class="pub-tw"><table>
+    <tr><th>状态</th><th>i<span style="font-size:0">_</span><sub>C</sub> 形状</th><th>特点</th><th>应用</th></tr>
+    <tr><td>欠压</td><td>尖顶</td><td>P<sub>o</sub>、η<sub>c</sub> 低，U<sub>cm</sub> 波动大</td><td>很少采用</td></tr>
+    <tr><td>临界</td><td>尖顶</td><td>P<sub>o</sub> 最大，η<sub>c</sub> 较高</td><td>发射机功率输出级</td></tr>
+    <tr><td>过压</td><td>凹顶</td><td>U<sub>cm</sub> 平稳，弱过压区 η<sub>c</sub> 最高</td><td>中间级（要求稳幅）</td></tr>
+  </table></div>
+
+  <h3>调幅原理关联</h3>
+  <ul>
+    <li>过压区：U<sub>cm</sub> 正比于 V<sub>CC</sub> → <span class="hl">集电极调幅</span>的工作原理。</li>
+    <li>欠压区：U<sub>cm</sub> 受 V<sub>BB</sub> 控制 → <span class="hl">基极调幅</span>的工作原理。</li>
+    <li>关键分解系数峰值：α<sub>1</sub> 在 θ<sub>c</sub> ≈ 120° 达最大 0.536；α<sub>2</sub> 在 θ<sub>c</sub> = 60° 达最大；
+      α<sub>3</sub> 在 θ<sub>c</sub> = 40° 达最大；α<sub>0</sub> 单调上升，θ<sub>c</sub> = 180° 时 α<sub>0</sub> = 0.5。</li>
+  </ul>
+</div>
+
+<div class="foot">
+  <p>内容来源：《通信电子线路》（第 3 版 · 陈启兴）第 3 章 · 3.3 节（书页 55 – 65，PDF 页 67 – 77）。
+  交互图中的曲线由本页脚本按教材式 (3-5)～(3-29) 实时计算；图 3-9 过压段为按教材文字定性绘制的示意曲线。</p>
+  <p>相关页面：<a href="00_学习入口.html">返回学习入口</a>　｜　<span title="本次公开版未收录"> 3.2 原理电路（未收录）</span></p>
+</div>
+</div>
+
+
+
+
+<!--COURSE-SUBSCRIPT-LIB-->
+<script>
+/* =======================================================================
+ * build/subscript.js —— 「真下标」（教材式竖排下标）唯一来源
+ *
+ * 目标：把标注里的「X_y」渲染成教材式的**真下标**（基线右下方的小字），
+ *       而不是字面上的下划线。
+ *
+ * 关键设计：**textContent 保持逐字不变**
+ *   下划线以「零宽」方式保留在文本里（font-size:0 的 tspan / span），
+ *   于是：
+ *     ① 页末自检里按字面串比对 document.body.textContent 的断言（txtguard）不受影响；
+ *     ② build/check_text.js 的线性抄写比对基线不变（PASS 数必须保持）；
+ *     ③ build/check_geom.js 用 textContent 估文字宽 → 几何判定结果不变；
+ *     ④ 复制粘贴得到的仍是线性写法 "Q_L"，与课程文档的线性记法一致。
+ *   若改成「删掉下划线」，textContent 会变 → 上述三处全部要跟着改，
+ *   且教材式线性写法在页面上就消失了。
+ *
+ * 本文件是**唯一来源**：build/lib.js 与 build/circuit/svg_components.js 里
+ * 各有一份**逐字节相同**的副本（标记 SUBSCRIPT-REGION），
+ * 由 scratch/sync_subscript.js 同步、scratch/test_subscript.js 核对。
+ *
+ * ⚠ 宿主文件（lib.js / svg_components.js）须在本区域**之后**补一行
+ *   `var CourseSubscript = window.CourseSubscript;`
+ *   —— 标准库的整段代码包在 IIFE 里，区域内的 var 会被 IIFE 吞掉、拿不到全局。
+ * ======================================================================= */
+(function (g) {
+  'use strict';
+
+  var NS = 'http://www.w3.org/2000/svg';
+
+  /* 下标字号比例与基线位移（教材式：基线右下方的小字） */
+  var RATIO = 0.68;   /* 下标字号 = 基准字号 × RATIO */
+  var SHIFT = 0.22;   /* 下标基线相对父基线下移 = 基准字号 × SHIFT（em） */
+
+  /* --- 字符分类 ---------------------------------------------------------
+   * isSym：可作「基字符」也可作「下标字符」的符号字符。
+   *   字母（A-Z a-z）、拉丁扩展（Ā Ĩ Ũ ī İ / Ȧ Ȱ Ȯ）、希腊字母（Δ Σ Ω ω φ π μ）、
+   *   组合记号（◌̇ ◌̅ ◌́）、撇号（’ ′ ″）、数字。
+   *   ⚠ 排除 Latin-1 里的 × (U+00D7) 与 ÷ (U+00F7) —— 它们是运算符不是符号。
+   *   ⚠ Unicode 下标数字（₁ ₂ …）本身已经是下标，只当基字符、不再拆。
+   */
+  function isSym(c) {
+    if (!c) return false;
+    var k = c.charCodeAt(0);
+    if (k >= 48 && k <= 57) return true;                         /* 0-9 */
+    if (k >= 65 && k <= 90) return true;                         /* A-Z */
+    if (k >= 97 && k <= 122) return true;                        /* a-z */
+    if (k >= 0x00C0 && k <= 0x00FF && k !== 0x00D7 && k !== 0x00F7) return true; /* Latin-1 字母 */
+    if (k >= 0x0100 && k <= 0x017F) return true;                 /* Latin Extended-A */
+    if (k >= 0x0180 && k <= 0x024F) return true;                 /* Latin Extended-B */
+    if (k >= 0x0300 && k <= 0x036F) return true;                 /* 组合记号 */
+    if (k >= 0x0370 && k <= 0x03FF) return true;                 /* 希腊字母 */
+    if (k === 0x2019 || k === 0x2032 || k === 0x2033) return true; /* ’ ′ ″ */
+    if (k >= 0x2080 && k <= 0x2089) return true;                 /* Unicode 下标数字 */
+    return false;
+  }
+  /* 下标的**首字符**：符号字符，外加单独的 +/−（教材的 F₊ / F₋ / u₊(t)） */
+  function isSubStart(c) {
+    if (isSym(c)) return true;
+    if (!c) return false;
+    var k = c.charCodeAt(0);
+    return k === 0x2B /* + */ || k === 0x2212 /* − */ || k === 0x2D /* - */;
+  }
+  /* 下标的**后续字符**：符号字符；小数点仅在「前后都是数字」时并入
+   * （教材的 f₀.₇ / K_r0.1 —— 那个点属于下标，不是句点） */
+  function isSubCont(c, prev, next) {
+    if (isSym(c)) return true;
+    if (!c) return false;
+    var k = c.charCodeAt(0);
+    if (k === 0x2E /* . */) {
+      var p = prev ? prev.charCodeAt(0) : 0, nx = next ? next.charCodeAt(0) : 0;
+      return p >= 48 && p <= 57 && nx >= 48 && nx <= 57;
+    }
+    return false;
+  }
+
+  /* ======================================================================
+   * 覆盖表（教材歧义标注）
+   *
+   * 「最长下标段」规则会把下面这些标注并成一段下标，但它们在教材里
+   * 是**两个（或三个）独立符号的乘积**。
+   * 这类写法在语法上**无法用规则区分**（C_jQ 与 feUi 结构完全相同），
+   * 唯一可靠的办法是逐条对照教材原式后写死。
+   *
+   * ⚠ 新增条目必须：① 先看教材页图核对；② 在 ref 里写明书页/式号；
+   *   ③ 保证 parts 拼接后与 from **逐字相同**（textContent 守恒）。
+   * ==================================================================== */
+  var ovTable = [
+    { from: 'ω_cCR_L', parts: ['ω_c', 'C', 'R_L'],
+      ref: '教材例 3-1（书页 54）：|Z_pn| 分母印作 1+j(nωCR_L−R_L/(nωL))' },    { from: 'U_LmU_Sm', parts: ['U_Lm', 'U_Sm'],
+      ref: '教材习题 9.4/9.5（书页 221）：U_Sm（输入幅值）与 U_Lm（本振幅值）是两个独立量' },
+    { from: 'U_SmU_Lm', parts: ['U_Sm', 'U_Lm'],
+      ref: '教材习题 9.4/9.5（书页 221）：变频跨导 ∝ a₂·U_Sm·U_Lm' },
+    { from: 'U_nmU_Lm', parts: ['U_nm', 'U_Lm'],
+      ref: '教材习题 9.4/9.5（书页 221）' },
+    { from: 'U_cmU_o', parts: ['U_cm', 'U_o'],
+      ref: '第 5 章振幅调制：输出功率 ∝ U_cm·U_o' },
+    { from: 'y_feU_i', parts: ['y_fe', 'U_i'],
+      ref: '教材 §2.3 高频等效电路：受控电流源 y_fe·U̇_i' },
+    { from: 'L_qC_q', parts: ['L_q', 'C_q'],
+      ref: '教材式 (4-26)（书页 103）：ω_q = 1/√(L_qC_q)' },
+    { from: 'C_qC_o', parts: ['C_q', 'C_o'],
+      ref: '教材式 (4-27)（书页 103）：ω_p = 1/√(L_q·C_qC_o/(C_q+C_o))' },
+    { from: 'K_fU_Ωm', parts: ['K_f', 'U_Ωm'],
+      ref: '教材式 (7-37)：K_f = f_c/(U_D+V_Q)' },
+    { from: 'L_1C_ΣQ', parts: ['L_1', 'C_ΣQ'],
+      ref: '教材式 (7-39)：f_c = 1/(2π√(L_1C_ΣQ))' },
+    { from: 'Q_Lγ', parts: ['Q_L', 'γ'],
+      ref: '教材式 (7-45)：K_p = −Q_Lγ/[2(U_D+V_Q)]' },
+    { from: 'C_qr_q', parts: ['C_q', 'r_q'],
+      ref: '教材图 4-13（书页 103）：L_q、C_q、r_q 串联，是三个独立元件' },
+    { from: 'ω_cC', parts: ['ω_c', 'C'],
+      ref: '教材例 3-1（书页 54）：ωC 是容性电纳项' },
+    { from: 'ω_cL', parts: ['ω_c', 'L'],
+      ref: '教材例 3-1（书页 54）：1/(ωL) 是感性电纳项' }
+  ];
+
+  /* 覆盖表按 from 长度倒序建正则 → 长的先匹配（「ω_cCR_L」先于「ω_cC」） */
+  var OVERRIDE_RE = null;
+  function overrideRe() {
+    if (OVERRIDE_RE) return OVERRIDE_RE;
+    if (!ovTable.length) return null;      /* ⚠ 空表不能建空正则：空模式会原地匹配 → 死循环 */
+    var list = ovTable.slice().sort(function (a, b) { return b.from.length - a.from.length; });
+    var src = list.map(function (o) {
+      return o.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('|');
+    OVERRIDE_RE = new RegExp(src, 'g');
+    return OVERRIDE_RE;
+  }
+
+  /* 把字符串切成原子段：[{text, parts|null}]
+   * parts=null → 普通文本；parts!=null → 覆盖命中（parts 为教材式分段） */
+  function splitByOverride(str) {
+    if (str === undefined || str === null) return [];
+    str = String(str);
+    if (str.indexOf('_') < 0) return [{ text: str, parts: null }];
+    var re = overrideRe();
+    if (!re) return [{ text: str, parts: null }];
+    re.lastIndex = 0;
+    var atoms = [], last = 0, m;
+    while ((m = re.exec(str)) !== null) {
+      if (!m[0].length) { re.lastIndex++; continue; }   /* 防御：空匹配必须推进 */
+      if (m.index > last) atoms.push({ text: str.slice(last, m.index), parts: null });
+      var parts = null;
+      for (var i = 0; i < ovTable.length; i++) {
+        if (ovTable[i].from === m[0]) { parts = ovTable[i].parts; break; }
+      }
+      atoms.push({ text: m[0], parts: parts });
+      last = m.index + m[0].length;
+      re.lastIndex = last;
+    }
+    if (last < str.length) atoms.push({ text: str.slice(last), parts: null });
+    return atoms;
+  }
+
+  /* --- 拆串 -------------------------------------------------------------
+   * 返回 [{s:文字, sub:是否下标段, pre:本段前紧邻的下划线数, us:段内下划线位置}]
+   * 规则：只有「符号字符 + _ + 可作下标的字符」才算下标分隔。
+   *   "Q_L"      → base "Q" / sub "L"
+   *   "P′_no1"   → base "P′" / sub "no1"
+   *   "U̇_b′e"    → base "U̇" / sub "b′e"
+   *   "K_r0.1"   → base "K" / sub "r0.1"（点属于下标）
+   *   "u_o(t)"   → base "u" / sub "o" / base "(t)"
+   *   "f_c + F"  → base "f" / sub "c" / base " + F"
+   *   "A _B"     → 空格前不是符号字符 → 整串当普通文字（不拆）
+   *   "a_b_c"    → base "a" / sub "b"(pre 1) / sub "c"(pre 1)
+   *                （两个下划线都保留：linearize 必须能还原成 "a_b_c"）
+   */
+  function splitRaw(str) {
+    var runs = [];
+    if (str === undefined || str === null) return runs;
+    str = String(str);
+    var n = str.length, plainStart = 0, i = 0;
+    while (i < n) {
+      if (str[i] === '_' && i > plainStart && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+        runs.push({ s: str.slice(plainStart, i), sub: false, pre: 0, us: [] });
+        var k = i + 2;                     /* 第一个字符已由 isSubStart 认可 */
+        while (k < n && isSubCont(str[k], str[k - 1], str[k + 1])) k++;
+        var run = { s: str.slice(i + 1, k), sub: true, pre: 1, us: [] };
+        runs.push(run);
+        plainStart = k; i = k;
+        /* 连续下划线（a_b_c）→ 并入同一段下标；**每个下划线都要保留**，
+           否则 textContent 会少一个 "_"（守恒被破坏）。
+           段内下划线的位置记在 us[] 里，linearize 据此还原。 */
+        while (i < n && str[i] === '_' && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+          var m = i + 2;
+          while (m < n && isSubCont(str[m], str[m - 1], str[m + 1])) m++;
+          run.us.push(run.s.length);
+          run.s += str.slice(i + 1, m);
+          plainStart = m; i = m;
+        }
+        continue;
+      }
+      i++;
+    }
+    if (plainStart < n) runs.push({ s: str.slice(plainStart), sub: false, pre: 0, us: [] });
+    return runs;
+  }
+
+  /* 覆盖表感知的拆串（对外主入口） */
+  function splitAll(str) {
+    var atoms = splitByOverride(str);
+    var runs = [];
+    for (var i = 0; i < atoms.length; i++) {
+      if (atoms[i].parts) {
+        for (var j = 0; j < atoms[i].parts.length; j++) {
+          runs = runs.concat(splitRaw(atoms[i].parts[j]));
+        }
+      } else {
+        runs = runs.concat(splitRaw(atoms[i].text));
+      }
+    }
+    return runs;
+  }
+
+  /* 还原成线性写法（用于守恒校验）：
+   * 普通段原样；下标段前面补回它的下划线；段内下划线按 us[] 位置插回 */
+  function linearize(runs) {
+    var out = '';
+    for (var i = 0; i < runs.length; i++) {
+      var r = runs[i];
+      var p = r.pre || 0;
+      for (var k = 0; k < p; k++) out += '_';
+      if (r.us && r.us.length) {
+        var at = 0;
+        for (var q = 0; q < r.us.length; q++) {
+          out += r.s.slice(at, r.us[q]);
+          out += '_';
+          at = r.us[q];
+        }
+        out += r.s.slice(at);
+      } else out += r.s;
+    }
+    return out;
+  }
+
+  function hasSub(str) {
+    if (str === undefined || str === null) return false;
+    var runs = splitAll(String(str));
+    for (var i = 0; i < runs.length; i++) if (runs[i].sub) return true;
+    return false;
+  }
+
+  /* --- SVG 渲染 ---------------------------------------------------------
+   * node：<text> 元素；baseSize：基准字号（数字）。
+   * 结构（全部用 <tspan> 承载，不依赖 document.createTextNode ——
+   *       标准库自己的回归测试用的最小 DOM 桩没有那个方法）：
+   *   普通文字 tspan（无属性）→ 零宽下划线 tspan → 下标 tspan → 复位 tspan
+   *   零宽下划线：font-size="0" → 不渲染、不占宽，但 textContent 里保留 "_"
+   *   下标 tspan：font-size = baseSize×RATIO，dy = baseSize×SHIFT（下移）
+   *   复位 tspan：dy = −baseSize×SHIFT → 其后的普通文字回到原基线
+   */
+  function renderSvg(node, str, baseSize) {
+    var runs = splitAll(str);
+    var has = false;
+    for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+    if (!has) { node.textContent = (str === undefined || str === null) ? '' : String(str); return node; }
+
+    var B = (typeof baseSize === 'number' && isFinite(baseSize) && baseSize > 0) ? baseSize : 16;
+    var subSize = Math.round(B * RATIO * 100) / 100;
+    var dy = Math.round(B * SHIFT * 100) / 100;
+
+    function zwSpan() {
+      var z = document.createElementNS(NS, 'tspan');
+      z.setAttribute('font-size', '0');
+      z.textContent = '_';
+      return z;
+    }
+
+    node.textContent = '';
+    var shifted = false;
+    for (var j = 0; j < runs.length; j++) {
+      var r = runs[j];
+      var p = r.pre || 0;
+      for (var z2 = 0; z2 < p; z2++) node.appendChild(zwSpan());
+      if (!r.sub) {
+        if (!r.s) continue;
+        var bs = document.createElementNS(NS, 'tspan');
+        if (shifted) { bs.setAttribute('dy', String(-dy)); shifted = false; }
+        bs.textContent = r.s;
+        node.appendChild(bs);
+      } else {
+        /* 段内下划线（合并下标 a_b_c）：按 us[] 把本段切成若干片 */
+        var pieces = [], at = 0;
+        if (r.us && r.us.length) {
+          for (var q = 0; q < r.us.length; q++) {
+            pieces.push(r.s.slice(at, r.us[q]));
+            pieces.push(null);                 /* null = 段内零宽下划线 */
+            at = r.us[q];
+          }
+        }
+        pieces.push(r.s.slice(at));
+        for (var k = 0; k < pieces.length; k++) {
+          if (pieces[k] === null) { node.appendChild(zwSpan()); continue; }
+          if (!pieces[k]) continue;
+          var ts = document.createElementNS(NS, 'tspan');
+          ts.setAttribute('font-size', String(subSize));
+          ts.setAttribute('dy', shifted ? '0' : String(dy));
+          ts.textContent = pieces[k];
+          node.appendChild(ts);
+          shifted = true;
+        }
+      }
+    }
+    return node;
+  }
+
+  /* --- HTML 渲染（正文侧） ---------------------------------------------
+   * toHtml(str)：把「X_y」转成「X<sub>…</sub>」，下划线以零宽 span 保留在
+   * <sub> **之前**（下划线是「分隔标记」，不属于下标本身）。
+   * 供源码级转换器使用（页面正文是静态 HTML，源级改写比运行时改 DOM 更稳）。
+   */
+  function innerHtml(run) {
+    if (!run.us || !run.us.length) return run.s;
+    var out = '', at = 0;
+    for (var q = 0; q < run.us.length; q++) {
+      out += run.s.slice(at, run.us[q]) + '<span style="font-size:0">_</span>';
+      at = run.us[q];
+    }
+    return out + run.s.slice(at);
+  }
+  function toHtml(str) {
+    var runs = splitAll(str);
+    var has = false;
+    for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+    if (!has) return str;
+    var out = '';
+    for (var j = 0; j < runs.length; j++) {
+      var r = runs[j];
+      var p = r.pre || 0;
+      for (var z = 0; z < p; z++) out += '<span style="font-size:0">_</span>';
+      if (r.sub) out += '<sub>' + innerHtml(r) + '</sub>';
+      else out += r.s;
+    }
+    return out;
+  }
+
+  /* --- HTML 片段转真下标（供页面**运行时**写标签用） -------------------
+   * 页面上有一部分标签是运行时生成的（读数面板的键名、动态说明文字），
+   * 源级改写碰不到它们 → 运行时用 subHtml() 转一下再写进 HTML 文本节点。
+   *   · 标签片段（<b>、<sup> …）原样保留，只转**文本部分**；
+   *   · 下划线以零宽 span 保留 → textContent 逐字不变，
+   *     页末自检里按字面串比对 document.body.textContent 的断言不受影响。
+   * ⚠ 只用于**固定标签字符串**，不接受用户输入（它会写 innerHTML）。
+   */
+  function subHtml(str) {
+    if (str === undefined || str === null) return '';
+    str = String(str);
+    if (str.indexOf('_') < 0) return str;
+    return str.split(/(<[^>]*>)/g).map(function (seg) {
+      if (!seg) return '';
+      if (seg.charAt(0) === '<') return seg;
+      return toHtml(seg);
+    }).join('');
+  }
+
+  var api = {
+    split: splitAll,
+    splitRaw: splitRaw,
+    splitAll: splitAll,
+    linearize: linearize,
+    hasSub: hasSub,
+    renderSvg: renderSvg,
+    toHtml: toHtml,
+    subHtml: subHtml,
+    setOverrides: function (list) {
+      ovTable = (list || []).slice();
+      OVERRIDE_RE = null;                 /* 正则缓存必须失效 */
+      return ovTable;
+    },
+    RATIO: RATIO,
+    SHIFT: SHIFT
+  };
+  /* 覆盖表用 getter 暴露：直接改 api.OVERRIDES 不起作用（内部读的是 ovTable） */
+  Object.defineProperty(api, 'OVERRIDES', {
+    get: function () { return ovTable; },
+    enumerable: true
+  });
+  g.CourseSubscript = api;
+  /* 裸全局别名：让**没有 lib.js** 的手工页也能直接写 subHtml('…')
+     （lib.js 里的同名函数是本函数的一层薄封装，行为一致） */
+  g.subHtml = subHtml;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
+var CourseSubscript = window.CourseSubscript;
+var subHtml;
+if (typeof subHtml !== 'function') { subHtml = window.subHtml || function (s) { return s; }; }
+</script>
+<script>
+/* =========================================================================
+   基础数学 —— 全部按教材 3.3 节式 (3-5)～(3-29)
+   ========================================================================= */
+const D2R=Math.PI/180;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function fmt(v){
+  const a=Math.abs(v);
+  if(a===0)return '0';
+  if(!isFinite(v))return '—';
+  if(a>=1000||a<0.001)return v.toExponential(1);
+  if(a>=100)return v.toFixed(0);
+  if(a>=10)return v.toFixed(1);
+  if(a>=1)return v.toFixed(2);
+  return v.toFixed(3);
+}
+/* 式(3-17)(3-18)(3-19) 分解系数 */
+function alpha0(th){
+  if(th<=1e-9)return 0;
+  if(th<0.01)return 2*th/(3*Math.PI);
+  const c=Math.cos(th),s=Math.sin(th);
+  return (s-th*c)/(Math.PI*(1-c));
+}
+function alpha1(th){
+  if(th<=1e-9)return 0;
+  if(th<0.01)return 4*th/(3*Math.PI);
+  const c=Math.cos(th),s=Math.sin(th);
+  return (th-s*c)/(Math.PI*(1-c));
+}
+function alphaN(th,n){
+  if(n===0)return alpha0(th);
+  if(n===1)return alpha1(th);
+  if(th<=1e-9)return 0;
+  const c=Math.cos(th),s=Math.sin(th);
+  return (Math.sin(n*th)*c-n*s*Math.cos(n*th))/(0.5*Math.PI*n*(n*n-1)*(1-c));
+}
+function g1of(th){const a0=alpha0(th),a1=alpha1(th);return a0>1e-12?a1/a0:2;}
+/* 式(3-15) 余弦脉冲，导通区 −θc ~ +θc */
+function icPulse(x,th,Icm){
+  if(th<=0)return 0;
+  if(Math.abs(x)>=th)return 0;
+  return Icm*(Math.cos(x)-Math.cos(th))/(1-Math.cos(th));
+}
+
+/* =========================================================================
+   Canvas 绘图工具
+   ========================================================================= */
+function drawAxes(ctx,x,y,w,h,xmin,xmax,ymin,ymax,xlabel,ylabel,title,opts={}){
+  ctx.save();
+  ctx.font='13px "Microsoft YaHei",sans-serif';
+  ctx.strokeStyle='#e6e6e6'; ctx.lineWidth=1;
+  const ny=opts.ny??4, nx=opts.nx??6;
+  for(let i=0;i<=ny;i++){
+    const yy=y+h-h*i/ny;
+    ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+w,yy);ctx.stroke();
+  }
+  for(let i=0;i<=nx;i++){
+    const xx=x+w*i/nx;
+    ctx.beginPath();ctx.moveTo(xx,y);ctx.lineTo(xx,y+h);ctx.stroke();
+  }
+  ctx.strokeStyle='#222';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+w,y+h);ctx.moveTo(x,y);ctx.lineTo(x,y+h);ctx.stroke();
+  ctx.fillStyle='#666';ctx.textAlign='center';
+  const fx=opts.xfmt||fmt;
+  for(let i=0;i<=nx;i++){
+    const xx=x+w*i/nx, v=xmin+(xmax-xmin)*i/nx;
+    ctx.fillText(fx(v),xx,y+h+16);
+  }
+  ctx.textAlign='right';
+  for(let i=0;i<=ny;i++){
+    const yy=y+h-h*i/ny, v=ymin+(ymax-ymin)*i/ny;
+    ctx.fillText(fmt(v),x-6,yy+4);
+  }
+  ctx.fillStyle='#111';ctx.textAlign='left';
+  if(title){ctx.font='bold 14px "Microsoft YaHei"';ctx.fillText(title,x+6,y-12);}
+  if(ylabel){ctx.fillStyle='#777';ctx.font='12px "Microsoft YaHei"';ctx.fillText(ylabel,x+6,y+16);}
+  if(xlabel){ctx.fillStyle='#111';ctx.font='12px "Microsoft YaHei"';ctx.textAlign='center';ctx.fillText(xlabel,x+w/2,y+h+36);}
+  ctx.restore();
+}
+function poly(ctx,pts,color,lw,dash){
+  if(pts.length<2)return;
+  ctx.save();
+  ctx.strokeStyle=color;ctx.lineWidth=lw||2;
+  if(dash)ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.stroke();
+  ctx.restore();
+}
+function dot(ctx,x,y,r,color){
+  ctx.save();ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.restore();
+}
+function label(ctx,x,y,s,color,size,align){
+  ctx.save();ctx.fillStyle=color;ctx.font='bold '+(size||12)+'px "Microsoft YaHei"';
+  ctx.textAlign=align||'left';ctx.fillText(s,x,y);ctx.restore();
+}
+function dashLine(ctx,x1,y1,x2,y2,color,lw,dash){
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=lw||1.2;
+  ctx.setLineDash(dash||[5,4]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.restore();
+}
+
+/* =========================================================================
+   3.3.1　输入 / 输出特性理想化对比（图 3-4、图 3-5）
+   ========================================================================= */
+function drawChar(){
+  const cv=document.getElementById('cvChar');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+
+  const Ubz=+document.getElementById('sUbz').value;
+  const gb=+document.getElementById('sGb').value;
+  const gc=+document.getElementById('sGc').value;
+  const Uces=+document.getElementById('sUces').value;
+  const gcr=+document.getElementById('sGcr').value;
+  document.getElementById('vUbz').textContent=Ubz.toFixed(2);
+  document.getElementById('vGb').textContent=gb.toFixed(3);
+  document.getElementById('vGc').textContent=gc.toFixed(2);
+  document.getElementById('vUces').textContent=Uces.toFixed(2);
+  document.getElementById('vGcr').textContent=gcr.toFixed(2);
+
+  /* ---------- 左：输入特性（图 3-4） ---------- */
+  const L=64,T=48,PW=420,PH=300;
+  const uMax=2.4, iMax=Math.max(0.22,gb*(uMax-Ubz)*1.15);
+  drawAxes(ctx,L,T,PW,PH,0,uMax,0,iMax,'u_BE (V)','i_B (A)','图 3-4　输入特性的理想化',{nx:6,ny:4});
+  const X1=v=>L+PW*v/uMax, Y1=v=>T+PH-PH*v/iMax;
+  /* 实际曲线：软膝盖，u→∞ 时趋近折线 */
+  const soft=0.13;
+  const act=[];
+  for(let i=0;i<=200;i++){
+    const u=uMax*i/200;
+    const ib=gb*soft*Math.log(1+Math.exp((u-Ubz)/soft));
+    act.push([X1(u),Y1(ib)]);
+  }
+  poly(ctx,act,'#1a46b5',2.6);
+  /* 理想化折线 */
+  const idl=[];
+  idl.push([X1(0),Y1(0)]);
+  idl.push([X1(Ubz),Y1(0)]);
+  idl.push([X1(uMax),Y1(gb*(uMax-Ubz))]);
+  poly(ctx,idl,'#c02020',2.2,[7,5]);
+  dashLine(ctx,X1(Ubz),Y1(0),X1(Ubz),Y1(iMax),'#c07a00',1.3);
+  label(ctx,X1(Ubz)+6,T+20,'U_bz','#c07a00',12,'left');
+  label(ctx,L+12,T+20,'实线：实际曲线（软膝盖）','#1a46b5',12,'left');
+  label(ctx,L+12,T+40,'虚线：理想化折线 式(3-5)','#c02020',12,'left');
+  label(ctx,L+12,T+60,'斜率 g_b = '+gb.toFixed(3)+' S','#333',12,'left');
+  /* 偏差阴影 */
+  ctx.save();ctx.fillStyle='rgba(192,160,0,.13)';
+  ctx.beginPath();
+  for(let i=0;i<act.length;i++){i===0?ctx.moveTo(act[i][0],act[i][1]):ctx.lineTo(act[i][0],act[i][1]);}
+  for(let i=idl.length-1;i>=0;i--)ctx.lineTo(idl[i][0],idl[i][1]);
+  ctx.closePath();ctx.fill();ctx.restore();
+
+  /* ---------- 右：输出特性（图 3-5） ---------- */
+  const R=580;
+  const ucMax=14, icMax=Math.max(1.2,gcr*ucMax*0.55);
+  drawAxes(ctx,R,T,PW,PH,0,ucMax,0,icMax,'u_CE (V)','i_C (A)','图 3-5　输出特性曲线的理想化',{nx:7,ny:4});
+  const X2=v=>R+PW*v/ucMax, Y2=v=>T+PH-PH*v/icMax;
+  /* 临界线 i_C = g_cr·u_CE */
+  const critEnd=Math.min(ucMax,icMax/gcr);
+  poly(ctx,[[X2(0),Y2(0)],[X2(critEnd),Y2(gcr*critEnd)]],'#0d7a3c',2.4);
+  label(ctx,X2(critEnd)+6,Y2(gcr*critEnd)+4,'临界线','#0d7a3c',12,'left');
+  /* 理想化折线族 + 实际曲线族 */
+  const NK=5;
+  for(let k=1;k<=NK;k++){
+    const Ick=icMax*k/NK*0.92;
+    const knee=Ick/gcr;
+    /* 实际：软饱和 i_C = Ick·(1−exp(−g_cr u / Ick)) */
+    const act2=[];
+    for(let i=0;i<=120;i++){
+      const u=ucMax*i/120;
+      act2.push([X2(u),Y2(Ick*(1-Math.exp(-gcr*u/Ick)))]);
+    }
+    poly(ctx,act2,'#1a46b5',1.8);
+    /* 理想化折线 */
+    const idl2=[[X2(0),Y2(0)]];
+    if(knee<ucMax){
+      idl2.push([X2(knee),Y2(Ick)]);
+      idl2.push([X2(ucMax),Y2(Ick)]);
+    }else{
+      idl2.push([X2(ucMax),Y2(gcr*ucMax)]);
+    }
+    poly(ctx,idl2,'#c02020',2.0,[7,5]);
+  }
+  /* U_CES 标注 */
+  if(Uces<ucMax){
+    dashLine(ctx,X2(Uces),Y2(0),X2(Uces),Y2(icMax),'#c07a00',1.3);
+    dot(ctx,X2(Uces),Y2(gcr*Uces),4.5,'#c07a00');
+    label(ctx,X2(Uces)+6,Y2(gcr*Uces)-8,'(U_CES, g_cr·U_CES)','#c07a00',11,'left');
+  }
+  label(ctx,R+12,T+20,'实线：实际曲线族','#1a46b5',12,'left');
+  label(ctx,R+12,T+40,'虚线：理想化折线 式(3-9)','#c02020',12,'left');
+  label(ctx,R+12,T+60,'g_cr = '+gcr.toFixed(2)+' S　U_CES = '+Uces.toFixed(2)+' V','#333',12,'left');
+
+  /* ---------- 读数 ---------- */
+  const beta=gc/gb;
+  document.getElementById('roBeta').textContent=beta.toFixed(1);
+  document.getElementById('roCrit').innerHTML = subHtml('i_C='+gcr.toFixed(2)+'·u_CE');
+  document.getElementById('roIces').textContent=(gcr*Uces).toFixed(2)+' A';
+  document.getElementById('roKnee').textContent=(beta*0.02/gcr).toFixed(2)+' V';
+  document.getElementById('liveChar').innerHTML = subHtml('<b>把当前滑块代入式 (3-5)～(3-10)：</b><br>'+
+    '<span class="mono">g_b = Δi_B/Δu_BE = '+gb.toFixed(3)+' S　⟹　i_B = '+gb.toFixed(3)+'(u_BE − '+Ubz.toFixed(2)+')</span><br>'+
+    '<span class="mono">g_c = β g_b = '+beta.toFixed(1)+' × '+gb.toFixed(3)+' = '+gc.toFixed(2)+' S　⟹　i_C = '+gc.toFixed(2)+'(u_be − '+Ubz.toFixed(2)+')</span><br>'+
+    '<span class="mono">临界线：i_C = g_cr·u_CE = '+gcr.toFixed(2)+' u_CE　；u_CE &lt; U_CES = '+Uces.toFixed(2)+' V 时走饱和段</span><br>'+
+    '折线在膝盖附近与实际曲线偏差最大；g_cr 越大、U_CES 越小，折线越贴近实际曲线的“直角”形状。');
+}
+
+/* =========================================================================
+   3.3.2　余弦脉冲波形 + 图 3-6 分解系数（核心）
+   ========================================================================= */
+function drawPulse(){
+  const cv=document.getElementById('cvPulse');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+
+  const thD=+document.getElementById('sTh2').value;
+  const Icm=+document.getElementById('sIcm').value;
+  const th=thD*D2R;
+  document.getElementById('vTh2').textContent=thD.toFixed(0);
+  document.getElementById('vIcm').textContent=Icm.toFixed(2);
+
+  /* ---------- 左：i_C(t) 余弦脉冲 ---------- */
+  const L=64,T=48,PW=410,PH=310;
+  const yMax=Icm*1.22;
+  drawAxes(ctx,L,T,PW,PH,-180,180,0,yMax,'ω_c t (°)','i_C (A)','余弦电流脉冲　式 (3-15)',{nx:6,ny:4,xfmt:v=>Math.round(v)+'°'});
+  const X1=v=>L+PW*(v+180)/360, Y1=v=>T+PH-PH*v/yMax;
+  /* 导通区阴影 */
+  if(thD>0.2){
+    ctx.save();ctx.fillStyle='rgba(192,32,32,.10)';
+    ctx.fillRect(X1(-thD),T,X1(thD)-X1(-thD),PH);ctx.restore();
+    label(ctx,(X1(-thD)+X1(thD))/2,T+22,'导通区 2θ_c','#c02020',12,'center');
+    label(ctx,X1(-thD)-4,T+PH-8,'−θ_c','#c07a00',12,'right');
+    label(ctx,X1(thD)+4,T+PH-8,'θ_c','#c07a00',12,'left');
+  }
+  /* 脉冲 */
+  const pts=[];
+  for(let i=0;i<=360;i++){
+    const deg=-180+i;
+    pts.push([X1(deg),Y1(icPulse(deg*D2R,th,Icm))]);
+  }
+  poly(ctx,pts,'#c02020',3);
+  /* I_CM 标线 */
+  dashLine(ctx,L,Y1(Icm),L+PW,Y1(Icm),'#1a46b5',1.3);
+  label(ctx,L+8,Y1(Icm)-8,'I_CM = '+Icm.toFixed(2)+' A','#1a46b5',12,'left');
+  label(ctx,L+12,T+PH-10,'i_C(t) = I_CM[cos ω_ct − cos θ_c]/(1 − cos θ_c)','#333',12,'left');
+
+  /* ---------- 右：图 3-6 分解系数 ---------- */
+  const R=560,PW2=400;
+  const aMin=-0.1,aMax=0.6;
+  drawAxes(ctx,R,T,PW2,PH,0,180,aMin,aMax,'θ_c (°)','α_i','图 3-6　分解系数 α_i 与 θ_c 的关系',{nx:6,ny:7,xfmt:v=>Math.round(v)+'°'});
+  const X2=t=>R+PW2*t/180;
+  const Y2=v=>T+PH-PH*(v-aMin)/(aMax-aMin);
+  const Yg=v=>T+PH-PH*v/2.0;
+  /* 右轴 g1 */
+  ctx.save();ctx.strokeStyle='#7a3fb0';ctx.lineWidth=1.3;ctx.fillStyle='#7a3fb0';
+  ctx.font='11px Consolas,monospace';ctx.textAlign='left';
+  for(const v of [0,0.5,1,1.5,2]){ctx.fillText(v,R+PW2+6,Yg(v)+4);}
+  ctx.fillText('g₁',R+PW2+6,Yg(2)+22);
+  ctx.restore();
+  const cols={0:'#0d7a3c',1:'#1a46b5',2:'#c07a00',3:'#c02020'};
+  for(let n=0;n<=3;n++){
+    const pts2=[];
+    for(let t=1;t<=180;t++)pts2.push([X2(t),Y2(alphaN(t*D2R,n))]);
+    poly(ctx,pts2,cols[n],2.4);
+    /* 曲线旁标注 */
+    const tLab=[168,150,42,30][n];
+    label(ctx,X2(tLab)+4,Y2(alphaN(tLab*D2R,n))-6,'α'+['₀','₁','₂','₃'][n],cols[n],12,'left');
+  }
+  const gpts=[];
+  for(let t=1;t<=180;t++)gpts.push([X2(t),Yg(g1of(t*D2R))]);
+  poly(ctx,gpts,'#7a3fb0',2.2,[7,5]);
+  label(ctx,X2(12)+4,Yg(g1of(12*D2R))-8,'g₁','#7a3fb0',12,'left');
+  /* 峰值标注（教材原文） */
+  const pk=[[120,1,0.536,'α₁ 最大 0.536 @ θ_c≈120°'],[60,2,0,'α₂ 最大 @ θ_c = 60°'],[40,3,0,'α₃ 最大 @ θ_c = 40°']];
+  for(const [td,n,force,txtLab] of pk){
+    const v=force||alphaN(td*D2R,n);
+    dot(ctx,X2(td),Y2(v),4.5,cols[n]);
+    label(ctx,X2(td),Y2(v)-12,txtLab,cols[n],11,'center');
+  }
+  /* 当前 θc 游标 */
+  dashLine(ctx,X2(thD),T,X2(thD),T+PH,'#c07a00',1.8,[4,3]);
+  for(let n=0;n<=3;n++)dot(ctx,X2(thD),Y2(alphaN(th,n)),4,cols[n]);
+  dot(ctx,X2(thD),Yg(g1of(th)),4,'#7a3fb0');
+  label(ctx,X2(thD)+6,T+16,'θ_c = '+thD.toFixed(0)+'°','#c07a00',12,'left');
+
+  /* ---------- 读数 ---------- */
+  const a=[alpha0(th),alpha1(th),alphaN(th,2),alphaN(th,3)];
+  const g1=g1of(th);
+  document.getElementById('roA0').textContent=a[0].toFixed(4);
+  document.getElementById('roA1').textContent=a[1].toFixed(4);
+  document.getElementById('roA2').textContent=a[2].toFixed(4);
+  document.getElementById('roA3').textContent=a[3].toFixed(4);
+  document.getElementById('roG1').textContent=g1.toFixed(4);
+  document.getElementById('roIc0').textContent=(Icm*a[0]).toFixed(4);
+  document.getElementById('roIc1').textContent=(Icm*a[1]).toFixed(4);
+  document.getElementById('roIc2').textContent=(Icm*a[2]).toFixed(4);
+  document.getElementById('roIc3').textContent=(Icm*a[3]).toFixed(4);
+  document.getElementById('livePulse').innerHTML = subHtml('<b>把式 (3-17)～(3-19) 用当前 θ_c = '+thD.toFixed(0)+'° 代入一遍：</b><br>'+
+    '<span class="mono">α₀ = (sin θ_c − θ_c cos θ_c)/[π(1−cos θ_c)] = '+a[0].toFixed(4)+'　⟹　I_C0 = I_CM·α₀ = '+Icm.toFixed(2)+'×'+a[0].toFixed(4)+' = '+(Icm*a[0]).toFixed(4)+' A</span><br>'+
+    '<span class="mono">α₁ = (θ_c − sin θ_c cos θ_c)/[π(1−cos θ_c)] = '+a[1].toFixed(4)+'　⟹　I_c1m = I_CM·α₁ = '+(Icm*a[1]).toFixed(4)+' A</span><br>'+
+    '<span class="mono">g₁ = α₁/α₀ = '+a[1].toFixed(4)+'/'+a[0].toFixed(4)+' = '+g1.toFixed(4)+'</span><br>'+
+    '<b>教材要点：</b>α₀ 单调上升；α₁ 在 θ_c ≈ 120° 达最大 0.536（此时输出功率最大，但效率太低）；'+
+    'α₂ 在 θ_c = 60° 达最大；α₃ 在 θ_c = 40° 达最大。兼顾输出功率与效率时通常取 θ_c = 60°～80°。');
+}
+
+/* =========================================================================
+   3.3.3　输出功率与效率（式 3-20 ~ 3-25）
+   ========================================================================= */
+function drawEta3(){
+  const cv=document.getElementById('cvEta3');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+
+  const thD=+document.getElementById('sTh3').value;
+  const xi=+document.getElementById('sXi').value;
+  const Vcc=+document.getElementById('sVcc3').value;
+  const Icm=+document.getElementById('sIcm3').value;
+  const th=thD*D2R;
+  document.getElementById('vTh3').textContent=thD.toFixed(0);
+  document.getElementById('vXi').textContent=xi.toFixed(2);
+  document.getElementById('vVcc3').textContent=Vcc.toFixed(1);
+  document.getElementById('vIcm3').textContent=Icm.toFixed(2);
+
+  /* ---------- 左：η_c = ½ ξ g₁(θ_c) ---------- */
+  const L=64,T=48,PW=410,PH=290;
+  drawAxes(ctx,L,T,PW,PH,10,180,0,1.0,'θ_c (°)','η_c','η_c = ½ ξ g₁(θ_c)　式 (3-25)',{nx:6,ny:4,xfmt:v=>Math.round(v)+'°'});
+  const X1=t=>L+PW*(t-10)/170, Y1=v=>T+PH-PH*v/1.0;
+  const epts=[];
+  for(let t=10;t<=180;t++)epts.push([X1(t),Y1(0.5*xi*g1of(t*D2R))]);
+  poly(ctx,epts,'#1a46b5',3);
+  /* 教材关键点（ξ=1 理想条件下的标注；当前 ξ 下点位置随 ξ 缩放） */
+  const keys=[[180,'甲类 50%'],[120,'θ_c=120°'],[90,'乙类 78.5%'],[60,'丙类']];
+  for(const [td,lab] of keys){
+    const v=0.5*xi*g1of(td*D2R);
+    dot(ctx,X1(td),Y1(v),4.5,'#c02020');
+    label(ctx,X1(td),Y1(v)-10,lab,'#c02020',11,td>150?'right':'center');
+  }
+  const eNow=0.5*xi*g1of(th);
+  dashLine(ctx,X1(thD),T,X1(thD),T+PH,'#c07a00',1.6,[4,3]);
+  dot(ctx,X1(thD),Y1(eNow),6,'#c07a00');
+  label(ctx,X1(thD)+8,Y1(eNow)+18,'当前 η_c = '+(eNow*100).toFixed(1)+'%','#c07a00',12,'left');
+
+  /* ---------- 右：P_= / P_o / P_c 随 θ_c ---------- */
+  const R=580,PW2=400;
+  const Ucm=xi*Vcc;
+  const PdcMax=Vcc*Icm*0.55;
+  drawAxes(ctx,R,T,PW2,PH,10,180,0,PdcMax,'θ_c (°)','功率 (W)','P_=、P_o、P_c 随 θ_c 变化',{nx:6,ny:4,xfmt:v=>Math.round(v)+'°'});
+  const X2=t=>R+PW2*(t-10)/170, Y2=v=>T+PH-PH*v/PdcMax;
+  const pdc=[],po=[],pc=[];
+  for(let t=10;t<=180;t++){
+    const tr=t*D2R;
+    const P0=Vcc*Icm*alpha0(tr);
+    const Poo=0.5*Ucm*Icm*alpha1(tr);
+    pdc.push([X2(t),Y2(P0)]);
+    po.push([X2(t),Y2(Poo)]);
+    pc.push([X2(t),Y2(P0-Poo)]);
+  }
+  poly(ctx,pdc,'#0d7a3c',2.4);
+  poly(ctx,po,'#1a46b5',2.6);
+  poly(ctx,pc,'#c02020',2.2);
+  label(ctx,X2(172),Y2(Vcc*Icm*alpha0(172*D2R))-8,'P_ =','#0d7a3c',12,'right');
+  label(ctx,X2(172),Y2(0.5*Ucm*Icm*alpha1(172*D2R))-8,'P_o','#1a46b5',12,'right');
+  label(ctx,X2(40),Y2(Vcc*Icm*alpha0(40*D2R)-0.5*Ucm*Icm*alpha1(40*D2R))+18,'P_c','#c02020',12,'center');
+  dashLine(ctx,X2(thD),T,X2(thD),T+PH,'#c07a00',1.6,[4,3]);
+
+  /* ---------- 读数 ---------- */
+  const a0=alpha0(th),a1=alpha1(th),g1=g1of(th);
+  const I0=Icm*a0,I1=Icm*a1;
+  const Pdc=Vcc*I0, Po=0.5*Ucm*I1, Pc=Pdc-Po;
+  document.getElementById('roI0c').textContent=I0.toFixed(4);
+  document.getElementById('roI1c').textContent=I1.toFixed(4);
+  document.getElementById('roG1c').textContent=g1.toFixed(4);
+  document.getElementById('roPdc').textContent=Pdc.toFixed(3);
+  document.getElementById('roPo').textContent=Po.toFixed(3);
+  document.getElementById('roPc').textContent=Pc.toFixed(3);
+  document.getElementById('roEta').textContent=(eNow*100).toFixed(1)+' %';
+  document.getElementById('roUcm3').textContent=Ucm.toFixed(2);
+  document.getElementById('livePow').innerHTML = subHtml('<b>式 (3-22)～(3-25) 用当前滑块代入：</b><br>'+
+    '<span class="mono">P_= = V_CC·I_C0 = '+Vcc.toFixed(1)+' × '+I0.toFixed(4)+' = '+Pdc.toFixed(3)+' W</span><br>'+
+    '<span class="mono">P_o = ½ U_cm I_c1m = ½ × '+Ucm.toFixed(2)+' × '+I1.toFixed(4)+' = '+Po.toFixed(3)+' W</span><br>'+
+    '<span class="mono">P_c = P_ − P_o = '+Pdc.toFixed(3)+' − '+Po.toFixed(3)+' = '+Pc.toFixed(3)+' W</span><br>'+
+    '<span class="mono">η_c = ½ ξ g₁(θ_c) = ½ × '+xi.toFixed(2)+' × '+g1.toFixed(4)+' = '+(eNow*100).toFixed(1)+'%</span><br>'+
+    '教材结论：ξ = 1 时甲类 θ_c = 180° 效率 50%，乙类 θ_c = 90° 效率 78.5%，丙类 θ_c &lt; 90° 效率更高；'+
+    '实际兼顾输出功率与效率通常取 θ_c = 60°～80°。');
+}
+
+/* =========================================================================
+   3.3.4　动态特性（式 3-26 ~ 3-28，图 3-7 / 图 3-8）
+   固定：θ_c = 70°，I_CM = 2 A，g_cr = 1 S
+   ========================================================================= */
+const TH4=70*D2R, ICM4=2, GCR4=1, GC4=1.43, UBZ4=0.6, VBB4=-0.5;
+function drawDyn(){
+  const cv=document.getElementById('cvDyn');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+
+  const Ic1m=ICM4*alpha1(TH4);
+  let Rl=+document.getElementById('sRl4').value;
+  let Vcc=+document.getElementById('sVcc4').value;
+  let Ucm=+document.getElementById('sUcm4').value;
+  /* R_L 与 U_cm 联动：U_cm = I_c1m·R_L（式 3-23） */
+  const src=document.activeElement;
+  if(src&&src.id==='sRl4'){Ucm=clamp(Ic1m*Rl,2,30);document.getElementById('sUcm4').value=Ucm.toFixed(1);}
+  else if(src&&src.id==='sUcm4'){Rl=clamp(Ucm/Ic1m,4,60);document.getElementById('sRl4').value=Rl.toFixed(1);}
+  document.getElementById('vRl4').textContent=Rl.toFixed(1);
+  document.getElementById('vVcc4').textContent=Vcc.toFixed(1);
+  document.getElementById('vUcm4').textContent=Ucm.toFixed(1);
+
+  const cosTh=Math.cos(TH4);
+  const Uo=Vcc-Ucm*cosTh;              /* 式(3-27) 截距 */
+  const gd=-ICM4/(Ucm*(1-cosTh));      /* 式(3-27) 斜率（与 g_c U_bm/U_cm 等价） */
+  const IQ=-GC4*(UBZ4-VBB4);           /* 式(3-28) 虚拟电流 */
+  const Ucmc=Vcc-ICM4/GCR4;            /* 临界 U_cm */
+  const uA=Vcc-Ucm;
+  let state='临界';
+  if(Math.abs(Ucm-Ucmc)<0.25)state='临界';
+  else if(Ucm<Ucmc)state='欠压';
+  else state='过压';
+
+  /* ---------- 左：i_C – u_CE 平面动态特性 ---------- */
+  const L=64,T=48,PW=460,PH=320;
+  const ucMax=Math.max(Vcc+Ucm*1.25,12), icMax=Math.max(ICM4*1.3,2.6);
+  drawAxes(ctx,L,T,PW,PH,0,ucMax,0,icMax,'u_CE (V)','i_C (A)','动态特性 AB-BC　式 (3-27)',{nx:6,ny:4});
+  const X=v=>L+PW*v/ucMax, Y=v=>T+PH-PH*v/icMax;
+  /* 临界线 */
+  const critEnd=Math.min(ucMax,icMax/GCR4);
+  poly(ctx,[[X(0),Y(0)],[X(critEnd),Y(GCR4*critEnd)]],'#0d7a3c',2.2);
+  label(ctx,X(critEnd)+4,Y(GCR4*critEnd)+4,'临界线','#0d7a3c',11,'left');
+  /* 放大区水平理想线（示意） */
+  for(let k=1;k<=3;k++){
+    dashLine(ctx,X(0),Y(icMax*k/3.4),X(ucMax),Y(icMax*k/3.4),'#c9cdd4',1);
+  }
+  /* 动态折线 AB-BC */
+  const pts=[[X(uA),Y(ICM4)],[X(Uo),Y(0)],[X(Vcc+Ucm),Y(0)]];
+  poly(ctx,pts,'#c02020',3);
+  label(ctx,X(uA)-6,Y(ICM4)-8,'A(V_CC−U_cm, I_CM)','#c02020',11,'right');
+  label(ctx,X(Uo),Y(0)+22,'B(U_o, 0)','#c02020',11,'center');
+  label(ctx,X(Vcc+Ucm)-4,Y(0)+22,'C','#c02020',11,'center');
+  dot(ctx,X(uA),Y(ICM4),5,'#c02020');
+  dot(ctx,X(Uo),Y(0),5,'#c02020');
+  /* AB 延长线到 Q(V_CC, I_Q) */
+  const uq=Vcc;
+  dashLine(ctx,X(Uo),Y(0),X(uq),Y(IQ),'#c07a00',1.8,[2,3]);
+  dashLine(ctx,X(uq),Y(0),X(uq),Y(icMax),'#7a3fb0',1.3);
+  dot(ctx,X(uq),Y(IQ),5,'#c07a00');
+  label(ctx,X(uq)+6,Y(IQ)+14,'Q(V_CC, I_Q)','#c07a00',11,'left');
+  label(ctx,X(uq)+6,T+18,'V_CC','#7a3fb0',11,'left');
+  label(ctx,L+12,T+20,'状态：'+state+(state==='过压'?'（A 点进入饱和区，脉冲凹顶）':'（尖顶脉冲）'),
+        state==='欠压'?'#c07a00':(state==='临界'?'#0d7a3c':'#c02020'),12,'left');
+
+  /* ---------- 右：u_CE(t) = V_CC − U_cm cos ω_ct ---------- */
+  const R=600,PW2=360;
+  drawAxes(ctx,R,T,PW2,PH,-180,180,0,Math.max(Vcc+Ucm*1.2,12),'ω_c t (°)','u_CE (V)','u_CE(t) = V_CC − U_cm cos ω_ct',{nx:6,ny:4,xfmt:v=>Math.round(v)+'°'});
+  const X3=v=>R+PW2*(v+180)/360, Y3=v=>T+PH-PH*v/Math.max(Vcc+Ucm*1.2,12);
+  const wpts=[];
+  for(let i=0;i<=180;i++){
+    const deg=-180+i*2;
+    wpts.push([X3(deg),Y3(Vcc-Ucm*Math.cos(deg*D2R))]);
+  }
+  poly(ctx,wpts,'#1a46b5',2.8);
+  dashLine(ctx,R,Y3(Vcc),R+PW2,Y3(Vcc),'#7a3fb0',1.3);
+  label(ctx,R+8,Y3(Vcc)-8,'V_CC','#7a3fb0',11,'left');
+  dashLine(ctx,R,Y3(Vcc-Ucm),R+PW2,Y3(Vcc-Ucm),'#c02020',1.2);
+  label(ctx,R+8,Y3(Vcc-Ucm)+16,'A：V_CC−U_cm（ωt = 0）','#c02020',11,'left');
+  dashLine(ctx,R,Y3(Uo),R+PW2,Y3(Uo),'#c07a00',1.2);
+  label(ctx,R+PW2-6,Y3(Uo)-8,'U_o（B 点）','#c07a00',11,'right');
+  label(ctx,R+8,Y3(Vcc+Ucm)-8,'C：V_CC+U_cm（ωt = ±180°）','#c02020',11,'left');
+
+  /* ---------- 读数 ---------- */
+  document.getElementById('roUo').textContent=Uo.toFixed(2);
+  document.getElementById('roGd').textContent=gd.toFixed(3);
+  document.getElementById('roState4').textContent=state;
+  document.getElementById('roIQ').textContent=IQ.toFixed(3);
+  document.getElementById('roUcmc').textContent=Ucmc.toFixed(2);
+  document.getElementById('roUa').textContent=uA.toFixed(2);
+  document.getElementById('liveDyn').innerHTML = subHtml('<b>截距法（图 3-7）用当前滑块代入：</b><br>'+
+    '<span class="mono">U_o = V_CC − U_cm cos θ_c = '+Vcc.toFixed(1)+' − '+Ucm.toFixed(1)+'×'+cosTh.toFixed(3)+' = '+Uo.toFixed(2)+' V</span><br>'+
+    '<span class="mono">g_d = −g_c U_bm/U_cm = −I_CM/[U_cm(1−cos θ_c)] = '+gd.toFixed(3)+' S（负值）</span><br>'+
+    '<span class="mono">A = ('+uA.toFixed(2)+' V, '+ICM4.toFixed(2)+' A)　B = ('+Uo.toFixed(2)+' V, 0)　C = ('+(Vcc+Ucm).toFixed(2)+' V, 0)　Q = ('+Vcc.toFixed(1)+' V, '+IQ.toFixed(3)+' A)</span><br>'+
+    '<span class="mono">临界条件：U_cm = V_CC − I_CM/g_cr = '+Ucmc.toFixed(2)+' V　⟹　当前 U_cm = '+Ucm.toFixed(2)+' V → <b>'+state+'</b></span><br>'+
+    '拖 R_L 时 U_cm = I_c1m·R_L 自动联动；R_L 增大 → g_d 绝对值变小（式 3-29）→ 动态线变平 → 欠压 → 临界 → 过压。');
+}
+
+/* =========================================================================
+   3.3.5　负载特性（图 3-9）
+   欠压/临界段用教材精确式；过压段按教材文字定性建模（凹顶脉冲不能直接用分解系数）
+   ========================================================================= */
+function loadPoint(Rl){
+  const th=70*D2R, Icm=2, Vcc=20, gcr=1;
+  const a0=alpha0(th), a1=alpha1(th);
+  const Ic1m=Icm*a1;
+  const Ucmc=Vcc-Icm/gcr;
+  const Rlc=Ucmc/Ic1m;                    /* 临界谐振电阻 */
+  let I0,I1,Ucm,ex=0,a0e=a0,a1e=a1;
+  if(Rl<=Rlc){
+    I0=Icm*a0; I1=Icm*a1; Ucm=I1*Rl;
+  }else{
+    ex=clamp((Rl-Rlc)/Rlc,0,1.4);
+    a0e=a0*(1+0.10*Math.pow(ex,2.5));     /* 凹顶：直流相对增大 */
+    a1e=a1*(1-0.25*Math.pow(ex,2.2));     /* 凹顶：基波相对减小 */
+    const ImEff=Vcc/(a1e*Rl+1/gcr);       /* 顶点仍贴临界线 */
+    I0=ImEff*a0e; I1=ImEff*a1e; Ucm=I1*Rl;
+  }
+  const Pdc=Vcc*I0, Po=0.5*Ucm*I1, Pc=Pdc-Po;
+  const eta=Pdc>0?Po/Pdc:0;
+  const gd=Math.abs(1/((1-Math.cos(th))*a1*Rl));
+  const state=Rl<Rlc-0.3?'欠压':(Rl>Rlc+0.3?'过压':'临界');
+  return {I0,I1,Ucm,Pdc,Po,Pc,eta,gd,state,Rlc,ex};
+}
+function drawLoad(){
+  const cv=document.getElementById('cvLoad');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+
+  const Rl=+document.getElementById('sRl5').value;
+  document.getElementById('vRl5').textContent=Rl.toFixed(1);
+  const cur=loadPoint(Rl);
+  const Rlc=cur.Rlc;
+  const RLmax=55;
+
+  /* ---------- 左：I_C0、I_c1m、U_cm vs R_L ---------- */
+  const L=64,T=48,PW=410,PH=300;
+  const yL=26;
+  drawAxes(ctx,L,T,PW,PH,0,RLmax,0,yL,'R_L (Ω)','电流 (A) / 电压 (V)','图 3-9 左　I_C0、I_c1m、U_cm 随 R_L',{nx:6,ny:4});
+  const X=v=>L+PW*v/RLmax;
+  const YA=v=>T+PH-PH*v/yL;   /* 电流/电压共用轴（数值可比） */
+  /* 区域分隔 */
+  dashLine(ctx,X(Rlc),T,X(Rlc),T+PH,'#7a3fb0',1.6);
+  label(ctx,X(Rlc),T+16,'临界','#7a3fb0',12,'center');
+  label(ctx,X(Rlc*0.45),T+16,'欠压区','#c07a00',12,'center');
+  label(ctx,X((Rlc+RLmax)/2),T+16,'过压区','#c02020',12,'center');
+  const i0p=[],i1p=[],ucp=[];
+  for(let r=1;r<=RLmax;r+=0.4){
+    const d=loadPoint(r);
+    i0p.push([X(r),YA(d.I0)]);
+    i1p.push([X(r),YA(d.I1)]);
+    ucp.push([X(r),YA(d.Ucm)]);
+  }
+  poly(ctx,i0p,'#0d7a3c',2.4);
+  poly(ctx,i1p,'#1a46b5',2.6);
+  poly(ctx,ucp,'#c02020',2.4);
+  label(ctx,X(30),YA(loadPoint(30).I0)+18,'I_C0','#0d7a3c',12,'center');
+  label(ctx,X(10),YA(loadPoint(10).I1)-10,'I_c1m','#1a46b5',12,'center');
+  label(ctx,X(8),YA(loadPoint(8).Ucm)-10,'U_cm','#c02020',12,'center');
+  dashLine(ctx,X(Rl),T,X(Rl),T+PH,'#c07a00',1.8,[4,3]);
+
+  /* ---------- 右：P_=、P_o、P_c、η_c vs R_L ---------- */
+  const R=580,PW2=400;
+  const yR=22;
+  drawAxes(ctx,R,T,PW2,PH,0,RLmax,0,yR,'R_L (Ω)','功率 (W)','图 3-9 右　P_=、P_o、P_c、η_c 随 R_L',{nx:6,ny:4});
+  const X2=v=>R+PW2*v/RLmax;
+  const YB=v=>T+PH-PH*v/yR;
+  dashLine(ctx,X2(Rlc),T,X2(Rlc),T+PH,'#7a3fb0',1.6);
+  label(ctx,X2(Rlc),T+16,'临界','#7a3fb0',12,'center');
+  label(ctx,X2(Rlc*0.45),T+16,'欠压区','#c07a00',12,'center');
+  label(ctx,X2((Rlc+RLmax)/2),T+16,'过压区','#c02020',12,'center');
+  const pdcp=[],pop=[],pcp=[],etap=[];
+  for(let r=1;r<=RLmax;r+=0.4){
+    const d=loadPoint(r);
+    pdcp.push([X2(r),YB(d.Pdc)]);
+    pop.push([X2(r),YB(d.Po)]);
+    pcp.push([X2(r),YB(d.Pc)]);
+    etap.push([X2(r),YB(d.eta*yR)]);   /* η_c 乘以满量程，归一到功率轴上显示 */
+  }
+  poly(ctx,pdcp,'#0d7a3c',2.4);
+  poly(ctx,pop,'#1a46b5',2.6);
+  poly(ctx,pcp,'#c02020',2.2);
+  poly(ctx,etap,'#7a3fb0',2.4,[7,5]);
+  label(ctx,X2(40),YB(loadPoint(40).Pdc)+18,'P_ =','#0d7a3c',12,'center');
+  label(ctx,X2(Rlc*0.55),YB(loadPoint(Rlc*0.55).Po)-10,'P_o','#1a46b5',12,'center');
+  label(ctx,X2(8),YB(loadPoint(8).Pc)-10,'P_c','#c02020',12,'center');
+  label(ctx,X2(46),YB(loadPoint(46).eta*yR)-10,'η_c（右轴 0~1 量程）','#7a3fb0',11,'center');
+  dashLine(ctx,X2(Rl),T,X2(Rl),T+PH,'#c07a00',1.8,[4,3]);
+
+  /* ---------- 读数 ---------- */
+  document.getElementById('roState5').textContent=cur.state;
+  document.getElementById('roI0e').textContent=cur.I0.toFixed(4);
+  document.getElementById('roI1e').textContent=cur.I1.toFixed(4);
+  document.getElementById('roUcm5').textContent=cur.Ucm.toFixed(2);
+  document.getElementById('roPdc5').textContent=cur.Pdc.toFixed(3);
+  document.getElementById('roPo5').textContent=cur.Po.toFixed(3);
+  document.getElementById('roPc5').textContent=cur.Pc.toFixed(3);
+  document.getElementById('roEta5').textContent=(cur.eta*100).toFixed(1)+' %';
+  document.getElementById('roRlc').textContent=Rlc.toFixed(2);
+  document.getElementById('roGd5').textContent=cur.gd.toFixed(4);
+  const dirText=cur.state==='欠压'
+    ? '欠压：θ_c、I_CM 不变 ⇒ I_C0、I_c1m 不变；U_cm = I_c1m R_L ∝ R_L；P_o ∝ R_L；η_c ∝ R_L；P_c 随 R_L 增大而减小'
+    : (cur.state==='临界'
+      ? '临界：输出功率最大，效率也比较高，常用于发射机的功率输出级'
+      : '过压：I_CM 减小 ⇒ I_C0、I_c1m 减小；U_cm 缓慢增大；P_、P_o 减小；η_c 先增后减；P_c 减小（弱过压区效率最高）');
+  document.getElementById('liveLoad').innerHTML = subHtml('<b>式 (3-29)：|g_d| = 1/[(1−cos θ_c) α₁(θ_c) R_L] = '+cur.gd.toFixed(4)+' S（R_L 越大，斜率绝对值越小，动态线越平）</b><br>'+
+    '<span class="mono">R_L = '+Rl.toFixed(1)+' Ω　临界 R_L = '+Rlc.toFixed(2)+' Ω　当前：<b>'+cur.state+'</b></span><br>'+
+    dirText+'。<br>'+
+    '<b>说明：</b>欠压与临界段严格按教材式 (3-17)(3-18)(3-23) 计算（θ_c、I_CM 不变）；'+
+    '过压段为凹顶脉冲，不能直接用前述分解系数，此处按教材对图 3-9 的文字描述定性绘制。');
+}
+
+/* =========================================================================
+   3.3.6　V_CC / V_BB / U_bm 对工作状态的影响（图 3-10 ~ 3-12）
+   模型：R_L = 20 Ω、g_cr = 1 S、U_bz = 0.6 V、g_c = 1.43 S（与例 3-3 同一套参数）
+   ========================================================================= */
+let INF_MODE='vcc';
+function infParams(s){
+  /* s ∈ [0,1] 扫描量；返回 {Vcc,Vbb,Ubm,theta,Icm,Iq} */
+  const Rl=20, gcr=1, gc=1.43, Ubz=0.6;
+  let Vcc=20, Vbb=-0.5, Ubm=2.5;
+  if(INF_MODE==='vcc'){Vcc=8+24*s;}
+  else if(INF_MODE==='vbb'){Vbb=-1.2+1.8*s;}
+  else {Ubm=1.2+2.8*s;}
+  const c=clamp((Ubz-Vbb)/Ubm,-1,1);
+  const th=Math.acos(c);
+  const Icm=gc*Ubm*(1-c);
+  const Iq=-gc*(Ubz-Vbb);
+  return {Vcc,Vbb,Ubm,th,Icm,Iq,Rl,gcr};
+}
+function infPoint(p){
+  const a0=alpha0(p.th), a1=alpha1(p.th);
+  const I1=p.Icm*a1, I0=p.Icm*a0;
+  const Ucmc=p.Vcc-p.Icm/p.gcr;
+  const UcmU=I1*p.Rl;
+  let Ucm,I0e=I0,I1e=I1,ex=0;
+  if(UcmU<=Ucmc+0.15){Ucm=UcmU;}
+  else{
+    ex=clamp((UcmU-Ucmc)/Math.max(Ucmc,1),0,1.2);
+    const a0e=a0*(1+0.10*Math.pow(ex,2.5));
+    const a1e=a1*(1-0.25*Math.pow(ex,2.2));
+    const ImEff=p.Vcc/(a1e*p.Rl+1/p.gcr);
+    I0e=ImEff*a0e; I1e=ImEff*a1e; Ucm=I1e*p.Rl;
+  }
+  const Pdc=p.Vcc*I0e, Po=0.5*Ucm*I1e, Pc=Pdc-Po;
+  let state='临界';
+  if(UcmU<Ucmc-0.3)state='欠压';
+  else if(UcmU>Ucmc+0.3)state='过压';
+  return {I0e,I1e,Ucm,Pdc,Po,Pc,state,ex};
+}
+function drawInf(){
+  const cv=document.getElementById('cvInf');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+
+  const s=+document.getElementById('sSweep').value/100;
+  document.getElementById('vSweep').textContent=(s*100).toFixed(0);
+  const p=infParams(s);
+  const d=infPoint(p);
+
+  /* ---------- 左：动态折线与 Q 点 ---------- */
+  const L=64,T=48,PW=460,PH=310;
+  const ucMax=36, icMax=5;
+  drawAxes(ctx,L,T,PW,PH,0,ucMax,0,icMax,'u_CE (V)','i_C (A)','动态特性与 Q 点平移',{nx:6,ny:5});
+  const X=v=>L+PW*v/ucMax, Y=v=>T+PH-PH*v/icMax;
+  poly(ctx,[[X(0),Y(0)],[X(icMax/p.gcr),Y(icMax)]],'#0d7a3c',2.2);
+  label(ctx,X(icMax/p.gcr)+4,Y(icMax)+4,'临界线','#0d7a3c',11,'left');
+  /* 三个扫描位置 */
+  const ss=[0.12,0.5,0.88];
+  const cols3=['#9aa0a6','#1a46b5','#c02020'];
+  for(let i=0;i<3;i++){
+    const pi=infParams(ss[i]);
+    const di=infPoint(pi);
+    const cosTh=Math.cos(pi.th);
+    const Uo=pi.Vcc-di.Ucm*cosTh;
+    const uA=pi.Vcc-di.Ucm;
+    poly(ctx,[[X(uA),Y(pi.Icm)],[X(Uo),Y(0)],[X(pi.Vcc+di.Ucm),Y(0)]],cols3[i],2.2);
+    dashLine(ctx,X(pi.Vcc),Y(0),X(pi.Vcc),Y(pi.Iq),'#c07a00',1.2,[2,3]);
+    dot(ctx,X(pi.Vcc),Y(pi.Iq),4.5,'#c07a00');
+    label(ctx,X(pi.Vcc),Y(pi.Iq)+16,'Q'+(i+1),'#c07a00',11,'center');
+    dot(ctx,X(uA),Y(pi.Icm),4,cols3[i]);
+  }
+  /* 迁移箭头 */
+  const pL=infParams(0.1), pH=infParams(0.9);
+  const dL=infPoint(pL), dH=infPoint(pH);
+  const ax1=X(pL.Vcc), ay1=Y(pL.Iq), ax2=X(pH.Vcc), ay2=Y(pH.Iq);
+  ctx.save();ctx.strokeStyle='#c07a00';ctx.lineWidth=2.2;
+  ctx.beginPath();ctx.moveTo(ax1,ay1);ctx.lineTo(ax2,ay2);ctx.stroke();
+  const ang=Math.atan2(ay2-ay1,ax2-ax1);
+  ctx.fillStyle='#c07a00';ctx.beginPath();
+  ctx.moveTo(ax2,ay2);
+  ctx.lineTo(ax2-10*Math.cos(ang-0.4),ay2-10*Math.sin(ang-0.4));
+  ctx.lineTo(ax2-10*Math.cos(ang+0.4),ay2-10*Math.sin(ang+0.4));
+  ctx.closePath();ctx.fill();ctx.restore();
+  const qMove=INF_MODE==='vcc'?'水平（I_Q 不变）':(INF_MODE==='vbb'?'垂直（I_Q 变化）':'不动（斜率变化）');
+  label(ctx,L+12,T+20,'Q 点移动：'+qMove,'#c07a00',12,'left');
+  label(ctx,L+12,T+40,'扫描方向：'+(INF_MODE==='vcc'?'V_CC 增大':(INF_MODE==='vbb'?'V_BB 增大':'U_bm 增大')),'#333',12,'left');
+  label(ctx,L+12,T+60,'灰 → 蓝 → 红 对应扫描量 12% / 50% / 88%','#333',11,'left');
+
+  /* ---------- 右：参数 vs 扫描量 ---------- */
+  const R=600,PW2=360;
+  const yR=24;
+  drawAxes(ctx,R,T,PW2,PH,0,1,0,yR,'扫描量（参数增大 →）','电流 (A) / 功率 (W)','I_c1m、I_C0、P_=、P_o、P_c 随参数变化',{nx:4,ny:4,xfmt:v=>Math.round(v*100)+'%'});
+  const X2=v=>R+PW2*v, YB=v=>T+PH-PH*v/yR;
+  /* 状态分区：图 3-10 的 V_CC 轴是「过压|临界|欠压」，与 R_L 轴相反 */
+  let b1,b2,lab1,lab2,lab3;
+  if(INF_MODE==='vcc'){
+    b1=0.42;b2=0.52;
+    lab1='过压';lab2='临界';lab3='欠压';
+  }else{
+    b1=0.46;b2=0.56;
+    lab1='欠压';lab2='临界';lab3='过压';
+  }
+  dashLine(ctx,X2(b1),T,X2(b1),T+PH,'#7a3fb0',1.5);
+  dashLine(ctx,X2(b2),T,X2(b2),T+PH,'#7a3fb0',1.5);
+  label(ctx,X2(b1*0.5),T+16,lab1,'#c07a00',12,'center');
+  label(ctx,X2((b1+b2)/2),T+16,lab2,'#7a3fb0',11,'center');
+  label(ctx,X2((b2+1)/2),T+16,lab3,'#c02020',12,'center');
+  if(INF_MODE==='vcc')label(ctx,X2(0.72),T+36,'注意：V_CC 增大方向为 过压→临界→欠压','#c02020',11,'center');
+  const cI1=[],cI0=[],cPd=[],cPo=[],cPc=[];
+  for(let i=0;i<=100;i++){
+    const u=i/100;
+    const pi=infParams(u);
+    const di=infPoint(pi);
+    cI1.push([X2(u),YB(di.I1e)]);
+    cI0.push([X2(u),YB(di.I0e)]);
+    cPd.push([X2(u),YB(di.Pdc)]);
+    cPo.push([X2(u),YB(di.Po)]);
+    cPc.push([X2(u),YB(di.Pc)]);
+  }
+  poly(ctx,cI1,'#1a46b5',2.2);
+  poly(ctx,cI0,'#0d7a3c',2.2);
+  poly(ctx,cPd,'#7a3fb0',2.2);
+  poly(ctx,cPo,'#c02020',2.4);
+  poly(ctx,cPc,'#c07a00',2.0);
+  label(ctx,X2(0.92),YB(infPoint(infParams(0.92)).I1e)-8,'I_c1m','#1a46b5',11,'right');
+  label(ctx,X2(0.92),YB(infPoint(infParams(0.92)).I0e)+16,'I_C0','#0d7a3c',11,'right');
+  label(ctx,X2(0.08),YB(infPoint(infParams(0.08)).Pdc)+18,'P_ =','#7a3fb0',11,'left');
+  label(ctx,X2(0.72),YB(infPoint(infParams(0.72)).Po)-10,'P_o','#c02020',11,'center');
+  label(ctx,X2(0.20),YB(infPoint(infParams(0.20)).Pc)+18,'P_c','#c07a00',11,'center');
+  dashLine(ctx,X2(s),T,X2(s),T+PH,'#c07a00',1.8,[4,3]);
+
+  /* ---------- 读数 ---------- */
+  const sweepVal=INF_MODE==='vcc'?p.Vcc:(INF_MODE==='vbb'?p.Vbb:p.Ubm);
+  const sweepName=INF_MODE==='vcc'?'V_CC = ':(INF_MODE==='vbb'?'V_BB = ':'U_bm = ');
+  const sweepUnit=INF_MODE==='vcc'?' V':(INF_MODE==='vbb'?' V':' V');
+  document.getElementById('roState6').textContent=d.state;
+  document.getElementById('roSweepV').textContent=sweepVal.toFixed(2)+sweepUnit;
+  document.getElementById('roQmove').textContent=qMove;
+  document.getElementById('roShape').textContent=d.state==='过压'?'凹顶脉冲':'尖顶脉冲';
+  const dirMap={
+    vcc:'V_CC 增大：<b>过压 → 临界 → 欠压</b>（与 R_L 轴相反！Q 点水平右移，I_Q 不变）',
+    vbb:'V_BB 增大：<b>欠压 → 临界 → 过压</b>（Q 点垂直上移，θ_c、I_CM、I_Q 增大）',
+    ubm:'U_bm 增大：<b>欠压 → 临界 → 过压</b>（Q 点不动，θ_c、I_CM、u_BEmax、g_d 都增大）'
+  };
+  document.getElementById('liveInf').innerHTML = subHtml('<b>当前扫描：'+sweepName+sweepVal.toFixed(2)+sweepUnit+'　工作状态：<b>'+d.state+'</b></b><br>'+
+    dirMap[INF_MODE]+'。<br>'+
+    '<span class="mono">θ_c = '+(p.th/D2R).toFixed(1)+'°　I_CM = '+p.Icm.toFixed(3)+' A　I_Q = '+p.Iq.toFixed(3)+' A　U_cm = '+d.Ucm.toFixed(2)+' V</span><br>'+
+    '<span class="mono">I_C0 = '+d.I0e.toFixed(3)+' A　I_c1m = '+d.I1e.toFixed(3)+' A　P_= = '+d.Pdc.toFixed(2)+' W　P_o = '+d.Po.toFixed(2)+' W　P_c = '+d.Pc.toFixed(2)+' W</span><br>'+
+    (INF_MODE==='vcc'
+      ? '在过压状态和理想情况下，输出信号的振幅正比于集电极电压 —— 这正是<b>集电极调幅</b>的工作原理。'
+      : (INF_MODE==='vbb'
+        ? '在欠压状态下，输出信号的振幅受控于基极电压 —— 这正是<b>基极调幅</b>的工作原理。'
+        : '随着 U_bm 增大，I_C0、I_c1m、U_cm、P_=、P_o 和 P_c 也随之增加。')));
+}
+
+/* =========================================================================
+   控件绑定
+   ========================================================================= */
+function bind(id,fn){
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('input',fn);
+}
+function bindClick(id,fn){
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('click',fn);
+}
+function init(){
+  /* 3.3.1 */
+  ['sUbz','sGb','sGc','sUces','sGcr'].forEach(id=>bind(id,drawChar));
+  /* 3.3.2 */
+  ['sTh2','sIcm'].forEach(id=>bind(id,drawPulse));
+  bindClick('bTh120',()=>{document.getElementById('sTh2').value=120;drawPulse();});
+  bindClick('bTh80',()=>{document.getElementById('sTh2').value=80;drawPulse();});
+  bindClick('bTh60',()=>{document.getElementById('sTh2').value=60;drawPulse();});
+  bindClick('bTh40',()=>{document.getElementById('sTh2').value=40;drawPulse();});
+  /* 3.3.3 */
+  ['sTh3','sXi','sVcc3','sIcm3'].forEach(id=>bind(id,drawEta3));
+  /* 3.3.4 */
+  ['sRl4','sVcc4','sUcm4'].forEach(id=>bind(id,drawDyn));
+  /* 3.3.5 */
+  bind('sRl5',drawLoad);
+  bindClick('bRl5u',()=>{document.getElementById('sRl5').value=8;drawLoad();});
+  bindClick('bRl5c',()=>{document.getElementById('sRl5').value=loadPoint(2).Rlc;drawLoad();});
+  bindClick('bRl5o',()=>{document.getElementById('sRl5').value=40;drawLoad();});
+  /* 3.3.6 */
+  bind('sSweep',drawInf);
+  bindClick('btnVcc',()=>{INF_MODE='vcc';
+    document.getElementById('btnVcc').classList.add('on');
+    document.getElementById('btnVbb').classList.remove('on');
+    document.getElementById('btnUbm').classList.remove('on');
+    document.getElementById('sSweep').value=50;
+    drawInf();});
+  bindClick('btnVbb',()=>{INF_MODE='vbb';
+    document.getElementById('btnVcc').classList.remove('on');
+    document.getElementById('btnVbb').classList.add('on');
+    document.getElementById('btnUbm').classList.remove('on');
+    document.getElementById('sSweep').value=50;
+    drawInf();});
+  bindClick('btnUbm',()=>{INF_MODE='ubm';
+    document.getElementById('btnVcc').classList.remove('on');
+    document.getElementById('btnVbb').classList.remove('on');
+    document.getElementById('btnUbm').classList.add('on');
+    document.getElementById('sSweep').value=50;
+    drawInf();});
+  /* 初绘 */
+  drawChar();drawPulse();drawEta3();drawDyn();drawLoad();drawInf();
+}
+init();
+
+/* 例题答案核对（data-ex-answer / data-ex-tol） */
+document.querySelectorAll('[data-ex-check]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var box=btn.closest('details')||btn.parentElement;
+    var fields=Array.prototype.slice.call(box.querySelectorAll('[data-ex-answer]'));
+    var feedback=box.querySelector('[data-ex-feedback]');
+    if(fields.some(function(f){return f.value.trim()===''||!Number.isFinite(Number(f.value));})){
+      feedback.textContent='请先填写所有答案（数字），注意题目要求的单位。';
+      return;
+    }
+    var results=fields.map(function(f){
+      var pass=Math.abs(Number(f.value)-Number(f.dataset.exAnswer))<=Number(f.dataset.exTol);
+      return f.getAttribute('aria-label')+'：'+(pass?'✓ 正确':'需复查公式、折算系数或单位');
+    });
+    feedback.textContent=results.join('；');
+  });
+});
+</script>
+
+<!-- CH3-SELFCHECK:BEGIN -->
+<script>
+/* ================= 3.3 页末自检（独立复算 + 教材数值对撞） =================
+   教材出处：3.3 谐振功率放大器的折线分析法，书页 56 – 62
+   （式 3-5 ~ 3-29；教材例 3-2、例 3-3 的完整题解）
+   本段完全独立于页面脚本：不引用页面内部任何函数，
+   分解系数按式 (3-17) / (3-18) / (3-19) 重新实现，例题按教材给定条件整链重算。
+   ======================================================================== */
+(function(){
+  'use strict';
+  var ok=true, msg=[];
+  function chk(name,got,exp,tol){
+    var t=(tol===undefined)?Math.abs(exp)*1e-9+1e-12:tol;
+    var pass=Math.abs(got-exp)<=t; if(!pass) ok=false;
+    msg.push((pass?'PASS':'FAIL')+'  '+name+'   got='+got+'   exp='+exp);
+  }
+  function chkTrue(name,cond,detail){
+    var pass=!!cond; if(!pass) ok=false;
+    msg.push((pass?'PASS':'FAIL')+'  '+name+(detail?('   '+detail):''));
+  }
+  /* 离线闸门的 DOM 桩没有真实 DOM（querySelectorAll 恒返回 []、body.textContent 为空）
+   * → 依赖 DOM 的断言在离线桩下必然误报；按 AGENTS 的口径先判环境能力，不可用就 SKIP。 */
+  var HAS_STATIC=!!(document.body&&document.body.textContent&&document.body.textContent.length>50);
+  function T(id){ var e=document.getElementById(id); return e?e.textContent:''; }
+
+  var D2R=Math.PI/180;
+  /* 式 (3-17) α₀(θc) = (sin θc − θc cos θc) / [π(1 − cos θc)] */
+  function alpha0(th){
+    if(th<=0) return 0;
+    var c=Math.cos(th), s=Math.sin(th);
+    return (s-th*c)/(Math.PI*(1-c));
+  }
+  /* 式 (3-18) α₁(θc) = (θc − sin θc cos θc) / [π(1 − cos θc)] */
+  function alpha1(th){
+    if(th<=0) return 0;
+    var c=Math.cos(th), s=Math.sin(th);
+    return (th-s*c)/(Math.PI*(1-c));
+  }
+
+  /* =====================================================================
+     教材例 3-2（书页 60）
+     已知：V_CC = 30 V，P_o = 10 W，I_C0 = 400 mA，U_cm = 28 V
+     ===================================================================== */
+  var VCC2=30, PO2=10, IC02=0.4, UCM2=28;
+  var P2=VCC2*IC02;                              /* 式 (3-22) P_= = V_CC·I_C0 */
+  var eta2=PO2/P2;                               /* 式 (3-25) η_c = P_o/P_=    */
+  var Rp2=0.5*UCM2*UCM2/PO2;                     /* 式 (3-23) 反解 R_p        */
+  var Ic1m2=2*PO2/UCM2;                          /* 式 (3-23) 反解 I_c1m      */
+  var g12=Ic1m2/IC02;                            /* g₁ = I_c1m/I_C0           */
+  var xi2=UCM2/VCC2;                             /* 电压利用系数 ξ            */
+
+  chk('例3-2　P_= = V_CC·I_C0 = 30×0.4 = 12 W（式 3-22）', P2, 12, 1e-9);
+  chk('例3-2　η_c = P_o/P_= = 10/12 = 83.3%（式 3-25）', eta2*100, 83.3, 0.06);
+  chk('例3-2　R_p = 0.5·U_cm²/P_o = 0.5×28²/10 = 39.2 Ω', Rp2, 39.2, 1e-9);
+  chk('例3-2　I_c1m = 2P_o/U_cm = 20/28 = 0.714 A', Ic1m2, 0.714, 1e-3);
+  chk('例3-2　g₁ = I_c1m/I_C0 = 0.714/0.4 = 1.79', g12, 1.79, 5e-3);
+  chk('例3-2　ξ = U_cm/V_CC = 28/30 = 0.9333', xi2, 0.9333, 1e-4);
+  chk('例3-2　由 η_c = 0.5·ξ·g₁ 反解 g₁ = 1.7857', 2*eta2/xi2, 1.7857, 1e-3);
+  chk('例3-2　P_c = P_= − P_o = 2 W（式 3-24）', P2-PO2, 2, 1e-9);
+
+  /* 由 g₁ 连续反查 θc（教材按表查得 60°，表格分辨率为 5°~10°） */
+  var gd=1e9, gt=0, a0f, a1f;
+  for(var d=50; d<=70; d+=0.01){
+    var gv=alpha1(d*D2R)/alpha0(d*D2R);
+    if(Math.abs(gv-2*eta2/xi2)<gd){ gd=Math.abs(gv-2*eta2/xi2); gt=d; }
+  }
+  chkTrue('例3-2　由 g₁ 反查 θc ≈ 60°（教材答案）', Math.abs(gt-60)<=2,
+          '连续反查 '+gt.toFixed(2)+'°（教材按表取 60°）');
+
+  /* =====================================================================
+     教材例 3-3（书页 61）
+     已知：g_cr = 1 S，U_bz = 0.6 V，V_CC = 20 V，V_BB = −0.5 V，U_bm = 2.5 V，
+           I_CM = 2 A，工作于临界状态
+     ===================================================================== */
+  var gcr=1, UBZ=0.6, VCC3=20, VBB3=-0.5, UBM3=2.5, ICM3=2;
+  var Ucm3=VCC3-ICM3/gcr;                        /* 临界态 U_CES = U_cm       */
+  var cos3=(UBZ-VBB3)/UBM3;                      /* 式 (3-12) cos θc          */
+  var th3=Math.acos(cos3)/D2R;
+  var A03=alpha0(th3*D2R), A13=alpha1(th3*D2R);  /* 精确复算的 α₀ / α₁      */
+
+  chk('例3-3　U_cm = V_CC − I_CM/g_cr = 20 − 2/1 = 18 V', Ucm3, 18, 1e-9);
+  chk('例3-3　cos θc = (U_bz − V_BB)/U_bm = 0.44（式 3-12）', cos3, 0.44, 1e-9);
+  chk('例3-3　θc = arccos(0.44) = 63.90°', th3, 63.9, 0.05);
+  chk('例3-3　α₀(63.90°) 精确复算 = 0.2315（教材查表值 0.232）', A03, 0.232, 1e-3);
+  chk('例3-3　α₁(63.90°) 精确复算 = 0.4093（教材查表值 0.410）', A13, 0.410, 1.5e-3);
+
+  /* 教材题解用的是 63.9° 查表得到的 α₀ = 0.232、α₁ = 0.410，按此链复算应精确落在教材答案上 */
+  var IC03=ICM3*0.232, Ic1m3=ICM3*0.410;
+  chk('例3-3　I_C0 = I_CM·α₀ = 2×0.232 = 0.464 A（式 3-17）', IC03, 0.464, 1e-9);
+  chk('例3-3　I_c1m = I_CM·α₁ = 2×0.410 = 0.820 A（式 3-18）', Ic1m3, 0.820, 1e-9);
+  chk('例3-3　P_= = 20×0.464 = 9.28 W（式 3-22）', VCC3*IC03, 9.28, 1e-9);
+  chk('例3-3　P_o = 0.5×18×0.820 = 7.38 W（式 3-23）', 0.5*Ucm3*Ic1m3, 7.38, 1e-9);
+  chk('例3-3　η_c = 7.38/9.28 = 79.5%（式 3-25）', (0.5*Ucm3*Ic1m3)/(VCC3*IC03)*100, 79.5, 0.06);
+  chk('例3-3　R_p = 0.5×18²/7.38 = 21.95 Ω', 0.5*Ucm3*Ucm3/(0.5*Ucm3*Ic1m3), 21.95, 0.01);
+  chk('例3-3　P_c = 9.28 − 7.38 = 1.90 W（式 3-24）', VCC3*IC03-0.5*Ucm3*Ic1m3, 1.90, 1e-9);
+
+  /* 全精度链与教材末位取舍的差异（并列说明，不改教材结论） */
+  var P3e=VCC3*ICM3*A03, Po3e=0.5*Ucm3*ICM3*A13;
+  chkTrue('例3-3　全精度链的 P_= 与教材 9.28 W 差在末位取舍内',
+          Math.abs(P3e-9.28)<=0.03, '全精度 P_= '+P3e.toFixed(4)+' W');
+  chkTrue('例3-3　全精度链的 P_o 与教材 7.38 W 差在末位取舍内',
+          Math.abs(Po3e-7.38)<=0.03, '全精度 P_o '+Po3e.toFixed(4)+' W');
+  chkTrue('例3-3　全精度链的 η_c 与教材 79.5% 差在末位取舍内',
+          Math.abs((Po3e/P3e)*100-79.5)<=0.3, '全精度 η_c '+((Po3e/P3e)*100).toFixed(3)+'%');
+
+  /* =====================================================================
+     教材书页 58：α₁ 在 θc ≈ 120° 取最大值 0.536（3.3 节的图 3-6 结论）
+     ===================================================================== */
+  chk('α₁(120°) = 0.5363（教材印 0.536）', alpha1(120*D2R), 0.536, 6e-4);
+
+  /* =====================================================================
+     页面例题输入框的答案基准须与教材答案一致
+     ===================================================================== */
+  var got=[], fs2=document.querySelectorAll('[data-ex-answer]');
+  for(var i=0;i<fs2.length;i++){
+    got.push(parseFloat(fs2[i].getAttribute('data-ex-answer')));
+  }
+  var expAns=[12,83.3,39.2,0.714,1.79,60,18,0.464,0.820,9.28,7.38,79.5,21.95,1.90];
+  if(HAS_STATIC) chk('页面例题答案基准共 14 项（例 3-2 六项 + 例 3-3 八项）', got.length, expAns.length, 0);
+  for(var j=0; j<Math.min(got.length,expAns.length); j++){
+    chk('答案基准第 '+(j+1)+' 项 = '+expAns[j], got[j], expAns[j], 1e-9);
+  }
+
+  console.log(msg.join('\n'));
+  if(ok) document.title=document.title+' ✓';
+  else console.error('3.3 自检未通过');
+})();
+</script>
+<!-- CH3-SELFCHECK:END -->
+
+
+
+
+</body>
+</html>

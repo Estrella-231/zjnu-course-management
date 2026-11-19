@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>原理讲解 · 3.4 谐振功率放大电路</title>
+<style>
+:root{
+  --ink:#1a1a1a; --mut:#6b6b6b; --line:#1f1f1f; --soft:#e9ecef;
+  --blue:#1a46b5; --red:#c02020; --green:#0d7a3c; --amber:#c07a00; --violet:#7a3fb0;
+  --bg:#fbfbf9; --card:#fff; --bd:#d8d8d2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC","Source Han Sans SC",sans-serif;
+  line-height:1.75;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px}
+header{background:linear-gradient(135deg,#12233f,#2a4a7d);color:#fff;padding:52px 0 44px;margin-bottom:36px}
+header .wrap{padding-bottom:0}
+.kicker{font-size:13px;letter-spacing:.22em;opacity:.72;margin:0 0 10px}
+h1{font-size:34px;margin:0 0 12px;line-height:1.3;font-weight:700}
+.sub{font-size:16px;opacity:.85;max-width:820px;margin:0}
+.meta{margin-top:22px;font-size:13px;opacity:.7;display:flex;gap:22px;flex-wrap:wrap}
+h2{font-size:23px;margin:52px 0 6px;padding-bottom:10px;border-bottom:2px solid var(--ink);font-weight:700}
+h2 .num{color:var(--blue);margin-right:10px}
+h3{font-size:17px;margin:28px 0 10px;color:#234}
+p{margin:10px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px 24px;margin:18px 0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+svg{width:100%;height:auto;display:block;background:#fff;border-radius:6px}
+.cap{font-size:13px;color:var(--mut);text-align:center;margin-top:8px}
+svg text{font-family:"Microsoft YaHei",sans-serif}
+.badge{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;background:#eef2f8;color:#234;margin-right:6px}
+kbd{background:#eef0f2;border:1px solid #ccd0d4;border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-size:13px;
+  font-family:Consolas,monospace}
+.formula{background:#f6f7f5;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;
+  font-family:"Cambria Math","Times New Roman",serif;font-size:17px;overflow-x:auto}
+.formula .no{float:right;color:var(--mut);font-size:14px}
+.ctrls{display:flex;flex-wrap:wrap;gap:26px;background:#f2f4f7;border:1px solid var(--bd);
+  border-radius:8px;padding:16px 20px;margin:16px 0}
+.ctrl{flex:1 1 210px}
+.ctrl label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.ctrl .row{display:flex;align-items:center;gap:10px}
+.ctrl input[type=range]{flex:1;accent-color:var(--blue);height:20px}
+.ctrl .val{font-family:Consolas,monospace;font-size:14px;font-weight:700;color:var(--blue);min-width:74px;text-align:right}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:16px 0}
+.ro{background:#fff;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:6px;padding:10px 14px}
+.ro .k{font-size:12px;color:var(--mut)}
+.ro .v{font-family:Consolas,monospace;font-size:19px;font-weight:700;color:var(--ink)}
+.ro.g{border-left-color:var(--green)} .ro.g .v{color:var(--green)}
+.ro.r{border-left-color:var(--red)} .ro.r .v{color:var(--red)}
+.ro.a{border-left-color:var(--amber)} .ro.a .v{color:var(--amber)}
+canvas{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--bd);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th,td{border:1px solid var(--bd);padding:8px 11px;text-align:left}
+th{background:#f2f4f7;font-weight:700}
+td.n{font-family:Consolas,monospace;white-space:nowrap}
+ul,ol{padding-left:24px}li{margin:7px 0}
+.hl{background:#fff6d8;padding:1px 4px;border-radius:3px;font-weight:600}
+.warn{background:#fff4f4;border-left:3px solid var(--red);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.steps{display:grid;gap:9px;margin:14px 0}
+.st{background:#f7f9fc;border-left:3px solid var(--blue);padding:10px 15px;border-radius:0 6px 6px 0;font-size:14.5px}
+.st b{color:var(--blue);margin-right:6px}
+.mono{font-family:Consolas,"Microsoft YaHei",monospace;background:#eef2f8;color:#12306e;
+      padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px;font-size:14px}
+.note{background:#f4f8ff;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.sym{font-size:14px;margin:12px 0}
+.sym td:first-child{width:120px}
+.why{display:block;margin-top:8px;font-size:13.5px;color:#444;line-height:1.72}
+.why::before{content:"↳ ";color:var(--amber);font-weight:700}
+.live{background:#fffaf0;border:1px dashed var(--amber);border-radius:8px;padding:13px 18px;margin:16px 0;font-size:14.5px}
+.live b{color:#9a5c00}
+.live .mono{background:#fff;margin-top:2px;margin-bottom:2px}
+.kv{font-family:Consolas,monospace;background:#eef2f8;color:#12306e;padding:1px 7px;border-radius:4px;font-size:14px}
+.eqno{color:var(--mut);font-size:12.5px;margin-left:6px;white-space:nowrap}
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);font-size:13px;color:var(--mut)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:8px 0 2px;align-items:center}
+.legend i{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:6px}
+button{font-family:inherit;font-size:14px;padding:7px 16px;border:1px solid var(--bd);background:#fff;
+  border-radius:6px;cursor:pointer;margin-right:8px}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* ==== 数学排版（ch3_fracify 注入） ==== */
+/* ==================== 数学排版：堆叠分式 / 根号 ====================
+   教材的分式、根号都是竖排写法，这里用纯 CSS 还原（不引外部字体/库）。
+   .frac  > .fn 分子 / .fd 分母（.fd 上边框即分式横线）
+   .sqrt > .sgn 根号 / .rad 被开方数（.rad 上边框即根号横线）
+   .fb 是视觉隐藏的 "/"：复制粘贴得到线性写法，静态抄写检查也靠它还原 */
+.mt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif}
+td.n.mt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;white-space:normal}
+.frac,.sqrt{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif}
+.frac{display:inline-flex;flex-direction:column;align-items:stretch;position:relative;
+  margin:0 .2em;padding:0 .03em;text-align:center;line-height:1.15;vertical-align:middle}
+.frac>.fn{padding:0 .24em .04em}
+.frac>.fd{padding:.04em .24em 0;border-top:1px solid currentColor}
+.frac>.fb{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sqrt{display:inline-block;white-space:nowrap}
+.sqrt>.sgn{display:inline-block}
+.sqrt>.rad{display:inline-block;border-top:1px solid currentColor;
+  padding:0 .18em 0 .34em;margin-left:-.2em}
+/* 被开方数里含堆叠分式时，根号要罩住整个分式（照教材的写法）：
+   字形 "√" 罩不住两行高的分式，改用 mask 画一个**可任意拉伸**的钩，
+   SVG 直接写在 data URI 里 —— 页面仍然完全自包含，不引用任何外部资源。
+   横线（根号顶上的那一条）仍由 .rad 的上边框给出；
+   钩的笔画用普通 stroke（不加 non-scaling-stroke），随字号一起缩放。 */
+.sqrt.tall{display:inline-flex;align-items:stretch;vertical-align:middle}
+.sqrt.tall>.sgn{flex:0 0 auto;position:relative;width:.42em;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 100' preserveAspectRatio='none'><path d='M1 99 L6.5 82 L11 2' fill='none' stroke='black' stroke-width='4.5'/></svg>") no-repeat center/100% 100%;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 100' preserveAspectRatio='none'><path d='M1 99 L6.5 82 L11 2' fill='none' stroke='black' stroke-width='4.5'/></svg>") no-repeat center/100% 100%}
+.sqrt.tall>.sgn>.sg{position:absolute;left:0;top:0;font-size:0;line-height:0}
+.sqrt.tall>.rad{flex:0 0 auto;border-top:1px solid currentColor;padding:0 .18em 0 .06em}
+
+</style>
+<style id="pub-mobile">.pub-tw{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;min-width:0;margin:14px 0}.pub-tw table{width:auto;max-width:none}.pub-tw::-webkit-scrollbar{height:8px}.pub-tw::-webkit-scrollbar-thumb{background:#c9c9c0;border-radius:4px}@media (max-width:760px){.pub-tw>table{width:max-content;min-width:100%}}img{max-width:100%;height:auto}canvas{max-width:100%;height:auto}pre{overflow-x:auto;max-width:100%}body{overflow-wrap:anywhere;}code{overflow-wrap:anywhere;word-break:break-word}</style><style id="pub-mobile-css">/* ============================================================================
+   移动端适配样式（build/mobile.css，由 build.js 内联进每个页面）
+   ----------------------------------------------------------------------------
+   背景：共享样式里 `svg{width:100%;height:auto}` 是**等比缩放**——
+   800×210 的框图在 390px 手机上只剩 281px 宽，缩放 0.35，
+   9.8px 的图内标注实际渲染只有 **3.4~5px**，完全看不清。
+
+   方案：宽图由 runtime（build/mobile.js）包进 .fig 横滑容器并按 **1:1** 渲染，
+        文字保持设计字号；容器内左右滑动看全图。
+   ⚠ 桌面端零影响：包裹动作只在「图宽 > 视口宽」时触发，
+     视口够宽时页面 DOM 与样式与改造前完全一致。
+
+   规则清单：
+     ① .figwrap/.fig     宽图横滑容器 + 滑动提示 + 两侧渐隐阴影
+     ② .tbl-wrap         表格横滑（窄屏下按内容宽度排版，不压扁列）
+     ③ 触控尺寸          pointer:coarse 时放大滑块/按钮
+     ④ .mvis-lb-*        点图全屏灯箱（双指缩放 / 拖动平移 / 双击放大）
+   ========================================================================== */
+
+/* ---------- ① 宽图横滑 ---------- */
+/* ⚠ min-width:0 / max-width:100% 不能省：
+   .figwrap 常处在 flex / grid 卡片里，而 flex 项的默认 min-width:auto 会让它
+   **不肯收缩到内容宽度以下** —— SVG 按 1:1 渲染后（如 902px 宽的框图），
+   容器不肯缩 → 卡片被撑到 902px → 整页被顶出横向滚动条。
+   允许收缩后，.fig 自己的 overflow-x:auto 接管横滑，页面不再溢出。 */
+.figwrap{margin:12px 0;min-width:0;max-width:100%;
+  /* contain:inline-size：让本盒子的**行内尺寸不再由内容决定** →
+     它在父级（grid/flex 卡片）里的 min-content 贡献降为 0。
+     ⚠ 这是关键的一步：grid 项默认 min-width:auto = 内容最小宽度，
+     1:1 渲染的宽图（如 432px 的 SVG）会把卡片撑到 470px → 整页横向溢出。
+     min-width:0 只能让**自己**收缩，压不住父级由内容撑开的宽度。 */
+  contain:inline-size;
+}
+.fig{
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  background:#fff;border:1px solid var(--bd,#d8d8d2);border-radius:8px;
+  scrollbar-width:thin;min-width:0;max-width:100%;
+}
+.fig>svg{
+  width:auto;max-width:none;display:block;margin:0 auto;
+  background:#fff;border-radius:0;
+}
+/* 可横滑时两侧加渐隐阴影，提示「还有内容」 */
+.figwrap.is-scroll>.fig{
+  box-shadow:inset 16px 0 14px -16px rgba(0,0,0,.30),
+             inset -16px 0 14px -16px rgba(0,0,0,.30);
+}
+.fighint{display:none;font-size:12px;color:var(--mut,#6b6b6b);text-align:center;margin-top:6px;}
+.figwrap.is-scroll>.fighint{display:block;}
+/* 提示条上的「放大」按钮 */
+.fighint button{
+  font:inherit;font-size:12px;margin:0 0 0 10px;padding:3px 10px;
+  border:1px solid var(--bd,#d8d8d2);border-radius:12px;background:#fff;color:var(--blue,#1a46b5);
+  vertical-align:baseline;
+}
+
+/* ---------- ①·b grid / flex 子项允许收缩 ----------
+   grid 项与 flex 项的默认 min-width:auto = **内容最小宽度**，
+   里面放了 1:1 渲染的宽图（SVG 宽 778px）时，项不肯缩到轨道宽以下 →
+   卡片被撑破 → 整页横向滚动条。
+   下面的容器清单由 scratch/survey_grid_classes.js 从发布目录**实测**得出
+   （谁声明了 display:grid/flex 就收谁），不是拍脑袋写的。 */
+.grid2>*,.grid3>*,.grid4>*,.grid>*,.grid12>*,.grid21>*,.irow>*,
+.cols2>*,.cols3>*,.readout>*,.meta>*,.ctrls>*,.ctrl .row>*,.steps>*,
+.legend>*,.frac>*,.badge-row>*,.eyebrow>*,.meta-row>*,.sec-head>*,
+.purpose>*,.widget-h>*,.btnrow>*,.flow>*,.kv>*,.readouts>*,.item>*,
+.buttons>*,.tabs>*,.presets>*,.symrow>*,.wave-trio>*,.bench>*{min-width:0}
+
+/* ---------- ② 表格横滑 ---------- */
+/* 章节样式里通常已有 .tbl-wrap；这里补一份兜底，
+   窄屏下让表格按内容宽度排布（不把列压成一条缝），超宽时横滑。 */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;max-width:100%;}
+@media (max-width:760px){
+  .tbl-wrap>table{width:max-content;min-width:100%;}
+}
+
+/* ---------- ②·b Canvas 自适应 ----------
+   canvas 用 width/height **属性**定死像素尺寸（如 width="640"），
+   在窄屏上就是一块不肯收缩的替换元素 → 连带把卡片与整页撑破
+   （实测某页 canvas 432px 宽，卡片被撑到 470px）。
+   max-width:100% + height:auto 让它等比缩小（只改显示尺寸，
+   不动画布的绘制分辨率，页面脚本读 canvas.width 不受影响）。 */
+canvas{max-width:100%;height:auto;}
+
+/* ---------- ③ 触控尺寸 ---------- */
+@media (pointer:coarse){
+  input[type=range]{height:34px;margin:2px 0;}
+  input[type=range]::-webkit-slider-thumb{width:26px;height:26px;}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border:0;}
+  button{min-height:40px;padding:9px 18px;}
+  .ctrl .val{font-size:15px;}
+  .fighint{font-size:12.5px;}
+}
+
+/* ---------- ④ 全屏灯箱 ---------- */
+.mvis-lb{
+  position:fixed;inset:0;z-index:99999;background:rgba(10,14,24,.96);
+  display:none;flex-direction:column;touch-action:none;overscroll-behavior:contain;
+}
+.mvis-lb.on{display:flex;}
+.mvis-lb-stage{
+  flex:1 1 auto;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.mvis-lb-zoom{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  transform-origin:center center;will-change:transform;
+}
+.mvis-lb-zoom>svg{
+  width:100%;height:100%;max-width:none;max-height:none;
+  background:transparent;border-radius:0;
+}
+.mvis-lb-bar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  background:#101828;color:#e8eef9;font-size:14px;
+}
+.mvis-lb-bar button{
+  background:#1e2c47;color:#e8eef9;border:1px solid #34456b;border-radius:8px;
+  min-width:46px;min-height:42px;margin:0;padding:8px 14px;font-size:16px;
+}
+.mvis-lb-bar button:active{background:#2a3c60;}
+.mvis-lb-tip{width:100%;text-align:center;color:#93a4c4;font-size:12px;}
+.mvis-lb-x{
+  position:absolute;top:8px;right:10px;z-index:2;
+  background:rgba(30,44,71,.9);color:#e8eef9;border:1px solid #34456b;
+  border-radius:8px;min-width:42px;min-height:42px;margin:0;font-size:18px;
+}
+/* 桌面端灯箱按钮不需要那么大的触控区 */
+@media (pointer:fine){
+  .mvis-lb-bar button{min-height:34px;font-size:14px;padding:6px 12px;}
+  .mvis-lb-x{min-height:34px;min-height:34px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="kicker">通信电子线路（第 3 版 · 陈启兴） 第 3 章 高频功率放大器</p>
+    <h1>3.4　谐振功率放大电路</h1>
+    <p class="sub">谐振高频功率放大电路由输入回路、有源器件和输出回路组成，输入/输出回路负责直流偏置、滤波与阻抗匹配。
+      本页按教材 3.4 节的顺序，把直流馈电电路（图 3-13 集电极串/并馈、图 3-14 基极串/并馈、图 3-15 基极自给反向偏置）、
+      匹配网络（图 3-16 的 L / 高阻变低阻 L / T / π 四种基本网络）与两个实际电路
+      （图 3-17　50 MHz / 25 W / 3DK208B，图 3-18　175 MHz / 10 W / VMOS DV1210）全部拆开重绘，
+      馈电方式、匹配网络与电路卡片都可切换、可重算。</p>
+    <div class="meta">
+      <span>教材页码：书页 65 – 70（PDF 页 77 – 82）</span>
+      <span>图 3-13 ~ 图 3-18</span>
+      <span>交互：集电极串/并馈切换、匹配网络四态切换、图 3-17 / 3-18 切换，结论实时重算</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===================== 1 引言 ===================== -->
+<h2><span class="num">1</span>引言：三大组成、两大功能</h2>
+
+<p>谐振高频功率放大电路由<span class="hl">输入回路</span>、<span class="hl">有源器件</span>（如晶体管、场效应管）和
+  <span class="hl">输出回路</span>组成。输入回路、输出回路的作用是为晶体管提供所需的<span class="hl">直流偏置</span>，
+  实现<span class="hl">滤波</span>和<span class="hl">阻抗匹配</span>。</p>
+
+<svg id="svgIntro" viewBox="0 0 960 270" role="img" aria-label="谐振高频功率放大电路的三大组成：输入回路、有源器件、输出回路">
+  <defs>
+    <marker id="arrIntro" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 Z" fill="#1a46b5"></path>
+    </marker>
+  </defs>
+  <rect x="30" y="46" width="240" height="86" rx="10" fill="#eef2f8" stroke="#1a46b5" stroke-width="1.8"></rect>
+  <text x="150" y="82" font-size="19" text-anchor="middle" fill="#12306e" font-weight="bold">输入回路</text>
+  <text x="150" y="110" font-size="14" text-anchor="middle" fill="#444">馈送基极直流偏置</text>
+  <rect x="360" y="46" width="240" height="86" rx="10" fill="#fdf3f3" stroke="#c02020" stroke-width="1.8"></rect>
+  <text x="480" y="82" font-size="19" text-anchor="middle" fill="#b91c1c" font-weight="bold">有源器件</text>
+  <text x="480" y="110" font-size="14" text-anchor="middle" fill="#444">晶体管 / 场效应管</text>
+  <rect x="690" y="46" width="240" height="86" rx="10" fill="#eef8f0" stroke="#0d7a3c" stroke-width="1.8"></rect>
+  <text x="810" y="82" font-size="19" text-anchor="middle" fill="#0d7a3c" font-weight="bold">输出回路</text>
+  <text x="810" y="110" font-size="14" text-anchor="middle" fill="#444">集电极馈电 + 谐振回路</text>
+  <line x1="278" y1="89" x2="352" y2="89" stroke="#1a46b5" stroke-width="2" marker-end="url(#arrIntro)"></line>
+  <line x1="608" y1="89" x2="682" y2="89" stroke="#1a46b5" stroke-width="2" marker-end="url(#arrIntro)"></line>
+  <text x="315" y="74" font-size="13" text-anchor="middle" fill="#1a46b5">u<tspan baseline-shift="sub" font-size="10">i</tspan></text>
+  <text x="645" y="74" font-size="13" text-anchor="middle" fill="#1a46b5">u<tspan baseline-shift="sub" font-size="10">o</tspan></text>
+  <rect x="30" y="168" width="450" height="76" rx="8" fill="#fffaf0" stroke="#c07a00" stroke-width="1.4" stroke-dasharray="6 4"></rect>
+  <text x="255" y="199" font-size="16" text-anchor="middle" fill="#9a5c00" font-weight="bold">输入回路 / 输出回路的作用（一）</text>
+  <text x="255" y="227" font-size="14.5" text-anchor="middle" fill="#444">为晶体管提供所需的<tspan font-weight="bold">直流偏置</tspan></text>
+  <rect x="480" y="168" width="450" height="76" rx="8" fill="#fffaf0" stroke="#c07a00" stroke-width="1.4" stroke-dasharray="6 4"></rect>
+  <text x="705" y="199" font-size="16" text-anchor="middle" fill="#9a5c00" font-weight="bold">输入回路 / 输出回路的作用（二）</text>
+  <text x="705" y="227" font-size="14.5" text-anchor="middle" fill="#444">实现<tspan font-weight="bold">滤波</tspan>与<tspan font-weight="bold">阻抗匹配</tspan></text>
+</svg>
+<p class="cap">图 3-12（示意）　谐振高频功率放大电路的三大组成与两大功能（据教材 书页 65 / PDF 77 的引言段整理）</p>
+
+<div class="note">
+  <b>本节脉络：</b>下面分别讨论直流馈电电路和输入回路、输出回路。
+  直流馈电电路决定电路的工作状态（必须落在丙类），匹配网络决定能否把功率高效地送到负载上，
+  最后用两个实际电路（图 3-17 / 图 3-18）把两者串起来看。
+</div>
+
+<!-- ===================== 2 直流馈电电路 ===================== -->
+<h2><span class="num">2</span>3.4.1　直流馈电电路</h2>
+
+<p>谐振高频功率放大器的工作状态是由<span class="hl">直流馈电电路</span>确定的。谐振高频功率放大器需要工作于丙类状态，
+  必须有相应的直流馈电电路。直流馈电电路是指把直流电源馈送到晶体管各极的电路，它包括
+  <span class="hl">集电极馈电电路</span>和<span class="hl">基极馈电电路</span>两部分。无论是哪一部分的馈电电路，
+  都有<span class="hl">串联馈电（简称串馈）</span>和<span class="hl">并联馈电（简称并馈）</span>两种方式。</p>
+
+<h3>2.1　集电极馈电电路（图 3-13）</h3>
+
+<p>集电极直流馈电电路是为放大器提供输入功率的。集电极电流中，直流分量产生了集电极损耗，基波分量转化为输出功率。
+  典型的集电极馈电电路如教材图 3-13 所示。</p>
+
+<div class="card">
+  <h3>交互：图 3-13 集电极串馈 / 并馈 —— 按钮切换，结论实时重算</h3>
+  <div class="ctrls" id="feedBtns">
+    <div class="ctrl">
+      <label>集电极馈电方式（教材图 3-13(a) / (b)）</label>
+      <div class="row">
+        <button type="button" data-mode="series" class="on" onclick="setFeed('series')">(a) 串馈</button>
+        <button type="button" data-mode="parallel" onclick="setFeed('parallel')">(b) 并馈</button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label>两者不变的部分（教材口径）</label>
+      <div class="row"><span class="kv">直流通路完全相同：V_CC 全部加到集电极，电源一端接地</span></div>
+    </div>
+  </div>
+  <svg id="svgFeed" viewBox="0 0 1000 430" role="img" aria-label="图 3-13 集电极馈电电路：串馈与并馈"></svg>
+  <p class="cap" id="capFeed">图 3-13　集电极馈电电路</p>
+  <div class="readout">
+    <div class="ro"><div class="k">谐振回路的直流电位</div><div class="v" id="roFeedPot">—</div></div>
+    <div class="ro g"><div class="k">回路电容 C 能否直接接地</div><div class="v" id="roFeedCap">—</div></div>
+    <div class="ro a"><div class="k">本方式需配的元件</div><div class="v" id="roFeedParts">—</div></div>
+    <div class="ro r"><div class="k">电路板安装 / 装调</div><div class="v" id="roFeedStab">—</div></div>
+  </div>
+  <div class="readout">
+    <div class="ro"><div class="k">对照：另一种方式（<span id="roFeedOther">并馈</span>）的谐振回路直流电位</div><div class="v" id="roFeedPot2">—</div></div>
+    <div class="ro g"><div class="k">对照：回路电容 C 能否直接接地</div><div class="v" id="roFeedCap2">—</div></div>
+    <div class="ro a"><div class="k">对照：需配的元件</div><div class="v" id="roFeedParts2">—</div></div>
+  </div>
+  <div class="live" id="liveFeed"><b>实时结论：</b><span class="kv">—</span></div>
+</div>
+
+<p><b>串馈</b>是指直流电源、匹配网络（谐振回路）和功率管三者<span class="hl">串联</span>连接的一种馈电方式，如教材图 3-13(a)。
+  图中，谐振于信号中心频率的并联谐振回路作为集电极负载，高频扼流线圈 ZL 对交流信号相当于开路、对直流短路；
+  滤波电容 C<sub>p</sub> 对交流信号相当于短路。</p>
+
+<p><b>并馈</b>是指直流电源、匹配网络（谐振回路）和功率管三者<span class="hl">并联</span>连接的一种馈电方式，如教材图 3-13(b)。
+  图中有并联 LC 谐振回路、高频扼流线圈 ZL 和滤波电容 C<sub>p</sub>、C<sub>c</sub>。</p>
+
+<div class="warn">
+  <b>串馈 vs 并馈，唯一的关键差别：</b>从图 3-13 可以看出，无论是串馈还是并馈电路，它们的直流通路完全相同，
+  V<sub>CC</sub> 都全部加到集电极上，它们的直流电源的一端都接地，以克服电源对地分布电容的影响。
+  二者的不同<b>仅在于匹配网络（谐振回路）的接入方式</b>：
+  串馈电路的谐振回路处于直流高电位，电容 C <b>不能直接接地</b>；
+  并馈电路的谐振回路处于直流低电位，电容 C <b>可以直接接地</b>，因此在电路板上安装时比串馈电路方便，而且电路更加稳定。
+</div>
+
+<h3>2.2　基极馈电电路（图 3-14）</h3>
+
+<p>基极馈电电路也有串馈与并馈两种方式，如教材图 3-14 所示。图 3-14(a) 所示为串馈电路，其直流馈电电路与
+  <span class="hl">输入信号源串联</span>连接；图 3-14(b) 所示为并馈电路，其直流馈电电路与
+  <span class="hl">输入信号源并联</span>连接。</p>
+
+<p>为了保证谐振功放工作于丙类状态，晶体管基极可加小于导通电压 U<sub>bz</sub> 的正偏压或加负偏压。
+  图 3-14(a) 所示的串馈电路中，C<sub>p</sub> 为滤波电容；图 3-14(b) 所示的并馈电路中，
+  ZL 为高频扼流线圈，C<sub>b</sub> 为隔直电容，C<sub>p</sub> 为滤波电容。</p>
+
+<div class="card">
+  <h3>图 3-14　基极馈电电路：(a) 串馈　(b) 并馈</h3>
+  <svg id="svgBase14" viewBox="0 0 960 395" role="img" aria-label="图 3-14 基极馈电电路：串馈与并馈"></svg>
+  <p class="cap">图 3-14　基极馈电电路（按教材原图用标准库重绘）</p>
+  <div class="note">
+    <b>对比记忆：</b>集电极馈电串 / 并联的是<b>直流电源、谐振回路与功率管三者</b>；
+    基极馈电串 / 并联的是<b>馈电支路与输入信号源</b>。两种说法都叫「串馈 / 并馈」，别混。
+  </div>
+</div>
+
+<h3>2.3　基极自给反向偏置电路（图 3-15）</h3>
+
+<p>由于图 3-14 所示电路中采用一个独立电源实现偏置很不方便，因此，在负偏置的丙类谐振功率放大器中，
+  一般采用图 3-15 所示的<span class="hl">基极自偏压电路</span>（又称自给偏置电路）。</p>
+
+<div class="card">
+  <h3>图 3-15　基极自给反向偏置电路：(a) 基极电流产生偏置　(b) 发射极电流产生偏置</h3>
+  <svg id="svgBase15" viewBox="0 0 960 405" role="img" aria-label="图 3-15 基极自给反向偏置电路"></svg>
+  <p class="cap">图 3-15　基极自给反向偏置电路（按教材原图用标准库重绘）</p>
+</div>
+
+<p>图 3-15(a) 所示的是利用基极电流 I<sub>B</sub>(t) 的直流分量 I<sub>B0</sub> 在 R<sub>b</sub> 上产生所需的负偏压，
+  并通过高频扼流线圈 ZL 加到基极上，使发射结静态工作点：</p>
+
+<div class="formula">U<sub>BEQ</sub> = −I<sub>B0</sub>R<sub>b</sub></div>
+
+<p>图 3-15(b) 所示的是利用 I<sub>E</sub> 的直流分量 I<sub>E0</sub> 在 R<sub>e</sub> 上产生所需的负偏压，
+  并通过高频扼流线圈 ZL 加到基极上，使：</p>
+
+<div class="formula">U<sub>BEQ</sub> = −I<sub>E0</sub>R<sub>e</sub></div>
+
+<p>这种自给偏置的基极馈电电路，其优点主要是放大器能够<span class="hl">自动维持放大器的工作稳定性</span>。
+  当输入信号的振幅加大时，发射结的反向偏置电压的绝对值加大；当输入信号的振幅减小时，
+  发射结的反向偏置电压的绝对值减小。因此，就算输入信号的幅度波动比较大，放大器的工作状态变化并不大。</p>
+
+<!-- ===================== 3 匹配网络 ===================== -->
+<h2><span class="num">3</span>3.4.2　匹配网络</h2>
+
+<h3>3.1　输出匹配网络（图 3-16）</h3>
+
+<p>在高频谐振功率放大器中，为了满足输出功率和效率的要求，并有较高的功率增益，
+  除正确选择放大器的工作状态外，还必须<span class="hl">正确设计输出匹配网络</span>。
+  根据谐振高频功率放大器所处的位置不同，其匹配网络常被分为输入、输出和级间匹配网络 3 种：
+  输入匹配网络用于信号源与放大器之间，输出匹配网络用于放大器与负载之间，
+  级间匹配网络用于放大器的推动级与输出级之间。这 3 种匹配网络都可以采用由电感 L 和电容 C 组成的
+  L 型、π 型或 T 型的基本网络，如教材图 3-16 所示。</p>
+
+<div class="card">
+  <h3>交互：图 3-16 基本型匹配网络 —— 按钮切换四种基本网络</h3>
+  <div class="ctrls" id="matchBtns">
+    <div class="ctrl">
+      <label>基本型匹配网络（教材图 3-16(a)~(d)）</label>
+      <div class="row">
+        <button type="button" data-mode="l1" class="on" onclick="setMatch('l1')">(a) L 型</button>
+        <button type="button" data-mode="l2" onclick="setMatch('l2')">(b) 高阻变低阻 L 型</button>
+        <button type="button" data-mode="t" onclick="setMatch('t')">(c) T 型</button>
+        <button type="button" data-mode="pi" onclick="setMatch('pi')">(d) π 型</button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label>元件记号（教材图 3-16）</label>
+      <div class="row"><span class="kv">X<sub>i</sub>（i = 1～5）表示电抗：纯电感或电容，或电感/电容与电阻的串联或并联</span></div>
+    </div>
+  </div>
+  <svg id="svgMatch" viewBox="0 0 960 310" role="img" aria-label="图 3-16 基本型匹配网络电路"></svg>
+  <p class="cap" id="capMatch">图 3-16　基本型匹配网络电路</p>
+  <div class="readout">
+    <div class="ro"><div class="k">电抗元件数</div><div class="v" id="roMatchN">—</div></div>
+    <div class="ro a"><div class="k">串联臂（串臂）</div><div class="v" id="roMatchS">—</div></div>
+    <div class="ro g"><div class="k">并联臂（并臂）</div><div class="v" id="roMatchP">—</div></div>
+    <div class="ro r"><div class="k">阻抗变换方向</div><div class="v" id="roMatchDir">—</div></div>
+  </div>
+  <div class="live" id="liveMatch"><b>实时结论：</b><span class="kv">—</span></div>
+</div>
+
+<p>在图 3-16 中，X<sub>i</sub> 和 i = 1～5 表示电抗。它可以是一个纯电感或电容，也可以是电感或电容与电阻的串联或并联。
+  在实际应用中，可以对 π 型匹配网络适当地增减，比如删除 X<sub>1</sub>、X<sub>5</sub>、X<sub>2</sub>、X<sub>3</sub> 和 X<sub>4</sub>。</p>
+
+<div class="note">
+  <b>设计输出匹配网络要满足以下两个条件：</b>
+  <br>（1）匹配网络的<span class="hl">谐振频率等于输入信号的中心频率</span>，实现滤波；
+  <br>（2）<span class="hl">阻抗匹配</span>。
+</div>
+
+<p>根据这两个条件，可以列出由两个方程组成的方程组。显然，如果匹配网络的元器件刚好两个，则该方程组有
+  <span class="hl">唯一解</span>；如果匹配网络的元器件超过两个，则有无数个解。对于元器件数目超过两个的情况，
+  可以先把超过两个的元器件的参数选择一个确定值，其实就是选择一些固定值元器件，比如固定值的电阻、电感、电容，
+  然后再解方程组，得到一个解。当然，这个解只是一个理论值或指导值，在实际工作中需要适当处理。
+  比如，解出的某电容值为 25.8 pF，就可以用一个 20 pF 的固定电容和一个 10 pF 的可调电容并联处理，
+  这样，既可以方便购买元器件，又可以在调试的时候容易达到预期目的。</p>
+
+<h3>3.2　输入回路和级间耦合网络</h3>
+
+<p>上面讨论的输出回路主要用于高频谐振功率放大器的末级，要求尽量大的输出功率和集电极效率。
+  末级之前的各级（主振级除外）都叫作中间级，尽管这些中间级可以作为缓冲、倍频、电压放大或功率放大等不同电路，
+  但是它们的集电极回路都是用来为下一级提供激励功率的。这些回路就叫作
+  <span class="hl">级间耦合网络</span>，对于下一级来说，它们就是输入回路。
+  因此，在下面的讨论中，没有区分输入回路和级间耦合网络。</p>
+
+<p>由于高频谐振功率放大器的末级与中间级的输入信号电平、工作状态和负载往往不同，所以对它们的要求也就不同。
+  对于末级电路来说，应该力求输出功率大、集电极效率高。正常情况下，末级的负载（如天线、传输线）是不变的，
+  因而可以使集电极回路匹配，并使末级电路工作在临界状态，以获得最大的输出功率和比较高的集电极效率。
+  但是，对于中间级来说，情况就不同了：中间级的负载是下一级的输入阻抗，
+  它的值随着激励电压的大小和电子元器件本身工作状态的变化而变化，
+  这就使得级间耦合网络的等效阻抗发生变化，从而引起中间级放大电路工作状态的变化。
+  如果中间级工作在欠压状态，则其输出电压将不稳定，这是下一级电路不希望的。
+  因为，对中间级来说，最重要的是应该保证输出电压稳定，以供给下一级稳定的激励电压，集电极效率则降为次要问题。
+  事实上，因为中间级工作低电平，集电极效率会低一些，所以对整个系统来说影响不大。</p>
+
+<div class="card">
+  <h3>中间级保证输出电压稳定的两条措施</h3>
+  <div class="steps">
+    <div class="st"><b>1</b>中间级放大器工作于<span class="hl">过压状态</span>。此时，它等效为一个恒压源，
+      其输出电压几乎不会随负载的变化而变化。尽管下一级的输入阻抗可能会变化，但是下一级得到的激励电压仍然是稳定的。</div>
+    <div class="st"><b>2</b>降低级间耦合网络的效率。耦合回路的效率降低，意味着它本身的损耗加大，
+      使得下一级的阻抗对耦合回路的阻抗的影响减小，也就是削弱了下一级电路对本级电路工作状态的影响。
+      中间级耦合回路的效率一般取 <span class="hl">0.1～0.5</span>，也就是中间级的输出功率应该是下一级所需功率的
+      <span class="hl">2～10 倍</span>。</div>
+  </div>
+</div>
+
+<p>匹配网络在谐振高频功率放大器中非常重要。如果匹配网络设计和调整得好，就能够保证谐振高频功率放大器工作于最佳状态。</p>
+
+<!-- ===================== 4 实际电路举例 ===================== -->
+<h2><span class="num">4</span>3.4.3　实际电路举例</h2>
+
+<div class="card">
+  <h3>交互：图 3-17 / 图 3-18 两个实际电路 —— 按钮切换</h3>
+  <div class="ctrls" id="cardBtns">
+    <div class="ctrl">
+      <label>实际电路（教材 3.4.3 节）</label>
+      <div class="row">
+        <button type="button" data-mode="c17" class="on" onclick="setCard('c17')">图 3-17　50 MHz / 25 W</button>
+        <button type="button" data-mode="c18" onclick="setCard('c18')">图 3-18　175 MHz VMOS</button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label>教材指标</label>
+      <div class="row"><span class="kv">负载 50 Ω；输出 25 W / 增益 7 dB（图 3-17）；输出 10 W / 增益 10 dB（图 3-18）</span></div>
+    </div>
+  </div>
+
+  <div id="card17Box">
+    <svg id="svgCard17" viewBox="0 0 1050 440" role="img" aria-label="图 3-17 50 MHz 25 W 谐振功率放大器电路"></svg>
+    <p class="cap">图 3-17　50 MHz、25 W 谐振功率放大器电路（按教材原图用标准库重绘）</p>
+  </div>
+
+  <div id="card18Box" style="display:none">
+    <svg id="svgCard18" viewBox="0 0 1200 485" role="img" aria-label="图 3-18 175 MHz VMOS 谐振功率放大器电路"></svg>
+    <p class="cap">图 3-18　175 MHz、VMOS 管谐振功率放大器电路（按教材原图用标准库重绘）</p>
+  </div>
+
+  <div class="readout">
+    <div class="ro"><div class="k">电路编号</div><div class="v" id="roCardName">—</div></div>
+    <div class="ro"><div class="k">工作频率</div><div class="v" id="roCardFreq">—</div></div>
+    <div class="ro a"><div class="k">有源器件</div><div class="v" id="roCardDev">—</div></div>
+    <div class="ro g"><div class="k">外接负载</div><div class="v" id="roCardRL">—</div></div>
+    <div class="ro g"><div class="k">输出功率</div><div class="v" id="roCardPo">—</div></div>
+    <div class="ro g"><div class="k">功率增益</div><div class="v" id="roCardGp">—</div></div>
+    <div class="ro"><div class="k">输入匹配网络</div><div class="v" id="roCardIn">—</div></div>
+    <div class="ro"><div class="k">输出匹配网络</div><div class="v" id="roCardOut">—</div></div>
+    <div class="ro r"><div class="k">馈电方式</div><div class="v" id="roCardFeed">—</div></div>
+  </div>
+  <div class="live" id="liveCard"><b>实时结论：</b><span class="kv">—</span></div>
+</div>
+
+<h3>4.1　50 MHz、25 W 谐振功率放大器（图 3-17）</h3>
+
+<p>图 3-17 所示的是工作频率为 50 MHz、25 W 谐振功率放大器电路，外接负载为 50 Ω，输出功率为 25 W，
+  功率增益可达 7 dB。图 3-17 中，由 C<sub>1</sub> 和 C<sub>2</sub> 和 L<sub>1</sub> 组成了
+  <span class="hl">T 型输入匹配网络</span>，调节 C<sub>1</sub> 和 C<sub>2</sub>，可使它们的谐振频率等于输入信号的中心频率，
+  并把放大器的输入阻抗在工作频率上变换为前级信号源所要求的 50 Ω 匹配电阻；
+  集电极馈电电路采用<span class="hl">并联</span>方式，由 L<sub>2</sub>、L<sub>3</sub>、C<sub>4</sub>、C<sub>5</sub> 和 C<sub>6</sub>
+  组成 π 型输出匹配网络。分别调节 C<sub>4</sub> 和 C<sub>6</sub>，使其谐振频率等于信号的中心频率，
+  并把 50 Ω 的外接负载在工作频率上变换为放大器所要求的负载电阻。</p>
+
+<div class="warn">
+  <b>⚠ 教材正文与教材图的一处编号不一致（并列说明）：</b>上段正文写的是「L<sub>2</sub>、L<sub>3</sub>、C<sub>4</sub>、C<sub>5</sub> 和 C<sub>6</sub>」
+  与「分别调节 C<sub>4</sub> 和 C<sub>6</sub>」，但教材图 3-17 里实际标注的输出端电容是
+  <b>C<sub>3</sub>（32～250 pF）与 C<sub>4</sub>（32～250 pF）</b>，并没有 C<sub>5</sub>、C<sub>6</sub>。
+  本页的电路图与读数一律<span class="hl">照教材图 3-17</span>标注（L<sub>2</sub>、L<sub>3</sub>、C<sub>3</sub>、C<sub>4</sub>），
+  正文的编号口径如上并列写出，供对照。
+</div>
+
+<h3>4.2　175 MHz、VMOS 管谐振功率放大器（图 3-18）</h3>
+
+<p>图 3-18 所示的是工作频率为 175 MHz、VMOS 管谐振功率放大器电路，外接负载为 50 Ω，输出功率为 10 W，
+  功率增益达 10 dB。图 3-18 中，由 C<sub>1</sub>、C<sub>2</sub>、C<sub>3</sub> 和 L<sub>1</sub> 组成了
+  <span class="hl">T 型输入匹配网络</span>，调节 C<sub>1</sub> 和 C<sub>2</sub>，可使它们的谐振频率等于输入信号的中心频率，
+  并把放大器的输入阻抗在工作频率上变换为前级信号源所要求的 50 Ω 匹配电阻。
+  栅极和漏极的馈电电路都采用<span class="hl">并联</span>方式，由 L<sub>2</sub>、L<sub>3</sub>、C<sub>4</sub>、C<sub>5</sub> 和 C<sub>6</sub>
+  组成 π 型输出匹配网络。分别调节 C<sub>4</sub> 和 C<sub>6</sub>，使其谐振频率等于信号的中心频率，
+  并把 50 Ω 的外接负载在工作频率上变换为放大器所要求的负载电阻。</p>
+
+<div class="live">
+  <b>自检（对照交互）：</b>交互「集电极馈电」切到<b>并馈</b>时，读数应为
+  <span class="kv">低（≈ 地）</span> 且 <span class="kv">可直接接地</span>，需配元件应为
+  <span class="kv">C_c、Z_L、C_p</span>；切回<b>串馈</b>时应为
+  <span class="kv">高（≈ V_CC）</span>、<span class="kv">不能直接接地</span>、<span class="kv">Z_L、C_p</span>。
+  交互「基本型匹配网络」切到 <b>T 型</b> 时元件数应为 <span class="kv">3</span>，切到 <b>π 型</b> 时应为
+  <span class="kv">5</span>；切回 <b>L 型</b> 时应为 <span class="kv">2</span>、串臂 <span class="kv">X₁</span>、并臂
+  <span class="kv">X₂</span>、方向 <span class="kv">低阻 → 高阻</span>。
+  交互「实际电路」切到 <b>图 3-18</b> 时，输出功率应为 <span class="kv">10 W</span>、功率增益应为
+  <span class="kv">10 dB</span>、有源器件应为 <span class="kv">DV1210</span>。
+</div>
+
+<div class="foot">
+  <p>内容来源：《通信电子线路》（第 3 版 · 陈启兴）第 3 章 · 3.4 节（书页 65 – 70，PDF 页 77 – 82），插图 3-13 ~ 3-18。
+    本页 6 幅电路图全部按教材原图用课程电路标准库（CourseCircuit v1.18）重绘，
+    端口坐标一律取自标准元件返回值；图 3-13 / 3-14 / 3-15 / 3-16 的「接地 / 实心结点 / 跨线桥 / 同名端」四类计数
+    逐图核教材原图后写死在页末断言里。</p>
+  <p>相关页面：<a href="00_学习入口.html">返回学习入口</a>　｜　
+    <a href="原理讲解_3.3_谐振功率放大器的折线分析法_可视化.html">3.3 折线分析法</a>　｜　
+    <a href="原理讲解_3.5_丙类倍频器_可视化.html">3.5 丙类倍频器</a></p>
+</div>
+
+</div>
+
+<script>
+/* CIRCUIT34:BEGIN */
+/* 课程电路标准库 + 3.4 页的 6 幅电路图代码 + 读数/交互。
+ * 换标准库版本：node scratch/inject_lib34.js --apply
+ * 改图：改 build/circuit/figures_34.js 后重跑上面那条命令。 */
+/* CourseCircuit v1.18 — 元件外形、明确引脚、正交连线、端口覆盖与网络连通审计。
+ * 源码由 inject_34.py 内嵌到独立HTML，不依赖外部运行时文件。
+ *
+ * 版本沿革
+ *   v1.0  初版（3.4 原理页试点）
+ *   v1.1  按 AGENTS.md《SVG 电路元件与逐图接线核验标准》补 6 项实证缺口
+ *        （见 scratch/audit_lib/lib_probe.js 的边界评审）
+ *   v1.2  修 v1.1 的两处实现缺陷 + 补「接地即公共端」语义 + 故障注入开关
+ *   v1.3  补课程实际用到但此前未覆盖的三个器件：
+ *        恒流源 currentSource()、交流信号源 acSource()、二极管 diode()
+ *        （规则：未覆盖的器件须先扩充、测试后再复用）
+ *   v1.4  修 acSource() 极性标记的方向缺陷：旧写法用元件局部坐标画，
+ *        水平放置时「−」变成一根竖杠（读作 | 而非 −）。
+ *        改为**世界坐标**绘制：a 端画「+」十字、b 端画「−」横杠；
+ *        并新增 o.polarity===false，让页面按教材把 +/− 标在圈外。
+ *   v1.5  为「题 5.14 图的环形调制器」补三项能力（教材原图需要，先扩充再复用）：
+ *        a) two() 支持**斜置**二端元件（o.angled:true 才允许）：教材 5.14 图的 VD₃/VD₄
+ *           画在 45° 对角支路上。斜置只改姿态不改形状（电阻矩形随轴向旋转）。
+ *        b) wire() 支持**斜线**导线（o.diag:true 才允许）：同上。
+ *        c) 新增 hop()：**非连接交叉（跳线/跨线桥）**。教材 5.14 图里 u₁(t) 水平线与
+ *           两条 45° 对角支路交于**同一点**且**不相连**（若相连则变压器原边短路）。
+ *           hop() 返回跨越弧的采样点并登记保护圆，audit() 在保护圆内不再报
+ *           「异网交叉」，从而把「不相连」显式表达出来而不是靠画图约定。
+ *   v1.6  补 currentSource() 的**教材画法**（o.style:'book'）：
+ *        第 2 章题 2.5 / 2.12 图与答案册「图题 2.5」用的是「圆圈内一条垂直于轴线的横线 +
+ *        圈外引线上的实心三角箭头」，与圈+内箭头的通用画法不同；
+ *        o.dir=+1（默认）表示电流由 a 指向 b，箭头落在 a 侧引线上、尖端朝向圆圈。
+ *   v1.7  ① currentSource(style:'book') 增 o.tip='away'：**尖端背离圆圈**
+ *        （教材题 2.12 图的 i_g 即此画法 —— 箭头在上端引线上、尖端朝上；
+ *          而题 2.5 图的 i_g 尖端朝下、朝向圆圈，两者方向相反，必须能分别表达）。
+ *      ② transistor() 增 o.flip='down'：**共基级画法**（基极横杠在下、发射极引线向左上、
+ *        集电极引线向右上），教材题 2.17 图的 VT₂ 即此画法；
+ *        同时增 o.labelAt=[x,y,anchor] 与 o.label===false（元件名位置可调 / 不画元件名）。
+ *   v1.8  补两个第 4 章题图用到的教材器件（未覆盖的器件须先扩充、测试后再复用）：
+ *        ① crystal()：**石英晶体符号**（教材第 4 章题 4.10 图、答案册「图题 4.10」同款）——
+ *           沿轴向依次是「极板 + 中间矩形 + 极板」。与通用画法不同，不能拿电容假借。
+ *        ② ind() 增 o.core：**铁芯电感**（教材题 4.10 图的 ZL 在线圈旁画一条铁芯线）。
+ *           o.core=true 时在元件**左侧**画一条与线圈等长的平行线；o.coreSide=1 画在右侧；
+ *           o.core 可直接给偏移量（像素）。不传 o.core 时画法与 v1.7 完全一致。
+ *   v1.9  补 polarityDot()：**同名端标记**（教材互感耦合线圈的「●」，见第 4 章题 4.3 图
+ *        与答案册《图题 4.3 中互感的同名端标注》）。它是一个**实心圆点**，
+ *        但**不是电路结点** —— 与 dot()（data-junction，电气结点）在 DOM 上明确区分：
+ *        本方法写 data-polarity 属性，audit() 完全看不见它（它不参与电气连通性）。
+ *        教材符号库里没有的记号必须先扩库（带回归测试）再复用，不许在页内私造。
+ *   v1.10 补第 8 / 9 章题图用到的两个教材器件（未覆盖的器件须先扩充、测试后再复用）：
+ *        ① jfet()：**结型场效应管符号**（教材第 9 章题 9.13 图、答案册「图题 9.13」同款）——
+ *           圆圈内一条竖直**沟道**线，栅极引线自左侧引入并在引线上画箭头。
+ *           o.arrow:'in'（默认）= **n 沟道**，箭头**尖端指向沟道**；'out' = p 沟道，尖端背离沟道。
+ *           教材符号与 MOS 的圆圈+断开沟道画法不同，不能拿 MOS 假借。
+ *        ② icBox()：**集成电路方框**（答案册「图题 8.11」的 MC1596 芯片）——
+ *           矩形 + 引脚短线 + 框内引脚号；pins 按 side/pos 定位，返回每个引脚的**真实端点**。
+ *   v1.11 补第 7 章题图用到的教材器件（未覆盖的器件须先扩充、测试后再复用）：
+ *        varactor()：**变容二极管符号**（教材第 7 章题 7.12 图 / 7.13 图的 VD，
+ *           PDF 186 / 187 **×20 放大逐点确认**）——
+ *           二极管本体（三角尖端抵住**阴极横条**）+ 一支**双箭头**（变容记号）。
+ *           ⚠ 双箭头的位置规则是**逐图核对出来的，不能凭印象**：
+ *             题 7.12 图：器件**水平**、阴极竖条在**左** → 双箭头在符号**下方**、**水平**、两箭头**背向背**；
+ *             题 7.13 图：器件**竖直**、阴极横条在**上** → 双箭头在符号**左侧**、**竖直**、两箭头**背向背**。
+ *           两图合起来只有一条规则：**双箭头平行于器件轴、位于局部 −v 侧、沿轴居中、两箭头背向背（中间断开）**。
+ *           ⚠ 局部 +v 方向 = (−uy, ux)，故局部 −v 方向 = (uy, −ux)；
+ *             用「绝对屏幕左/上」定位会在器件朝向变化时跑到错的一侧。
+ *           默认 a=阳极、b=阴极，b 接阴极横条那一端。
+ *           o.w / o.h 同 diode()；o.arrow:'double'（默认）| 'none'；
+ *           o.arrowSide:'local-'（默认）| 'local+' | 'left' | 'right' | 'up' | 'down'；
+ *           o.arrowAt（沿轴位置，默认 0 = 与符号体居中对齐，+u 指向阴极）/
+ *           o.arrowV（离轴距离，默认 h+7）/ o.arrowLen（箭头半长，默认 6）。
+ *   v1.12 补可变电容的**教材斜箭头方向**（教材第 7 章题 7.12 图的「10 pF」斜箭头电容，
+ *           PDF 186 ×9 放大逐点确认）：
+ *           教材的斜箭头恒为**世界坐标**的「左下 → 右上」(↗)，**不随器件轴向旋转**；
+ *           而 v1.0 起的默认画法把斜箭头画在元件**局部坐标**里 → 竖直器件会变成 ↖，与教材不符。
+ *           → cap() 增 o.varArrow:'up' = 世界坐标 ↗（教材画法）；不传时默认画法**完全不变**
+ *             （第 3.4 原理页与第 9 章习题页的既有图不受影响）。
+ *           教材符号 ≠ 通用符号 → 先扩库（带正例 + 负例回归）再复用，不在页面里私造。
+ *   v1.13 补 arrow() 的**可变几何句柄**（原理讲解 2.3 的图 2-5(b) 需要）：
+ *          图 2-5(b) 里 İ₁ / İ₂ 两个参考方向箭头的**长度随滑块实时变化**；
+ *          v1.12 之前 arrow() 无返回值 → 页面只能自己私造一份箭头（与标准库混用，
+ *          违反 AGENTS.md「旧 helper 与标准库不得混在一张图里」）。
+ *          现在 arrow() 返回 {line, head, set(x1,y1,x2,y2)}，set() 就地改几何；
+ *          既有调用方都不使用返回值，**画法与 v1.12 完全一致**（回归用例锁住）。
+ *
+ *   v1.14 补两处**教材画法**（都在第 2/3 章的教材页图上逐点确认过）：
+ *          ① acSource() 增 o.style='bar'（教材电压源记号，第 3 章图 3-2 的信号源，
+ *             书页 52 / PDF 64）：圆圈内一条**沿元件轴向**的直线，**导线整段穿过圆圈**
+ *             （圆内那段线可见）。与库里原有两种画法都不同：
+ *               · acSource 默认 —— 圆圈内「+ / −」；
+ *               · currentSource(style:'book') —— 圆圈内一条**垂直于**轴线的横线 ＋ 圈外实心三角箭头。
+ *             圆先画（白底）线后画 → 圆内那段线可见，与教材页图一致。
+ *             不传 o.style 时默认画法**完全不变**。
+ *          ② currentSource(style:'book') 增 o.arrow=false：**不画引线箭头** ——
+ *             教材图 2-8 里信号电流源 İ_s 引线上**有**向上箭头，而两个受控源
+ *             （y_re·Ů_c / y_fe·Ů_i）引线上**没有**箭头（圈内横杠照旧）。
+ *             教材依据：书页 22 / PDF 34 图 2-8，×6 放大件 scratch/shots/r19b_f28_left.png。
+ *             缺省 arrow:true —— 旧调用方行为与画法完全不变。
+ *   v1.15 补三项能力（教材原图需要，先扩库再复用）：
+ *          ① currentSource(style:'book') 真正实现 o.arrow=false ——
+ *             **上一轮页面按已存在来用、库里其实没有**，由回归用例当场抓到；
+ *             教材依据：书页 22 / PDF 34 图 2-8（信号电流源 İ_s 引线上**有**箭头，
+ *             两个受控源引线上**没有**箭头）。
+ *          ② jfet() 增 o.rot = 0(默认)/90/180/270 —— 绕器件中心 (x,y) 旋转**符号本体**
+ *             （沟道 / 栅极引线 / 箭头 / 漏源引线）。
+ *          ③ jfet() 增 o.ds = 'normal'(默认)/'swap' —— **只交换漏源两脚所接的网络**
+ *             （几何不动）。JFET 源漏对称：教材第 2 章图 2-20 的 VT₂ 是
+ *             「栅极朝下、源在左、漏在右」的共栅画法，用 o.rot:270 + o.ds:'swap' 复现，
+ *             不必在页面里私造符号。教材依据：书页 36 / PDF 48 图 2-20。
+ *          不传新选项时画法与 v1.14 **完全一致**（回归用例锁住）。
+ *   v1.16  Scene.text() 把标注里的「X_y」画成**教材式真下标**（基线右下方的小字）：
+ *          之前图内标注是「下划线式」（f_c、u_o、R_L、V_CC、C_b …），与教材排版不一致。
+ *          拆串规则见唯一来源 build/subscript.js（lib.js 里有一份逐字节相同的副本）。
+ *          ⚠ 关键约束：**textContent 保持不变** —— 下划线以零宽 tspan 保留在文本里，
+ *            于是页末自检的 txtguard、check_text.js 的抄写基线、check_geom.js 的
+ *            估宽判定全部不受影响；不传新选项时画法与 v1.15 **完全一致**（回归用例锁住）。
+ *   v1.17  真下标拆串加**覆盖表**（build/subscript.js 里的 OVERRIDES）：
+ *          「最长下标段」规则会把 U_SmU_Lm / ω_cCR_L / y_feU_i 这类写法并成一段下标，
+ *          但教材里它们是**两个（或三个）独立符号的乘积**（例 3-1 书页 54、式 4-26 书页 103、
+ *          习题 9.4 书页 221 均已逐条核对）。这类写法在语法上无法用规则区分，
+ *          只能逐条核教材后写死 → 覆盖表每条都注明书页/式号。
+ *          同时修掉连续下划线（a_b_c）的守恒：第二个下划线原本会被吞掉，
+ *          现在记在 us[] 里，linearize 能逐字还原。
+ *          ⚠ 对**不含**覆盖表条目的标注，画法与 v1.16 **完全一致**（回归用例锁住）。
+ *   v1.18 补**乘法器**符号 multiplier()（教材符号：圆圈内一个 ×，三端口 A/B/O）：
+ *          教材 书页 149 / PDF 161「题 6.8 图」用的就是这个符号（⊗ 乘法器 → C∥R → 接地）。
+ *          此前库里没有该器件，页面曾私造**方框图**（两个矩形块 + 箭头）冒充 →
+ *          与教材原图不符，且违反「旧 helper 与标准库不得混在一张图里」。
+ *          按「未覆盖的器件须先扩充、测试后再复用」补上。
+ *          ⚠ o.label===true 才画元件名（教材符号圈内**没有**名称）；
+ *            不传任何新选项时，**既有元件的画法与 v1.17 完全一致**（回归用例锁住）。
+ * v1.1 的 6 项扩充（对应 lib_probe 的 ①③④⑤⑥⑦）
+ *   ① 电感符号尺寸固定（原来 body=Math.min(60,len-18)，引线一变长符号就变形）
+ *   ③ audit() 新增「同一网络必须连成一片」（原来两段互不相连的「0」不报）
+ *   ④ audit() 新增「异网导线交叉 / 异网共用端点」（原来交叉处不报，读者易误读成连接）
+ *   ⑤ wire() 正交判定加浮点容差（原来 1e-7 的误差就抛错）
+ *   ⑥ 新增带抽头的绕组与变压器 windingTapped() / transformerTapped() / coupledWindings()
+ *      （抽头必须落在绕组折点，不许用普通二端元件假借）
+ *   ⑦ 配色可覆盖 usePalette()，并给出与课程既有页面一致的 'course' 预设
+ *
+ * v1.2 的变更
+ *   a) 修 transformerTapped() 的实参错位（原写法把 pNodes[0] 当 yBot、pNodes[1] 当 nodes）
+ *   b) windingTapped() 的入参改为 nodes 数组自描述（首尾=两端，中间=抽头），并校验节点严格递增
+ *   c) audit() 的同网连通性：**接地符号即公共端** —— 同名网络的多个接地符号视为同一节点，
+ *      另加「导线折点落在同网导线上」的并查集合并（原先只合并引脚/端口，漏掉 T 形接头）
+ *   d) audit() 新增「异网共用端点」（疑似短路）
+ *   e) 新增故障注入开关 window.__COURSE_CIRCUIT_DISABLE__，用于证明每条检查真的接上了
+
+ */
+(function(global){
+  'use strict';
+  const NS='http://www.w3.org/2000/svg';
+  const colors={wire:'#334155',signal:'#1a46b5',feed:'#a66600',device:'#0d7a3c',tank:'#b91c1c'};
+  /* 课程既有 52 页原理讲解 + 22 页例题/习题页的墨色（迁移时整页配色才不变） */
+  const PALETTES={
+    course:{wire:'#1f1f1f',signal:'#1f1f1f',feed:'#1f1f1f',device:'#0d7a3c',tank:'#1f1f1f'},
+    default:null
+  };
+  function usePalette(name){const p=PALETTES[name];if(!p)throw Error('未知配色预设 '+name);Object.assign(colors,p);return colors;}
+  const EPS=.01;          /* 几何容差 */
+  const ORTHO=.01;        /* 正交判定容差 */
+  const IND_BODY=60;      /* 电感符号固定长度（不再随引线长度变化） */
+  const IND_LEAD=6;       /* 电感两端引线的最小长度 */
+  /* 故障注入：置位后关闭对应的检查项，用于自证「规则真的在起作用」。 */
+  function disabled(tag){
+    const f=global.__COURSE_CIRCUIT_DISABLE__;
+    if(!f)return false;
+    if(Array.isArray(f))return f.indexOf(tag)>=0;
+    return !!f[tag];
+  }
+  function e(parent,tag,a){const n=document.createElementNS(NS,tag);Object.keys(a).forEach(k=>n.setAttribute(k,a[k]));parent.appendChild(n);return n;}
+  function point(x,y,net){if(!Number.isFinite(x)||!Number.isFinite(y)||!net)throw Error('非法引脚坐标或网络');return {x,y,net};}
+  function clear(svg,box){svg.innerHTML='';svg.setAttribute('viewBox',box);svg.__circuits=[];}
+  /*=== SUBSCRIPT-REGION-BEGIN ===*/
+  /* =======================================================================
+   * build/subscript.js —— 「真下标」（教材式竖排下标）唯一来源
+   *
+   * 目标：把标注里的「X_y」渲染成教材式的**真下标**（基线右下方的小字），
+   *       而不是字面上的下划线。
+   *
+   * 关键设计：**textContent 保持逐字不变**
+   *   下划线以「零宽」方式保留在文本里（font-size:0 的 tspan / span），
+   *   于是：
+   *     ① 页末自检里按字面串比对 document.body.textContent 的断言（txtguard）不受影响；
+   *     ② build/check_text.js 的线性抄写比对基线不变（PASS 数必须保持）；
+   *     ③ build/check_geom.js 用 textContent 估文字宽 → 几何判定结果不变；
+   *     ④ 复制粘贴得到的仍是线性写法 "Q_L"，与课程文档的线性记法一致。
+   *   若改成「删掉下划线」，textContent 会变 → 上述三处全部要跟着改，
+   *   且教材式线性写法在页面上就消失了。
+   *
+   * 本文件是**唯一来源**：build/lib.js 与 build/circuit/svg_components.js 里
+   * 各有一份**逐字节相同**的副本（标记 SUBSCRIPT-REGION），
+   * 由 scratch/sync_subscript.js 同步、scratch/test_subscript.js 核对。
+   *
+   * ⚠ 宿主文件（lib.js / svg_components.js）须在本区域**之后**补一行
+   *   `var CourseSubscript = window.CourseSubscript;`
+   *   —— 标准库的整段代码包在 IIFE 里，区域内的 var 会被 IIFE 吞掉、拿不到全局。
+   * ======================================================================= */
+  (function (g) {
+    'use strict';
+
+    var NS = 'http://www.w3.org/2000/svg';
+
+    /* 下标字号比例与基线位移（教材式：基线右下方的小字） */
+    var RATIO = 0.68;   /* 下标字号 = 基准字号 × RATIO */
+    var SHIFT = 0.22;   /* 下标基线相对父基线下移 = 基准字号 × SHIFT（em） */
+
+    /* --- 字符分类 ---------------------------------------------------------
+     * isSym：可作「基字符」也可作「下标字符」的符号字符。
+     *   字母（A-Z a-z）、拉丁扩展（Ā Ĩ Ũ ī İ / Ȧ Ȱ Ȯ）、希腊字母（Δ Σ Ω ω φ π μ）、
+     *   组合记号（◌̇ ◌̅ ◌́）、撇号（’ ′ ″）、数字。
+     *   ⚠ 排除 Latin-1 里的 × (U+00D7) 与 ÷ (U+00F7) —— 它们是运算符不是符号。
+     *   ⚠ Unicode 下标数字（₁ ₂ …）本身已经是下标，只当基字符、不再拆。
+     */
+    function isSym(c) {
+      if (!c) return false;
+      var k = c.charCodeAt(0);
+      if (k >= 48 && k <= 57) return true;                         /* 0-9 */
+      if (k >= 65 && k <= 90) return true;                         /* A-Z */
+      if (k >= 97 && k <= 122) return true;                        /* a-z */
+      if (k >= 0x00C0 && k <= 0x00FF && k !== 0x00D7 && k !== 0x00F7) return true; /* Latin-1 字母 */
+      if (k >= 0x0100 && k <= 0x017F) return true;                 /* Latin Extended-A */
+      if (k >= 0x0180 && k <= 0x024F) return true;                 /* Latin Extended-B */
+      if (k >= 0x0300 && k <= 0x036F) return true;                 /* 组合记号 */
+      if (k >= 0x0370 && k <= 0x03FF) return true;                 /* 希腊字母 */
+      if (k === 0x2019 || k === 0x2032 || k === 0x2033) return true; /* ’ ′ ″ */
+      if (k >= 0x2080 && k <= 0x2089) return true;                 /* Unicode 下标数字 */
+      return false;
+    }
+    /* 下标的**首字符**：符号字符，外加单独的 +/−（教材的 F₊ / F₋ / u₊(t)） */
+    function isSubStart(c) {
+      if (isSym(c)) return true;
+      if (!c) return false;
+      var k = c.charCodeAt(0);
+      return k === 0x2B /* + */ || k === 0x2212 /* − */ || k === 0x2D /* - */;
+    }
+    /* 下标的**后续字符**：符号字符；小数点仅在「前后都是数字」时并入
+     * （教材的 f₀.₇ / K_r0.1 —— 那个点属于下标，不是句点） */
+    function isSubCont(c, prev, next) {
+      if (isSym(c)) return true;
+      if (!c) return false;
+      var k = c.charCodeAt(0);
+      if (k === 0x2E /* . */) {
+        var p = prev ? prev.charCodeAt(0) : 0, nx = next ? next.charCodeAt(0) : 0;
+        return p >= 48 && p <= 57 && nx >= 48 && nx <= 57;
+      }
+      return false;
+    }
+
+    /* ======================================================================
+     * 覆盖表（教材歧义标注）
+     *
+     * 「最长下标段」规则会把下面这些标注并成一段下标，但它们在教材里
+     * 是**两个（或三个）独立符号的乘积**。
+     * 这类写法在语法上**无法用规则区分**（C_jQ 与 feUi 结构完全相同），
+     * 唯一可靠的办法是逐条对照教材原式后写死。
+     *
+     * ⚠ 新增条目必须：① 先看教材页图核对；② 在 ref 里写明书页/式号；
+     *   ③ 保证 parts 拼接后与 from **逐字相同**（textContent 守恒）。
+     * ==================================================================== */
+    var ovTable = [
+      { from: 'ω_cCR_L', parts: ['ω_c', 'C', 'R_L'],
+        ref: '教材例 3-1（书页 54）：|Z_pn| 分母印作 1+j(nωCR_L−R_L/(nωL))' },    { from: 'U_LmU_Sm', parts: ['U_Lm', 'U_Sm'],
+        ref: '教材习题 9.4/9.5（书页 221）：U_Sm（输入幅值）与 U_Lm（本振幅值）是两个独立量' },
+      { from: 'U_SmU_Lm', parts: ['U_Sm', 'U_Lm'],
+        ref: '教材习题 9.4/9.5（书页 221）：变频跨导 ∝ a₂·U_Sm·U_Lm' },
+      { from: 'U_nmU_Lm', parts: ['U_nm', 'U_Lm'],
+        ref: '教材习题 9.4/9.5（书页 221）' },
+      { from: 'U_cmU_o', parts: ['U_cm', 'U_o'],
+        ref: '第 5 章振幅调制：输出功率 ∝ U_cm·U_o' },
+      { from: 'y_feU_i', parts: ['y_fe', 'U_i'],
+        ref: '教材 §2.3 高频等效电路：受控电流源 y_fe·U̇_i' },
+      { from: 'L_qC_q', parts: ['L_q', 'C_q'],
+        ref: '教材式 (4-26)（书页 103）：ω_q = 1/√(L_qC_q)' },
+      { from: 'C_qC_o', parts: ['C_q', 'C_o'],
+        ref: '教材式 (4-27)（书页 103）：ω_p = 1/√(L_q·C_qC_o/(C_q+C_o))' },
+      { from: 'K_fU_Ωm', parts: ['K_f', 'U_Ωm'],
+        ref: '教材式 (7-37)：K_f = f_c/(U_D+V_Q)' },
+      { from: 'L_1C_ΣQ', parts: ['L_1', 'C_ΣQ'],
+        ref: '教材式 (7-39)：f_c = 1/(2π√(L_1C_ΣQ))' },
+      { from: 'Q_Lγ', parts: ['Q_L', 'γ'],
+        ref: '教材式 (7-45)：K_p = −Q_Lγ/[2(U_D+V_Q)]' },
+      { from: 'C_qr_q', parts: ['C_q', 'r_q'],
+        ref: '教材图 4-13（书页 103）：L_q、C_q、r_q 串联，是三个独立元件' },
+      { from: 'ω_cC', parts: ['ω_c', 'C'],
+        ref: '教材例 3-1（书页 54）：ωC 是容性电纳项' },
+      { from: 'ω_cL', parts: ['ω_c', 'L'],
+        ref: '教材例 3-1（书页 54）：1/(ωL) 是感性电纳项' }
+    ];
+
+    /* 覆盖表按 from 长度倒序建正则 → 长的先匹配（「ω_cCR_L」先于「ω_cC」） */
+    var OVERRIDE_RE = null;
+    function overrideRe() {
+      if (OVERRIDE_RE) return OVERRIDE_RE;
+      if (!ovTable.length) return null;      /* ⚠ 空表不能建空正则：空模式会原地匹配 → 死循环 */
+      var list = ovTable.slice().sort(function (a, b) { return b.from.length - a.from.length; });
+      var src = list.map(function (o) {
+        return o.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }).join('|');
+      OVERRIDE_RE = new RegExp(src, 'g');
+      return OVERRIDE_RE;
+    }
+
+    /* 把字符串切成原子段：[{text, parts|null}]
+     * parts=null → 普通文本；parts!=null → 覆盖命中（parts 为教材式分段） */
+    function splitByOverride(str) {
+      if (str === undefined || str === null) return [];
+      str = String(str);
+      if (str.indexOf('_') < 0) return [{ text: str, parts: null }];
+      var re = overrideRe();
+      if (!re) return [{ text: str, parts: null }];
+      re.lastIndex = 0;
+      var atoms = [], last = 0, m;
+      while ((m = re.exec(str)) !== null) {
+        if (!m[0].length) { re.lastIndex++; continue; }   /* 防御：空匹配必须推进 */
+        if (m.index > last) atoms.push({ text: str.slice(last, m.index), parts: null });
+        var parts = null;
+        for (var i = 0; i < ovTable.length; i++) {
+          if (ovTable[i].from === m[0]) { parts = ovTable[i].parts; break; }
+        }
+        atoms.push({ text: m[0], parts: parts });
+        last = m.index + m[0].length;
+        re.lastIndex = last;
+      }
+      if (last < str.length) atoms.push({ text: str.slice(last), parts: null });
+      return atoms;
+    }
+
+    /* --- 拆串 -------------------------------------------------------------
+     * 返回 [{s:文字, sub:是否下标段, pre:本段前紧邻的下划线数, us:段内下划线位置}]
+     * 规则：只有「符号字符 + _ + 可作下标的字符」才算下标分隔。
+     *   "Q_L"      → base "Q" / sub "L"
+     *   "P′_no1"   → base "P′" / sub "no1"
+     *   "U̇_b′e"    → base "U̇" / sub "b′e"
+     *   "K_r0.1"   → base "K" / sub "r0.1"（点属于下标）
+     *   "u_o(t)"   → base "u" / sub "o" / base "(t)"
+     *   "f_c + F"  → base "f" / sub "c" / base " + F"
+     *   "A _B"     → 空格前不是符号字符 → 整串当普通文字（不拆）
+     *   "a_b_c"    → base "a" / sub "b"(pre 1) / sub "c"(pre 1)
+     *                （两个下划线都保留：linearize 必须能还原成 "a_b_c"）
+     */
+    function splitRaw(str) {
+      var runs = [];
+      if (str === undefined || str === null) return runs;
+      str = String(str);
+      var n = str.length, plainStart = 0, i = 0;
+      while (i < n) {
+        if (str[i] === '_' && i > plainStart && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+          runs.push({ s: str.slice(plainStart, i), sub: false, pre: 0, us: [] });
+          var k = i + 2;                     /* 第一个字符已由 isSubStart 认可 */
+          while (k < n && isSubCont(str[k], str[k - 1], str[k + 1])) k++;
+          var run = { s: str.slice(i + 1, k), sub: true, pre: 1, us: [] };
+          runs.push(run);
+          plainStart = k; i = k;
+          /* 连续下划线（a_b_c）→ 并入同一段下标；**每个下划线都要保留**，
+             否则 textContent 会少一个 "_"（守恒被破坏）。
+             段内下划线的位置记在 us[] 里，linearize 据此还原。 */
+          while (i < n && str[i] === '_' && isSym(str[i - 1]) && isSubStart(str[i + 1])) {
+            var m = i + 2;
+            while (m < n && isSubCont(str[m], str[m - 1], str[m + 1])) m++;
+            run.us.push(run.s.length);
+            run.s += str.slice(i + 1, m);
+            plainStart = m; i = m;
+          }
+          continue;
+        }
+        i++;
+      }
+      if (plainStart < n) runs.push({ s: str.slice(plainStart), sub: false, pre: 0, us: [] });
+      return runs;
+    }
+
+    /* 覆盖表感知的拆串（对外主入口） */
+    function splitAll(str) {
+      var atoms = splitByOverride(str);
+      var runs = [];
+      for (var i = 0; i < atoms.length; i++) {
+        if (atoms[i].parts) {
+          for (var j = 0; j < atoms[i].parts.length; j++) {
+            runs = runs.concat(splitRaw(atoms[i].parts[j]));
+          }
+        } else {
+          runs = runs.concat(splitRaw(atoms[i].text));
+        }
+      }
+      return runs;
+    }
+
+    /* 还原成线性写法（用于守恒校验）：
+     * 普通段原样；下标段前面补回它的下划线；段内下划线按 us[] 位置插回 */
+    function linearize(runs) {
+      var out = '';
+      for (var i = 0; i < runs.length; i++) {
+        var r = runs[i];
+        var p = r.pre || 0;
+        for (var k = 0; k < p; k++) out += '_';
+        if (r.us && r.us.length) {
+          var at = 0;
+          for (var q = 0; q < r.us.length; q++) {
+            out += r.s.slice(at, r.us[q]);
+            out += '_';
+            at = r.us[q];
+          }
+          out += r.s.slice(at);
+        } else out += r.s;
+      }
+      return out;
+    }
+
+    function hasSub(str) {
+      if (str === undefined || str === null) return false;
+      var runs = splitAll(String(str));
+      for (var i = 0; i < runs.length; i++) if (runs[i].sub) return true;
+      return false;
+    }
+
+    /* --- SVG 渲染 ---------------------------------------------------------
+     * node：<text> 元素；baseSize：基准字号（数字）。
+     * 结构（全部用 <tspan> 承载，不依赖 document.createTextNode ——
+     *       标准库自己的回归测试用的最小 DOM 桩没有那个方法）：
+     *   普通文字 tspan（无属性）→ 零宽下划线 tspan → 下标 tspan → 复位 tspan
+     *   零宽下划线：font-size="0" → 不渲染、不占宽，但 textContent 里保留 "_"
+     *   下标 tspan：font-size = baseSize×RATIO，dy = baseSize×SHIFT（下移）
+     *   复位 tspan：dy = −baseSize×SHIFT → 其后的普通文字回到原基线
+     */
+    function renderSvg(node, str, baseSize) {
+      var runs = splitAll(str);
+      var has = false;
+      for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+      if (!has) { node.textContent = (str === undefined || str === null) ? '' : String(str); return node; }
+
+      var B = (typeof baseSize === 'number' && isFinite(baseSize) && baseSize > 0) ? baseSize : 16;
+      var subSize = Math.round(B * RATIO * 100) / 100;
+      var dy = Math.round(B * SHIFT * 100) / 100;
+
+      function zwSpan() {
+        var z = document.createElementNS(NS, 'tspan');
+        z.setAttribute('font-size', '0');
+        z.textContent = '_';
+        return z;
+      }
+
+      node.textContent = '';
+      var shifted = false;
+      for (var j = 0; j < runs.length; j++) {
+        var r = runs[j];
+        var p = r.pre || 0;
+        for (var z2 = 0; z2 < p; z2++) node.appendChild(zwSpan());
+        if (!r.sub) {
+          if (!r.s) continue;
+          var bs = document.createElementNS(NS, 'tspan');
+          if (shifted) { bs.setAttribute('dy', String(-dy)); shifted = false; }
+          bs.textContent = r.s;
+          node.appendChild(bs);
+        } else {
+          /* 段内下划线（合并下标 a_b_c）：按 us[] 把本段切成若干片 */
+          var pieces = [], at = 0;
+          if (r.us && r.us.length) {
+            for (var q = 0; q < r.us.length; q++) {
+              pieces.push(r.s.slice(at, r.us[q]));
+              pieces.push(null);                 /* null = 段内零宽下划线 */
+              at = r.us[q];
+            }
+          }
+          pieces.push(r.s.slice(at));
+          for (var k = 0; k < pieces.length; k++) {
+            if (pieces[k] === null) { node.appendChild(zwSpan()); continue; }
+            if (!pieces[k]) continue;
+            var ts = document.createElementNS(NS, 'tspan');
+            ts.setAttribute('font-size', String(subSize));
+            ts.setAttribute('dy', shifted ? '0' : String(dy));
+            ts.textContent = pieces[k];
+            node.appendChild(ts);
+            shifted = true;
+          }
+        }
+      }
+      return node;
+    }
+
+    /* --- HTML 渲染（正文侧） ---------------------------------------------
+     * toHtml(str)：把「X_y」转成「X<sub>…</sub>」，下划线以零宽 span 保留在
+     * <sub> **之前**（下划线是「分隔标记」，不属于下标本身）。
+     * 供源码级转换器使用（页面正文是静态 HTML，源级改写比运行时改 DOM 更稳）。
+     */
+    function innerHtml(run) {
+      if (!run.us || !run.us.length) return run.s;
+      var out = '', at = 0;
+      for (var q = 0; q < run.us.length; q++) {
+        out += run.s.slice(at, run.us[q]) + '<span style="font-size:0">_</span>';
+        at = run.us[q];
+      }
+      return out + run.s.slice(at);
+    }
+    function toHtml(str) {
+      var runs = splitAll(str);
+      var has = false;
+      for (var i = 0; i < runs.length; i++) if (runs[i].sub) { has = true; break; }
+      if (!has) return str;
+      var out = '';
+      for (var j = 0; j < runs.length; j++) {
+        var r = runs[j];
+        var p = r.pre || 0;
+        for (var z = 0; z < p; z++) out += '<span style="font-size:0">_</span>';
+        if (r.sub) out += '<sub>' + innerHtml(r) + '</sub>';
+        else out += r.s;
+      }
+      return out;
+    }
+
+    /* --- HTML 片段转真下标（供页面**运行时**写标签用） -------------------
+     * 页面上有一部分标签是运行时生成的（读数面板的键名、动态说明文字），
+     * 源级改写碰不到它们 → 运行时用 subHtml() 转一下再写进 HTML 文本节点。
+     *   · 标签片段（<b>、<sup> …）原样保留，只转**文本部分**；
+     *   · 下划线以零宽 span 保留 → textContent 逐字不变，
+     *     页末自检里按字面串比对 document.body.textContent 的断言不受影响。
+     * ⚠ 只用于**固定标签字符串**，不接受用户输入（它会写 innerHTML）。
+     */
+    function subHtml(str) {
+      if (str === undefined || str === null) return '';
+      str = String(str);
+      if (str.indexOf('_') < 0) return str;
+      return str.split(/(<[^>]*>)/g).map(function (seg) {
+        if (!seg) return '';
+        if (seg.charAt(0) === '<') return seg;
+        return toHtml(seg);
+      }).join('');
+    }
+
+    var api = {
+      split: splitAll,
+      splitRaw: splitRaw,
+      splitAll: splitAll,
+      linearize: linearize,
+      hasSub: hasSub,
+      renderSvg: renderSvg,
+      toHtml: toHtml,
+      subHtml: subHtml,
+      setOverrides: function (list) {
+        ovTable = (list || []).slice();
+        OVERRIDE_RE = null;                 /* 正则缓存必须失效 */
+        return ovTable;
+      },
+      RATIO: RATIO,
+      SHIFT: SHIFT
+    };
+    /* 覆盖表用 getter 暴露：直接改 api.OVERRIDES 不起作用（内部读的是 ovTable） */
+    Object.defineProperty(api, 'OVERRIDES', {
+      get: function () { return ovTable; },
+      enumerable: true
+    });
+    g.CourseSubscript = api;
+    /* 裸全局别名：让**没有 lib.js** 的手工页也能直接写 subHtml('…')
+       （lib.js 里的同名函数是本函数的一层薄封装，行为一致） */
+    g.subHtml = subHtml;
+    if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
+/*=== SUBSCRIPT-REGION-END ===*/
+  class Scene{
+    constructor(svg,id,dx){this.id=id;this.parent=e(svg,'g',{'data-scene':id,transform:'translate('+(dx||0)+' 0)'});this.parts=[];this.wires=[];this.anchors=[];this.grounds=[];this.dots=[];this.polarity=[];this.hops=[];svg.__circuits.push(this);}
+    p(x,y,net){return point(x,y,net);}
+    text(x,y,str,opt){opt=opt||{};if(typeof str!=='string')throw Error('标签必须是字符串');const n=e(this.parent,'text',{x,y,'font-size':opt.size||14,'text-anchor':opt.anchor||'middle',fill:opt.color||colors.wire,'font-family':'Microsoft YaHei, sans-serif','font-weight':opt.bold?'700':'400'});CourseSubscript.renderSvg(n,str,opt.size||14);return n;}
+    line(parent,x1,y1,x2,y2,color){return e(parent,'line',{x1,y1,x2,y2,stroke:color||colors.wire,'stroke-width':1.8});}
+    /* 连线。默认只允许正交（横/竖）折线；斜线须显式声明 o.diag:true。
+     * 正交限制是防呆护栏：漏画一段横线/竖线时立刻报错，而不是悄悄连歪。 */
+    wire(net,points,opt){opt=opt||{};points=points.map(p=>Array.isArray(p)?point(p[0],p[1],net):p);points.forEach(p=>{if(p.net!==net)throw Error('导线跨接了不同命名网络 '+net+' / '+p.net);});for(let i=1;i<points.length;i++)if(opt.diag!==true&&Math.abs(points[i].x-points[i-1].x)>ORTHO&&Math.abs(points[i].y-points[i-1].y)>ORTHO)throw Error('连线必须正交（斜线须显式声明 diag:true）');const el=e(this.parent,'polyline',{points:points.map(p=>p.x+','+p.y).join(' '),fill:'none',stroke:colors.wire,'stroke-width':1.8,'stroke-linejoin':'round','data-wire':net});this.wires.push({net,el});return el;}
+    /* 标注用箭头（电流/信号参考方向）。不是元件，只是画在导线上的方向记号。
+     * v1.13：**返回句柄** {line, head, set(x1,y1,x2,y2)} —— set() 就地改几何。
+     * 为什么要句柄：原理讲解 2.3 的图 2-5(b) 里 İ₁ / İ₂ 两个参考方向箭头
+     * 的**长度随滑块实时变化**。v1.12 之前 arrow() 无返回值，页面只能自己
+     * 私造一份箭头（与标准库混用，违反 AGENTS.md 的「旧 helper 与标准库不得
+     * 混在一张图里」）。现在由库里统一提供可变几何的箭头。
+     * 向后兼容：v1.12 及以前 arrow() 返回 undefined，现返回对象；
+     * 既有调用方都不使用返回值，行为与画法完全不变。 */
+    arrow(x1,y1,x2,y2,opt){opt=opt||{};
+      if(Math.hypot(x2-x1,y2-y1)<2)throw Error('箭头长度过小');
+      const col=opt.color||colors.wire;
+      const hl=opt.head===undefined?9:opt.head,hw=opt.headWidth===undefined?3.4:opt.headWidth;
+      const ln=e(this.parent,'line',{x1,y1,x2,y2,stroke:col,'stroke-width':opt.width===undefined?1.8:opt.width});
+      const poly=e(this.parent,'polygon',{points:'',fill:col,stroke:'none'});
+      const api={line:ln,head:poly};
+      api.set=function(nx1,ny1,nx2,ny2){
+        const L=Math.hypot(nx2-nx1,ny2-ny1);if(L<2)throw Error('箭头长度过小');
+        const ux=(nx2-nx1)/L,uy=(ny2-ny1)/L;
+        ln.setAttribute('x1',nx1);ln.setAttribute('y1',ny1);
+        ln.setAttribute('x2',nx2-ux*hl*0.7);ln.setAttribute('y2',ny2-uy*hl*0.7);
+        const tip={x:nx2,y:ny2},b1={x:nx2-ux*hl-uy*hw,y:ny2-uy*hl+ux*hw},b2={x:nx2-ux*hl+uy*hw,y:ny2-uy*hl-ux*hw};
+        poly.setAttribute('points',[tip,b1,b2].map(p=>p.x+','+p.y).join(' '));
+        return api;
+      };
+      api.set(x1,y1,x2,y2);
+      return api;
+    }
+    /* ⑦ 非连接交叉（跳线 / 跨线桥）。
+     * 教材图里两条导线交叉但**不相连**时必须画出可辨认的记号，不能只靠「画图约定」。
+     * 用法：var pts=c.hop('net',{x,y},{r:16,side:'up'}); 把返回的采样点并入该网络的
+     * polyline（c.wire(net,[起,...,pts,...,止],{diag:true})），画出来就是一段跨越弧；
+     * 同时登记保护圆，audit() 在圆内不再报「异网交叉」。
+     * side: 'up'|'down'|'left'|'right' —— 弧的鼓起方向（默认 up）。 */
+    hop(net,p,o){
+      o=o||{};
+      const r=o.r===undefined?16:o.r;
+      if(!(r>0))throw Error('跳线半径必须为正');
+      const side=o.side||'up';
+      if(['up','down','left','right'].indexOf(side)<0)throw Error('跳线方向只能是 up/down/left/right');
+      const horiz=(side==='up'||side==='down');
+      const e1=horiz?{x:p.x-r,y:p.y}:{x:p.x,y:p.y-r};
+      const e2=horiz?{x:p.x+r,y:p.y}:{x:p.x,y:p.y+r};
+      const ap=side==='up'?{x:p.x,y:p.y-r}:side==='down'?{x:p.x,y:p.y+r}:side==='left'?{x:p.x-r,y:p.y}:{x:p.x+r,y:p.y};
+      const norm=a=>{while(a<0)a+=2*Math.PI;while(a>=2*Math.PI)a-=2*Math.PI;return a;};
+      const fwd=(a,b)=>{let x=norm(b)-norm(a);while(x<=0)x+=2*Math.PI;while(x>2*Math.PI)x-=2*Math.PI;return x;};
+      let a1=norm(Math.atan2(e1.y-p.y,e1.x-p.x)),a2=norm(Math.atan2(e2.y-p.y,e2.x-p.x)),am=norm(Math.atan2(ap.y-p.y,ap.x-p.x));
+      const dir=fwd(a1,am)<=fwd(a1,a2)?1:-1;
+      const sweep=dir>0?fwd(a1,a2):fwd(a2,a1);
+      const N=o.n===undefined?9:o.n,pts=[];
+      for(let i=0;i<=N;i++){const a=a1+dir*(i/N)*sweep;pts.push({x:p.x+r*Math.cos(a),y:p.y+r*Math.sin(a),net:net});}
+      this.hops.push({net:net,x:p.x,y:p.y,r:r});
+      return pts;
+    }
+    /* 跳线保护圆内不再报「异网交叉」（故障注入开关 hop 可关掉此规则）。 */
+    hopNear(x,y){
+      if(disabled('hop'))return false;
+      return this.hops.some(h=>Math.hypot(x-h.x,y-h.y)<=h.r+1);
+    }
+    dot(p){this.dots.push({net:p.net,x:p.x,y:p.y});e(this.parent,'circle',{cx:p.x,cy:p.y,r:3,fill:colors.wire,'data-junction':p.net});}
+    /* 同名端标记（教材互感线圈的「●」）：**实心圆点，但不是电路结点**。
+     * 与 dot() 的区别在 DOM 上是硬性的：本方法写 data-polarity，dot() 写 data-junction；
+     * audit() 只看导线/引脚/端口/接地，**看不见同名端标记**（它不参与电气连通性）。
+     * o.r 默认 3.2；o.color 默认墨色。 */
+    polarityDot(p,opt){opt=opt||{};const r=opt.r===undefined?3.2:opt.r;const col=opt.color||colors.wire;
+      this.polarity.push({net:p.net,x:p.x,y:p.y});
+      e(this.parent,'circle',{cx:p.x,cy:p.y,r:r,fill:col,stroke:'none','data-polarity':p.net});
+      return {x:p.x,y:p.y,net:p.net};}
+    /* 接地符号 = 公共端的声明：同名网络的多个接地符号在电气上是同一个节点。 */
+    ground(p){this.anchors.push(p);this.grounds.push(p);const g=e(this.parent,'g',{'data-ground':p.net});this.line(g,p.x,p.y,p.x,p.y+8);[10,7,3].forEach((a,i)=>this.line(g,p.x-a,p.y+8+5*i,p.x+a,p.y+8+5*i));}
+    port(p,label,opt){opt=opt||{};this.anchors.push(p);e(this.parent,'circle',{cx:p.x,cy:p.y,r:4.5,fill:'#fff',stroke:colors.wire,'stroke-width':1.7,'data-port':p.net});if(label)this.text(p.x+(opt.dx||0),p.y+(opt.dy===undefined?-15:opt.dy),label,{size:13,anchor:opt.anchor||'middle'});}
+    component(id,kind,pins,draw){if(this.parts.some(c=>c.id===id))throw Error('重复元件 '+id);const g=e(this.parent,'g',{'data-component':id,'data-kind':kind});Object.keys(pins).forEach(k=>{const p=pins[k];e(g,'g',{'data-pin':k,'data-net':p.net,'data-x':p.x,'data-y':p.y});});draw(g);const c={id,kind,pins,el:g};this.parts.push(c);return pins;}
+    two(id,kind,a,b,opt){opt=opt||{};const vertical=a.x===b.x,horizontal=a.y===b.y;const angled=!vertical&&!horizontal;
+      if(angled&&opt.angled!==true)throw Error('元件两端必须同轴（斜置元件须显式声明 angled:true）');
+      const len=Math.hypot(b.x-a.x,b.y-a.y);if(len<38)throw Error('元件引脚间距过短 '+id);const mx=(a.x+b.x)/2,my=(a.y+b.y)/2,ux=(b.x-a.x)/len,uy=(b.y-a.y)/len,col=opt.color||colors.wire;
+      const xy=(u,v)=>({x:mx+u*ux-v*uy,y:my+u*uy+v*ux});
+      const pins=this.component(id,kind,{a,b},g=>{
+        const seg=(u1,v1,u2,v2)=>{const p=xy(u1,v1),q=xy(u2,v2);this.line(g,p.x,p.y,q.x,q.y,col);};
+        if(kind==='capacitor'){
+          seg(-len/2,0,-4,0);seg(-4,-11,-4,11);seg(4,-11,4,11);seg(4,0,len/2,0);
+          if(opt.variable){
+            if(opt.varArrow==='up'){
+              /* 教材画法（教材第 7 章题 7.12 图的「10 pF」斜箭头电容，PDF 186 ×9 放大逐点确认）：
+               * 斜箭头是**世界坐标**的「左下 → 右上」(↗)，**不随器件轴向旋转**。
+               * v1.0 起的默认画法把斜箭头画在元件局部坐标里 → 竖直器件会变成 ↖，与教材不符。
+               * 教材符号 ≠ 通用符号 → 按「先扩库（带回归测试）再复用」处理，不在页面里私造。 */
+              const sx=mx-17, sy=my+16, tx=mx+17, ty=my-16;
+              this.line(g,sx,sy,tx,ty,col);
+              const ddx=tx-sx, ddy=ty-sy, LL=Math.hypot(ddx,ddy), nx=ddx/LL, ny=ddy/LL, px2=-ny, py2=nx;
+              const bx=tx-nx*7, by=ty-ny*7;
+              this.line(g,bx+px2*4.5,by+py2*4.5,tx,ty,col);
+              this.line(g,bx-px2*4.5,by-py2*4.5,tx,ty,col);
+            }else{
+              seg(-17,16,17,-16);const t=xy(17,-16);e(g,'path',{d:'M '+(t.x-6)+' '+t.y+' L '+t.x+' '+t.y+' L '+t.x+' '+(t.y+6),fill:'none',stroke:col,'stroke-width':1.6});
+            }
+          }
+        }else if(kind==='inductor'){
+          /* ① 符号长度固定：引线变长时只让引线变长，符号本身不变形 */
+          if(len<IND_BODY+2*IND_LEAD)throw Error('电感引脚间距过短，无法画固定尺寸符号 '+id+'（需 ≥'+(IND_BODY+2*IND_LEAD)+'px，实际 '+len.toFixed(1)+'px）');
+          const body=IND_BODY,r=body/8;seg(-len/2,0,-body/2,0);let d='M '+xy(-body/2,0).x+' '+xy(-body/2,0).y;
+          for(let i=0;i<4;i++){const p=xy(-body/2+body*(i+1)/4,0);d+=' A '+r+' '+r+' 0 0 1 '+p.x+' '+p.y;}e(g,'path',{d,stroke:col,'stroke-width':1.8,fill:'none'});seg(body/2,0,len/2,0);
+          /* ② o.core：**铁芯电感**（教材题 4.10 图的 ZL 在线圈旁画一条铁芯线）。
+           *    线圈的凸弧画在局部 +v 侧（竖直元件 = 左、水平元件 = 上），
+           *    所以铁芯线画在 −v 侧（竖直 = 右、水平 = 上方），两者不重叠。
+           *    o.core=true → 偏移 −11px；o.core 可直接给数字按该偏移量。
+           *    o.coreDash=true → 铁芯线画成**虚线**（教材题 4.8 图的 ZL 磁芯线是虚线，
+           *      答案册重绘成实线 —— 本库以教材为准）。
+           *    不传 o.core 时画法与 v1.7 完全一致（正例 + 负例回归见 test_components.js）。 */
+          if(opt.core){
+            const off=typeof opt.core==='number'?opt.core:-11;
+            if(opt.coreDash){const dl=8,gp=4;for(let u=-body/2;u+dl<=body/2;u+=dl+gp)seg(u,off,u+dl,off);}
+            else seg(-body/2,off,body/2,off);
+          }
+        }else if(kind==='crystal'){
+          /* 石英晶体：教材画法 = 极板 + 中间矩形 + 极板（第 4 章题 4.10 图、
+           * 答案册「图题 4.10」同款）。符号本体长度固定，不随引线长度变形。
+           * o.size = 极板到极板的总长；o.plate = 极板半长；o.box = 中间矩形半宽。 */
+          const size=opt.size===undefined?22:opt.size;
+          const pl=opt.plate===undefined?9:opt.plate;
+          const bw=opt.box===undefined?9:opt.box;
+          const bh=size*0.22;
+          if(len<size+18)throw Error('晶体引脚间距过短 '+id+'（需 ≥'+(size+18)+'px，实际 '+len.toFixed(1)+'px）');
+          seg(-len/2,0,-size/2,0);seg(size/2,0,len/2,0);
+          seg(-size/2,-pl,-size/2,pl);          /* 极板 1 */
+          seg(size/2,-pl,size/2,pl);            /* 极板 2 */
+          const q1=xy(-bh,-bw),q2=xy(-bh,bw),q3=xy(bh,bw),q4=xy(bh,-bw);
+          e(g,'path',{d:'M '+q1.x+' '+q1.y+' L '+q2.x+' '+q2.y+' L '+q3.x+' '+q3.y+' L '+q4.x+' '+q4.y+' Z',fill:'#fff',stroke:col,'stroke-width':1.8});
+        }else if(kind==='dc-source'){
+          g.setAttribute('data-positive',opt.positive==='b'?'b':'a');
+          seg(-len/2,0,-6,0);seg(6,0,len/2,0);const positive=opt.positive==='b'?1:-1;seg(-6,-(positive===-1?13:7),-6,(positive===-1?13:7));seg(6,-(positive===1?13:7),6,(positive===1?13:7));
+          const p=xy(positive*13,18);this.text(p.x,p.y,'+',{size:12,color:col});
+        }else if(kind==='current-source'){
+          /* 恒流源：圆圈 + 箭头。箭头默认由 b 指向 a（opt.direction:'b' 可反向）。
+           * o.style==='book'：**教材画法**（第 2 章题 2.5 / 2.12 图、答案册「图题 2.5」同款）——
+           *   圆圈内画一条**垂直于元件轴线**的横线（信号电流源记号），
+           *   箭头画在**圈外的引线上**、实心三角、尖端朝向圆圈。
+           *   o.dir：+1 = 电流由 a 指向 b（箭头落在 a 侧引线上），−1 = 由 b 指向 a。
+           *   （默认 +1；圈+内箭头的旧画法仍按 b→a，不受影响。） */
+          const r=opt.r||15;
+          if(len<2*r)throw Error('电流源引脚间距过短 '+id);
+          seg(-len/2,0,-r,0);seg(r,0,len/2,0);
+          e(g,'circle',{cx:mx,cy:my,r:r,fill:'#fff',stroke:col,'stroke-width':1.8});
+          if(opt.style==='book'){
+            const dir=opt.dir===undefined?1:(opt.dir>=0?1:-1);
+            const side=dir>0?-1:1;          /* 箭头所在的引线侧（a 侧 = u 负方向） */
+            /* 箭头大小随引线长度自适应：绝不能越出引脚 */
+            const avail=len/2-r;
+            const hl=Math.min(opt.head===undefined?13:opt.head,avail*0.5);
+            const hw=opt.headWidth===undefined?5:opt.headWidth;
+            const gap=Math.max(2,Math.min(opt.gap===undefined?7:opt.gap,avail-hl-2));
+            const away=opt.tip==='away';    /* 尖端背离圆圈（教材题 2.12 图画法） */
+            const tipU=away?side*(r+gap+hl):side*(r+gap),baseU=away?side*(r+gap):side*(r+gap+hl);
+            const bar1=xy(0,-r),bar2=xy(0,r);
+            this.line(g,bar1.x,bar1.y,bar2.x,bar2.y,col);          /* 圈内横线 */
+            /* v1.15：o.arrow===false 时**不画引线箭头** ——
+             * 教材图 2-8 里信号电流源 İ_s 引线上**有**向上箭头，而两个受控源
+             * （y_re·Ů_c / y_fe·Ů_i）引线上**没有**箭头（圈内横杠照旧）。
+             * 教材依据：书页 22 / PDF 34 图 2-8，×6 放大件 scratch/shots/r19b_f28_left.png。
+             * 缺省 arrow:true —— 旧调用方行为与画法完全不变。 */
+            if(opt.arrow!==false){
+              const tip=xy(tipU,0),b1=xy(baseU,-hw),b2=xy(baseU,hw);
+              this.line(g,b1.x,b1.y,tip.x,tip.y,col);
+              e(g,'polygon',{points:[tip,b1,b2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+            }
+          }else{
+            const dir=opt.direction==='b'?1:-1;
+            const tip=xy(dir*9,0),tail=xy(-dir*9,0),b1=xy(dir*2,5),b2=xy(dir*2,-5);
+            this.line(g,tail.x,tail.y,tip.x,tip.y,col);
+            e(g,'polygon',{points:[tip,b1,b2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+          }
+        }else if(kind==='ac-source'){
+          /* 交流信号源：圆圈 + 极性标记。
+           * v1.4 修正：极性标记一律按**世界坐标**绘制，不随元件轴向翻转 ——
+           * 旧写法用元件局部坐标，水平放置时「−」会变成一根竖杠（读作 | 而不是 −）。
+           * 现在 a 端画「+」（世界横杠 + 世界竖杠的十字）、b 端画「−」（世界横杠）。
+           * o.polarity===false 时不画内置标记，由页面按教材在圈外另行标注。
+           * v1.14 新增 o.style='bar'：**教材电压源画法**（第 3 章图 3-2 的信号源，
+           * 书页 52 / PDF 64 ×22 放大逐点确认）——
+           *   圆圈内一条**沿元件轴向**的直线，**导线整段穿过圆圈**（圆内那段线可见）。
+           *   这是国标电压源记号，与默认的「圈内 +/−」不同。
+           *   画法顺序：先画圆（白底）再画贯穿线 → 圆内那段线可见，与教材页图一致。
+           *   不传 o.style 时默认画法**完全不变**（既有调用方不受影响）。 */
+          const r=opt.r||15;
+          if(len<2*r)throw Error('交流源引脚间距过短 '+id);
+          if(opt.style==='bar'){
+            e(g,'circle',{cx:mx,cy:my,r:r,fill:'#fff',stroke:col,'stroke-width':1.8});
+            const q1=xy(-len/2,0),q2=xy(len/2,0);
+            this.line(g,q1.x,q1.y,q2.x,q2.y,col);   /* 导线穿圈：整段一条线 */
+          }else{
+          seg(-len/2,0,-r,0);seg(r,0,len/2,0);
+          e(g,'circle',{cx:mx,cy:my,r:r,fill:'#fff',stroke:col,'stroke-width':1.8});
+          if(opt.polarity!==false){
+            const dd=r-6;
+            const pa=xy(-dd,0),pb=xy(dd,0);
+            this.line(g,pa.x-4,pa.y,pa.x+4,pa.y,col);      /* 「+」的横杠 */
+            this.line(g,pa.x,pa.y-4,pa.x,pa.y+4,col);      /* 「+」的竖杠 */
+            this.line(g,pb.x-4,pb.y,pb.x+4,pb.y,col);      /* 「−」的横杠 */
+          }
+          }
+        }else if(kind==='diode'){
+          /* 二极管：三角形（阳极侧）尖端抵住阴极竖条。默认 a=阳极、b=阴极。
+           * o.w = 沿轴向的半长（三角底边到竖条），o.h = 垂直轴向的半高（竖条长度的一半）。 */
+          const w=opt.w===undefined?6:opt.w, h=opt.h===undefined?8:opt.h;
+          if(len<2*w+2)throw Error('二极管引脚间距过短 '+id);
+          const sgn=opt.reverse?-1:1;
+          seg(-len/2,0,-w,0);seg(w,0,len/2,0);
+          const bar1=xy(sgn*w,-h),bar2=xy(sgn*w,h);
+          this.line(g,bar1.x,bar1.y,bar2.x,bar2.y,col);
+          const q1=xy(-sgn*w,-h*0.8),q2=xy(-sgn*w,h*0.8),tip=xy(sgn*w,0);
+          e(g,'path',{d:'M '+q1.x+' '+q1.y+' L '+q2.x+' '+q2.y+' L '+tip.x+' '+tip.y+' Z',fill:'#fff',stroke:col,'stroke-width':1.8});
+        }else if(kind==='varactor'){
+          /* 变容二极管：二极管本体（三角尖端抵住**阴极横条**）+ **一支双箭头**（变容记号）。
+           * 教材画法逐点核对（教材第 7 章题 7.12 图 / 7.13 图，PDF 186–187 ×20 放大）：
+           *   题 7.12 图：器件**水平**、阴极竖条在左 → 双箭头在符号**下方**、**水平**、两个箭头**背向背**；
+           *   题 7.13 图：器件**竖直**、阴极横条在上 → 双箭头在符号**左侧**、**竖直**、两个箭头**背向背**。
+           * 两图合起来只有一条规则：**双箭头平行于器件轴、位于局部 −v 侧、沿轴居中、两个箭头背向背（中间断开）**。
+           * ⚠ 不能用「绝对屏幕左/上」定位 —— 那会在器件朝向变化时跑到错的一侧；
+           *   局部 +v 方向 = (−uy, ux)，所以局部 −v 方向 = (uy, −ux)。
+           * 与通用二极管的差别就在这支双箭头 —— 不能拿 diode() 假借。
+           * 默认 a=阳极、b=阴极；o.w / o.h 同 diode()；
+           * o.arrow:'double'（默认）| 'none'；
+           * o.arrowSide:'local-'（默认）| 'local+' | 'left' | 'right' | 'up' | 'down'；
+           * o.arrowAt（沿轴位置，默认 0 = 与符号体居中对齐；+u 方向 = 指向阴极 b 侧）/
+           * o.arrowV（离轴距离，默认 h+7）/ o.arrowLen（箭头半长，默认 6）。 */
+          const w=opt.w===undefined?7:opt.w, h=opt.h===undefined?9:opt.h;
+          if(len<2*w+2)throw Error('变容二极管引脚间距过短 '+id);
+          const sgn=opt.reverse?-1:1;
+          seg(-len/2,0,-w,0);seg(w,0,len/2,0);
+          const bar1=xy(sgn*w,-h),bar2=xy(sgn*w,h);
+          this.line(g,bar1.x,bar1.y,bar2.x,bar2.y,col);
+          const t1=xy(-sgn*w,-h*0.8),t2=xy(-sgn*w,h*0.8),ttip=xy(sgn*w,0);
+          e(g,'path',{d:'M '+t1.x+' '+t1.y+' L '+t2.x+' '+t2.y+' L '+ttip.x+' '+ttip.y+' Z',fill:'#fff',stroke:col,'stroke-width':1.8});
+          if(opt.arrow!=='none'){
+            const side=opt.arrowSide||'local-';
+            let ox=0,oy=0;
+            if(side==='local-'){ox=uy;oy=-ux;}          /* 局部 −v 侧 = 教材画法 */
+            else if(side==='local+'){ox=-uy;oy=ux;}
+            else if(side==='left'){ox=-1;oy=0;}
+            else if(side==='right'){ox=1;oy=0;}
+            else if(side==='up'){ox=0;oy=-1;}
+            else{ox=0;oy=1;}
+            const dist=opt.arrowV===undefined?(h+7):opt.arrowV;
+            const au=opt.arrowAt===undefined?0:opt.arrowAt;
+            const cx=mx+ox*dist+ux*au, cy=my+oy*dist+uy*au;
+            const al=opt.arrowLen===undefined?6:opt.arrowLen, gp=1;
+            const p1={x:cx-ux*al,y:cy-uy*al},p2={x:cx-ux*gp,y:cy-uy*gp};
+            this.line(g,p1.x,p1.y,p2.x,p2.y,col);
+            const p3={x:cx+ux*gp,y:cy+uy*gp},p4={x:cx+ux*al,y:cy+uy*al};
+            this.line(g,p3.x,p3.y,p4.x,p4.y,col);
+            const px=-uy,py=ux;                       /* 垂直于轴线的方向 */
+            const tipP={x:cx+ux*al,y:cy+uy*al};
+            const b1={x:cx+ux*(al-3.6)+px*2.6,y:cy+uy*(al-3.6)+py*2.6};
+            const b2={x:cx+ux*(al-3.6)-px*2.6,y:cy+uy*(al-3.6)-py*2.6};
+            e(g,'polygon',{points:[tipP,b1,b2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+            const tipM={x:cx-ux*al,y:cy-uy*al};
+            const c1={x:cx-ux*(al-3.6)+px*2.6,y:cy-uy*(al-3.6)+py*2.6};
+            const c2={x:cx-ux*(al-3.6)-px*2.6,y:cy-uy*(al-3.6)-py*2.6};
+            e(g,'polygon',{points:[tipM,c1,c2].map(p=>p.x+','+p.y).join(' '),fill:col,stroke:'none'});
+          }
+        }else{
+          const size=kind==='impedance'?48:36;seg(-len/2,0,-size/2,0);seg(size/2,0,len/2,0);
+          if(angled){
+            /* 斜置元件：矩形随元件轴向**旋转**（旋转是姿态变化，不是符号变形 ——
+               符号本身的长宽比与轴对齐时完全一致）。 */
+            const th=Math.atan2(uy,ux)*180/Math.PI;
+            e(g,'rect',{x:mx-size/2,y:my-8,width:size,height:16,fill:'#fff',stroke:col,'stroke-width':1.8,
+                       transform:'rotate('+th.toFixed(4)+' '+mx.toFixed(4)+' '+my.toFixed(4)+')'});
+          }else{
+            const p=xy(-size/2,-8);e(g,'rect',{x:vertical?mx-8:p.x,y:vertical?my-size/2:my-8,width:vertical?16:size,height:vertical?size:16,fill:'#fff',stroke:col,'stroke-width':1.8});
+          }
+        }
+      });
+      const label=opt.label===undefined?id:opt.label;
+      if(label){const at=opt.at||(angled?[xy(0,-26).x,xy(0,-26).y]:(vertical?[mx+22,my+4]:[mx,my-20]));this.text(at[0],at[1],label,{anchor:opt.anchor||'middle',color:col,size:opt.size||14});}
+      if(opt.value){const at=opt.valueAt||(angled?[xy(0,-46).x,xy(0,-46).y]:(vertical?[mx+26,my+26]:[mx,my-41]));this.text(at[0],at[1],opt.value,{size:12,anchor:opt.anchor||'middle',color:col});}
+      return pins;
+    }
+    cap(id,a,b,o){return this.two(id,'capacitor',a,b,o);}
+    ind(id,a,b,o){return this.two(id,'inductor',a,b,o);}
+    /* 石英晶体（教材第 4 章题 4.10 图、答案册「图题 4.10」同款）：极板 + 矩形 + 极板。 */
+    crystal(id,a,b,o){return this.two(id,'crystal',a,b,o);}
+    res(id,a,b,o){return this.two(id,'resistor',a,b,o);}
+    imp(id,a,b,o){return this.two(id,'impedance',a,b,o);}
+    battery(id,a,b,o){return this.two(id,'dc-source',a,b,o);}
+    currentSource(id,a,b,o){return this.two(id,'current-source',a,b,o);}
+    acSource(id,a,b,o){return this.two(id,'ac-source',a,b,o);}
+    diode(id,a,b,o){return this.two(id,'diode',a,b,o);}
+    /* 变容二极管（教材第 7 章题 7.12 图 / 7.13 图的 VD，PDF 186 / 187 ×20 放大逐点确认）：
+     * 二极管本体（三角尖端抵住**阴极横条**，默认 a=阳极、b=阴极）+ **一支双箭头**表示电容值可调。
+     * 与通用二极管的差别就在这支双箭头 —— 不能拿 diode() 假借。
+     * o.w / o.h 同 diode()；
+     * o.arrow:'double'（默认）| 'none'；
+     * o.arrowSide 用**局部方向**（教材两图归纳出的唯一规则：双箭头在**局部 −v 侧**）：
+     *   'local-'（默认）| 'local+' | 'left' | 'right' | 'up' | 'down'；
+     * o.arrowAt（沿轴位置，默认 0 = 与符号体居中对齐；+u 方向 = 指向阴极 b 侧）/
+     * o.arrowV（离轴距离，默认 h+7）/ o.arrowLen（箭头半长，默认 6）。
+     * 返回 {a,b} 两个**真实端点**。 */
+    varactor(id,a,b,o){return this.two(id,'varactor',a,b,o);}
+    /* 结型场效应管 JFET：圆圈 + 竖直沟道 + 栅极引线上的箭头。
+     * 教材画法（教材第 9 章题 9.13 图、答案册「图题 9.13」同款）：
+     *   圆圈内一条竖直线是**沟道**，栅极自左侧引入，箭头画在栅极引线上。
+     * o.arrow:'in'（默认）= **n 沟道**，箭头**尖端指向沟道**（教材画法）；
+     *              'out'    = p 沟道，箭头尖端**背离**沟道。
+     * o.r 圆半径 / o.ch 沟道半长 / o.gate 栅极引线长 / o.lead 漏源引线长。
+     * o.label 元件名（默认 id）、o.labelAt=[x,y,anchor]；o.pinLabels={g:'G',d:'D',s:'S'}。
+     *
+     * v1.15 增两项能力（教材第 2 章**图 2-20** 的 VT₂ —— 共栅画法，原有硬编码朝向表达不了）：
+     *   o.rot : 0(默认) | 90 | 180 | 270 —— 绕器件中心 (x,y) 把**符号本体**
+     *          （沟道 / 栅极引线 / 箭头 / 漏源引线）整体旋转。
+     *   o.ds  : 'normal'(默认) | 'swap' —— **只交换漏源两脚所接的网络**（几何不动）。
+     *          JFET 的源漏对称：教材图 2-20 的 VT₂ 正是「栅极朝下、源在左、漏在右」，
+     *          用 o.rot:270 + o.ds:'swap' 即可复现，不必在页面里私造符号。
+     *   教材依据：《通信电子线路》（第 3 版，陈启兴）**书页 36 / PDF 48 图 2-20**；
+     *   像素级取证 scratch/shots/r19e_vt2_ascii2.txt.txt 与 r19e_f220_vt2map.txt。
+     *   不传 o.rot / o.ds 时画法与 v1.14 **完全一致**（回归用例锁住）。
+     * 返回 {G,D,S} 三个**真实端点**。 */
+    jfet(id,x,y,nets,opt){
+      opt=opt||{};
+      const col=opt.color||colors.device;
+      const R=opt.r===undefined?34:opt.r;
+      const ch=opt.ch===undefined?16:opt.ch;
+      const gd=opt.gate===undefined?28:opt.gate;
+      const ld=opt.lead===undefined?26:opt.lead;
+      const inward=(opt.arrow||'in')==='in';
+      const rot=opt.rot||0;
+      if(rot!==0&&rot!==90&&rot!==180&&rot!==270)throw Error('jfet 的 o.rot 只能是 0 / 90 / 180 / 270');
+      const swapDS=(opt.ds||'normal')==='swap';
+      /* 基础朝向：栅极在左、漏极在上、源极在下。T() 把「基础相对坐标」映射到实际坐标。
+       * 屏幕坐标 y 向下，故 rot:90 = 视觉顺时针 90°（上→右、左→上）。 */
+      const T=function(dx,dy){
+        let X=dx,Y=dy,t;
+        if(rot===90){t=X;X=-Y;Y=t;}
+        else if(rot===180){X=-X;Y=-Y;}
+        else if(rot===270){t=X;X=Y;Y=-t;}
+        return {x:x+X,y:y+Y};
+      };
+      const gP=T(-gd,0), dP=T(0,-(ch+ld)), sP=T(0,ch+ld);
+      const pins={G:point(gP.x,gP.y,nets.g),
+                  D:point(dP.x,dP.y,swapDS?nets.s:nets.d),
+                  S:point(sP.x,sP.y,swapDS?nets.d:nets.s)};
+      this.component(id,'jfet',pins,g=>{
+        e(g,'circle',{cx:x,cy:y,r:R,fill:'none',stroke:col,'stroke-width':1.4});
+        const c0=T(0,-ch), c1=T(0,ch);
+        this.line(g,c0.x,c0.y,c1.x,c1.y,col);                 /* 沟道 */
+        if(inward){
+          const g1=T(-gd,0),g2=T(-18,0),h1=T(-8,0),h2=T(-17,-3.6),h3=T(-17,3.6);
+          this.line(g,g1.x,g1.y,g2.x,g2.y,col);
+          e(g,'polygon',{points:h1.x+','+h1.y+' '+h2.x+','+h2.y+' '+h3.x+','+h3.y,fill:col,stroke:'none'});
+        }else{
+          const g1=T(-gd,0),g2=T(-9,0),h1=T(-18,0),h2=T(-9,-3.6),h3=T(-9,3.6);
+          this.line(g,g1.x,g1.y,g2.x,g2.y,col);
+          e(g,'polygon',{points:h1.x+','+h1.y+' '+h2.x+','+h2.y+' '+h3.x+','+h3.y,fill:col,stroke:'none'});
+        }
+        const dl0=T(0,-ch),dl1=T(0,-ch-ld);
+        const sl0=T(0,ch),sl1=T(0,ch+ld);
+        this.line(g,dl0.x,dl0.y,dl1.x,dl1.y,col);              /* 漏极引线 */
+        this.line(g,sl0.x,sl0.y,sl1.x,sl1.y,col);              /* 源极引线 */
+      });
+      const lbl=(opt.label===false)?null:(opt.label||id);
+      if(lbl){
+        const dflt=T(-4,-R-8);
+        const la=opt.labelAt||[dflt.x,dflt.y];
+        this.text(la[0],la[1],lbl,{color:col,size:opt.labelSize||14,anchor:la[2]||'middle'});
+      }
+      const pl=opt.pinLabels;
+      if(pl){
+        if(pl.g){const p=T(-gd-5,-4);this.text(p.x,p.y,pl.g,{color:col,size:12,anchor:'end'});}
+        if(pl.d){const p=T(6,-ch-ld+4);this.text(p.x,p.y,pl.d,{color:col,size:12});}
+        if(pl.s){const p=T(6,ch+ld+12);this.text(p.x,p.y,pl.s,{color:col,size:12});}
+      }
+      return pins;
+    }
+    /* 集成电路方框（IC）：矩形 + 引脚短线 + 框内引脚号。
+     * pins: { 名字: {net, side:'left'|'right'|'top'|'bottom', pos:0..1, label:'引脚号'} }
+     *   side='left'/'right' 时 pos 是沿该边**从上到下**的比例；
+     *   side='top'/'bottom'   时 pos 是沿该边**从左到右**的比例。
+     * o.name 方框内的器件名；o.nameAt=[dx,dy]（相对中心的偏移）。
+     * o.stub 引脚短线长度（默认 12）。返回每个引脚的**真实端点** {x,y,net}。 */
+    icBox(id,x,y,w,h,pins,opt){
+      opt=opt||{};
+      const col=opt.color||colors.device;
+      const stub=opt.stub===undefined?12:opt.stub;
+      const x0=x-w/2,x1=x+w/2,y0=y-h/2,y1=y+h/2;
+      const geo={},pinPts={};
+      Object.keys(pins).forEach(k=>{
+        const sp=pins[k],side=sp.side||'left';
+        let bx,by,dx,dy;
+        if(side==='left'){bx=x0;by=y0+h*sp.pos;dx=-1;dy=0;}
+        else if(side==='right'){bx=x1;by=y0+h*sp.pos;dx=1;dy=0;}
+        else if(side==='top'){by=y0;bx=x0+w*sp.pos;dx=0;dy=-1;}
+        else{by=y1;bx=x0+w*sp.pos;dx=0;dy=1;}
+        const ex=bx+dx*stub,ey=by+dy*stub;
+        geo[k]={x:ex,y:ey,net:sp.net};
+        pinPts[k]=point(ex,ey,sp.net);
+        sp._bx=bx;sp._by=by;sp._dx=dx;sp._dy=dy;sp._side=side;
+      });
+      this.component(id,'ic',pinPts,g=>{
+        e(g,'rect',{x:x0,y:y0,width:w,height:h,fill:'#fff',stroke:col,'stroke-width':1.8});
+        Object.keys(pins).forEach(k=>{
+          const sp=pins[k];
+          this.line(g,sp._bx,sp._by,sp._bx+sp._dx*stub,sp._by+sp._dy*stub,col);
+          if(sp.label){
+            let lx,ly,an;
+            if(sp._side==='left'){lx=sp._bx+14;ly=sp._by+4;an='start';}
+            else if(sp._side==='right'){lx=sp._bx-14;ly=sp._by+4;an='end';}
+            else if(sp._side==='top'){lx=sp._bx;ly=sp._by+16;an='middle';}
+            else{lx=sp._bx;ly=sp._by-14;an='middle';}
+            this.text(lx,ly,sp.label,{color:col,size:12,anchor:an});
+          }
+        });
+        if(opt.name){const na=opt.nameAt||[0,0];this.text(x+na[0],y+na[1]+5,opt.name,{color:col,size:opt.nameSize||15});}
+      });
+      return geo;
+    }
+    /* 晶体管。o.flip==='down'：**共基级画法**（教材题 2.17 图的 VT2）——
+     *   基极横杠在下、发射极引线向左上（带箭头）、集电极引线向右上、基极引线向下。
+     *   o.label===false 不画元件名；o.labelAt=[x,y,anchor] 指定元件名位置。 */
+    transistor(id,x,y,nets,opt){opt=opt||{};const mos=!!opt.mos,col=colors.device,flip=!mos&&opt.flip==='down';
+      const pins=flip
+        ? {B:point(x,y+50,nets.b),C:point(x+40,y-50,nets.c),E:point(x-40,y-50,nets.e)}
+        : {B:point(x,y,nets.b),C:point(x+60,y-50,nets.c),E:point(x+60,y+50,nets.e)};
+      this.component(id,mos?'nmos':'npn',mos?{G:pins.B,D:pins.C,S:pins.E}:pins,g=>{
+        if(mos){this.line(g,x,y,x+18,y,col);this.line(g,x+18,y-24,x+18,y+24,col);this.line(g,x+28,y-24,x+28,y+24,col);this.line(g,x+28,y-18,x+60,y-18,col);this.line(g,x+60,y-18,x+60,y-50,col);this.line(g,x+28,y+18,x+60,y+18,col);this.line(g,x+60,y+18,x+60,y+50,col);e(g,'circle',{cx:x+32,cy:y,r:40,fill:'none',stroke:col,'stroke-width':1.2});}
+        else if(flip){
+          this.line(g,x-16,y,x+16,y,col);          /* 基极横杠（在下） */
+          this.line(g,x,y,x,y+50,col);             /* 基极引线向下 */
+          this.line(g,x-16,y,x-40,y-40,col);       /* 发射极引线（左上） */
+          this.line(g,x-40,y-40,x-40,y-50,col);
+          e(g,'polygon',{points:(x-40)+','+(y-50)+' '+(x-46)+','+(y-41)+' '+(x-34)+','+(y-41),fill:col});
+          this.line(g,x+16,y,x+40,y-40,col);       /* 集电极引线（右上） */
+          this.line(g,x+40,y-40,x+40,y-50,col);
+        }
+        else{this.line(g,x,y,x+20,y,col);this.line(g,x+20,y-25,x+20,y+25,col);this.line(g,x+20,y-22,x+60,y-40,col);this.line(g,x+60,y-40,x+60,y-50,col);this.line(g,x+20,y+22,x+60,y+40,col);this.line(g,x+60,y+40,x+60,y+50,col);e(g,'polygon',{points:(x+43)+','+(y+25)+' '+(x+60)+','+(y+40)+' '+(x+45)+','+(y+39),fill:col});}
+      });
+      const lbl=(opt.label===false)?null:(opt.label||id);
+      if(lbl){const la=opt.labelAt||[x+10,y-58];this.text(la[0],la[1],lbl,{color:col,size:15,anchor:la[2]||'middle'});}
+      return pins;
+    }
+    /* 乘法器（教材符号：**圆圈内一个 ×**）。三端口：A 左输入 / B 下输入 / O 右输出。
+     *   教材 书页 149 / PDF 161「题 6.8 图」用的就是这个符号（⊗ 乘法器 → C∥R → 接地）。
+     *   此前库里没有，页面曾私造一个**方框图**（两个矩形块 + 箭头）冒充 →
+     *   与教材原图不符，且违反「旧 helper 与标准库不得混在一张图里」。
+     *   按「未覆盖的器件须先扩充、测试后再复用」补上（v1.18）。
+     *   o.label===true 才画元件名（教材符号圈内**没有**名称）；o.r 控制圆半径。 */
+    multiplier(id,x,y,nets,opt){opt=opt||{};
+      const col=colors.device,r=opt.r||18;
+      const pins={A:point(x-r,y,nets.a),B:point(x,y+r,nets.b),O:point(x+r,y,nets.o)};
+      this.component(id,'multiplier',pins,g=>{
+        e(g,'circle',{cx:x,cy:y,r:r,fill:'none',stroke:col,'stroke-width':1.5});
+        const k=r*0.72;
+        this.line(g,x-k,y-k,x+k,y+k,col);
+        this.line(g,x-k,y+k,x+k,y-k,col);
+      });
+      if(opt.label===true){const la=opt.labelAt||[x,y+r+16];this.text(la[0],la[1],id,{color:col,size:13,anchor:la[2]||'middle'});}
+      else if(typeof opt.label==='string'&&opt.label){const la=opt.labelAt||[x,y+r+16];this.text(la[0],la[1],opt.label,{color:col,size:13,anchor:la[2]||'middle'});}
+      return pins;
+    }
+    winding(id,x,y,topNet,bottomNet){return this.ind(id,point(x,y-48,topNet),point(x,y+48,bottomNet),{label:''});}    transformer(id,x,y,nets){const p=this.winding(id+'.p',x,y,nets.p1,nets.p2),s=this.winding(id+'.s',x+50,y,nets.s1,nets.s2);this.line(this.parent,x+23,y-45,x+23,y+45);this.line(this.parent,x+28,y-45,x+28,y+45);this.text(x+25,y+69,id,{size:13});return {p1:p.a,p2:p.b,s1:s.a,s2:s.b};}
+    /* ⑥ 带抽头的竖直绕组。
+     * nodes: [{net,y}]，按 y 升序；**首尾是绕组两端，中间的节点即抽头**。
+     * 教材口径「抽头位于线圈实际曲线折点」：绕组被 nodes 分成若干段，
+     *   段界就是折点，抽头引线从折点引出 —— 不落在折点上的抽头无法表达。
+     * o.bulge: 凸弧鼓向（+1 右 / −1 左）；o.side: 抽头引出方向（±1）；
+     * o.lead: 抽头引线长度；o.rx: 凸弧横向半径；o.bumps: 每段的凸弧个数。
+     * 返回 {a,b,taps:[{net,x,y}]}，a/b/taps 都是可直接接线的真实端点。 */
+    windingTapped(id,x,nodes,o){
+      o=o||{};
+      const bulge=o.bulge===undefined?1:o.bulge, side=o.side===undefined?-1:o.side;
+      const lead=o.lead===undefined?16:o.lead, rx=o.rx===undefined?9:o.rx;
+      const ns=(nodes||[]).map(n=>({net:n.net,y:n.y})).sort((a,b)=>a.y-b.y);
+      if(ns.length<2)throw Error('绕组至少要有首尾两个节点 '+id);
+      for(let i=1;i<ns.length;i++)if(!(ns[i].y>ns[i-1].y))throw Error('绕组节点必须按 y 严格递增 '+id+'（第 '+i+' 个节点）');
+      const col=o.color||colors.wire;
+      const pins={a:point(x,ns[0].y,ns[0].net),b:point(x,ns[ns.length-1].y,ns[ns.length-1].net)};
+      ns.slice(1,-1).forEach((n,i)=>{pins['t'+(i+1)]=point(x+side*lead,n.y,n.net);});
+      this.component(id,'winding',pins,g=>{
+        let d='';
+        for(let i=0;i<ns.length-1;i++){
+          const y1=ns[i].y,y2=ns[i+1].y,h=y2-y1;
+          const k=o.bumps||Math.max(1,Math.round(h/15));
+          for(let j=0;j<k;j++){
+            const a=y1+h*j/k,b=y1+h*(j+1)/k;
+            d+=' M '+x+' '+a+' A '+rx+' '+(h/(2*k)).toFixed(3)+' 0 0 '+(bulge>0?1:0)+' '+x+' '+b.toFixed(3);
+          }
+        }
+        e(g,'path',{d,stroke:col,'stroke-width':1.8,fill:'none'});
+        /* 抽头引线：自折点（节点所在处）水平引出 */
+        ns.slice(1,-1).forEach(n=>{this.line(g,x,n.y,x+side*lead,n.y,col);});
+      });
+      const taps=ns.slice(1,-1).map(n=>({net:n.net,x:x+side*lead,y:n.y}));
+      return {a:pins.a,b:pins.b,taps:taps,nodes:ns};
+    }
+    /* ⑥ 带抽头的变压器：一次/二次各一个可抽头绕组，各绕组电隔离，共用铁芯。
+     * pNodes / sNodes 均为 [{net,y}]，含义同 windingTapped()。 */
+    transformerTapped(id,x,pNodes,sNodes,o){
+      o=o||{};
+      const p=this.windingTapped(id+'.p',x,pNodes,Object.assign({bulge:1,side:-1},o.p||{}));
+      const s=this.windingTapped(id+'.s',x+(o.dx===undefined?50:o.dx),sNodes,Object.assign({bulge:-1,side:1},o.s||{}));
+      const yTop=Math.min(p.nodes[0].y,s.nodes[0].y),yBot=Math.max(p.nodes[p.nodes.length-1].y,s.nodes[s.nodes.length-1].y);
+      const c0=o.core0===undefined?x+23:o.core0, c1=o.core1===undefined?x+28:o.core1;
+      this.line(this.parent,c0,yTop+4,c0,yBot-4);this.line(this.parent,c1,yTop+4,c1,yBot-4);
+      /* o.label===false 时不画自动的元件名（教材图有的变压器并不标 T） */
+      if(o.label!==false)this.text(o.labelX===undefined?x+25:o.labelX,o.labelY===undefined?yBot+25:o.labelY,id,{size:13});
+      return {p:p,s:s};
+    }
+    /* ⑥ 多绕组（耦合绕组 / 多绕组变压器）：N 个绕组共用同一铁芯，各自电隔离。 */
+    coupledWindings(id,x,list,o){
+      o=o||{};
+      const out=[];
+      let yTop=Infinity,yBot=-Infinity;
+      list.forEach((it,i)=>{
+        const side=it.side===undefined?(i%2?-1:1):it.side;
+        const bulge=it.bulge===undefined?(-side):it.bulge;
+        const dx=it.dx===undefined?(o.dx===undefined?50:o.dx):it.dx;
+        const ww=this.windingTapped(id+'.'+(it.label||('w'+(i+1))),x+dx*i,it.nodes,Object.assign({},it,o,{bulge:bulge,side:side}));
+        out.push(ww);
+        ww.nodes.forEach(n=>{if(n.y<yTop)yTop=n.y;if(n.y>yBot)yBot=n.y;});
+      });
+      const c0=o.core0===undefined?x+(o.coreDx||23):o.core0, c1=o.core1===undefined?x+(o.coreDx||23)+5:o.core1;
+      this.line(this.parent,c0,yTop+4,c0,yBot-4);this.line(this.parent,c1,yTop+4,c1,yBot-4);
+      if(o.label!==false)this.text(o.labelX===undefined?x+(o.coreDx||23):o.labelX,o.labelY===undefined?yBot+25:o.labelY,id,{size:13});
+      return out;
+    }
+    /* 连接检查读实际生成的 polyline，而不是只检查事先声明的网络标签。 */
+    audit(){
+      const eps=EPS, issues=[];
+      const wires=this.wires.map(w=>({net:w.el.getAttribute('data-wire'),pts:w.el.getAttribute('points').trim().split(/\s+/).map(s=>s.split(',').map(Number))}));
+      const pins=[];this.parts.forEach(c=>Object.entries(c.pins).forEach(([name,p])=>pins.push({id:c.id,p,name})));
+      const on=(p,a,b)=>Math.abs((p.x-a[0])*(b[1]-a[1])-(p.y-a[1])*(b[0]-a[0]))<eps&&p.x>=Math.min(a[0],b[0])-eps&&p.x<=Math.max(a[0],b[0])+eps&&p.y>=Math.min(a[1],b[1])-eps&&p.y<=Math.max(a[1],b[1])+eps;
+      /* 1. 引脚：悬空 / 误接到异网导线 */
+      pins.forEach(pin=>{const p=pin.p;
+        let connected=this.anchors.some(a=>a.net===p.net&&Math.hypot(a.x-p.x,a.y-p.y)<eps)||pins.some(q=>q!==pin&&q.p.net===p.net&&Math.hypot(q.p.x-p.x,q.p.y-p.y)<eps);
+        wires.forEach(w=>{for(let i=1;i<w.pts.length;i++)if(on(p,w.pts[i-1],w.pts[i])){if(w.net===p.net)connected=true;else issues.push(pin.id+'.'+pin.name+' 导线误接 '+w.net+' / '+p.net);}});
+        if(!connected)issues.push(pin.id+'.'+pin.name+' 引脚悬空');
+      });
+      /* 2. 异网导线交叉 / 异网共用端点 */
+      const segs=[];wires.forEach(w=>{for(let i=1;i<w.pts.length;i++)segs.push({net:w.net,a:w.pts[i-1],b:w.pts[i]});});
+      if(!disabled('cross')){
+        const crossPt=(p1,p2,p3,p4)=>{
+          const d=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+          const d1=d(p3,p4,p1),d2=d(p3,p4,p2),d3=d(p1,p2,p3),d4=d(p1,p2,p4);
+          if(((d1>0&&d2<0)||(d1<0&&d2>0))&&((d3>0&&d4<0)||(d3<0&&d4>0))){
+            const t=d3/(d3-d4);return {x:p3[0]+t*(p4[0]-p3[0]),y:p3[1]+t*(p4[1]-p3[1])};
+          }
+          return null;
+        };
+        const same=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<eps;
+        for(let i=0;i<segs.length;i++)for(let j=i+1;j<segs.length;j++){
+          const A=segs[i],B=segs[j];if(A.net===B.net)continue;
+          const q=crossPt(A.a,A.b,B.a,B.b);
+          if(q){
+            /* 跳线保护圆内的交叉是「显式声明的不相连」，不算缺陷。 */
+            if(!this.hopNear(q.x,q.y))issues.push('导线 '+A.net+' 与导线 '+B.net+' 交叉但没有接点标记');
+            continue;
+          }
+          /* T 形：一条线的端点落在另一条线的中段 */
+          const ends=[[A,B],[B,A]];
+          for(const [e1,other] of ends){
+            for(const p of [e1.a,e1.b]){
+              if(on({x:p[0],y:p[1]},other.a,other.b)&&!same(p,other.a)&&!same(p,other.b)){
+                if(!this.hopNear(p[0],p[1]))issues.push('导线 '+e1.net+' 的端点落在导线 '+other.net+' 上（异网，需接点标记）');
+              }
+            }
+          }
+          /* 异网共用端点：疑似短路 */
+          for(const p of [A.a,A.b])for(const q of [B.a,B.b])if(same(p,q))issues.push('导线 '+A.net+' 与导线 '+B.net+' 共用端点 ('+p[0]+','+p[1]+')（异网，疑似短路）');
+        }
+      }
+      /* 3. 同一网络必须连成一片 */
+      if(!disabled('split')){
+        const pts=[],par=[];
+        /* par 必须随 pts 一起长：并查集的父指针表比点表短会让 find() 全部返回 undefined，
+         * 结果「同网分裂」永远检不出来（v1.1 的实现正是这样写的）。
+         * pid 要同时接受 [x,y] 折线顶点与 {x,y} 引脚/端口，两种形状混用时
+         * 坐标会读成 undefined，NaN 比较恒为 false，引脚就会各拿一个新索引。 */
+        const pid=p=>{const x=Array.isArray(p)?p[0]:p.x,y=Array.isArray(p)?p[1]:p.y;
+          let i=pts.findIndex(q=>Math.hypot(q[0]-x,q[1]-y)<eps);if(i<0){pts.push([x,y]);i=pts.length-1;par[i]=i;}return i;};
+        const find=a=>{while(par[a]!==a){par[a]=par[par[a]];a=par[a];}return a;};
+        const uni=(a,b)=>{const ra=find(a),rb=find(b);if(ra!==rb)par[rb]=ra;};
+        const segIds=segs.map(s=>[pid(s.a),pid(s.b)]);
+        segIds.forEach(([a,b])=>uni(a,b));
+        pins.forEach(pin=>{pin.__i=pid(pin.p);});
+        this.anchors.forEach(a=>{a.__i=pid(a);});
+        /* 接地符号即公共端：同名网络的多个接地符号属于同一节点 */
+        const gByNet={};this.grounds.forEach(g=>{(gByNet[g.net]=gByNet[g.net]||[]).push(g.__i);});
+        Object.keys(gByNet).forEach(net=>{const l=gByNet[net];for(let i=1;i<l.length;i++)uni(l[0],l[i]);});
+        /* 导线折点落在同网导线上 → 视为接通（T 形接头） */
+        wires.forEach(w=>w.pts.forEach(p=>{
+          const i=pid(p);
+          segs.forEach((s,k)=>{if(s.net!==w.net)return;if(on({x:p[0],y:p[1]},s.a,s.b))uni(i,segIds[k][0]);});
+        }));
+        /* 引脚/端口落在同网导线上 → 接通 */
+        segs.forEach((s,k)=>{
+          pins.forEach(pin=>{if(pin.p.net!==s.net)return;if(on(pin.p,s.a,s.b))uni(pin.__i,segIds[k][0]);});
+          this.anchors.forEach(an=>{if(an.net!==s.net)return;if(on(an,s.a,s.b))uni(an.__i,segIds[k][0]);});
+        });
+        const nets={};
+        segs.forEach((s,k)=>{(nets[s.net]=nets[s.net]||[]).push(find(segIds[k][0]));});
+        pins.forEach(pin=>{(nets[pin.p.net]=nets[pin.p.net]||[]).push(find(pin.__i));});
+        this.anchors.forEach(an=>{(nets[an.net]=nets[an.net]||[]).push(find(an.__i));});
+        Object.keys(nets).forEach(net=>{
+          const set=new Set(nets[net]);
+          if(set.size>1)issues.push('网络 '+net+' 分裂成 '+set.size+' 块（互不相连）');
+        });
+      }
+      return {scene:this.id,parts:this.parts.length,wires:wires.length,pins:pins.length,issues};
+    }
+  }
+  global.CourseCircuit={version:'1.18',colors,palettes:PALETTES,usePalette,clear,Scene,point,audit(svg){return(svg.__circuits||[]).map(s=>s.audit());}};
+})(window);
+
+// 桩DOM工具将window与VM全局分开；显式提供同名经典脚本绑定。
+// ⚠ 这里的顺序有讲究（见 build/circuit/README.md「库区边界」）：
+//   ① 本块**最后一行**必须是 COURSE-CIRCUIT-END 标记 —— 刷新工具按它切库区，
+//      标记之后的内容属于页面自己；早先版本把「var CourseCircuit = ...」当切点，
+//      而它不是最后一行 → 每刷一次就多留一行残留（库区会无声膨胀）。
+//   ② subHtml 用「typeof 守卫」而不是直接赋值：同页还带 build/lib.js 时，
+//      lib.js 顶层有 function subHtml（函数声明会被提升），直接赋值会把它覆盖掉；
+//      而且本行执行时 lib.js 可能还没跑，window.subHtml 可能不存在。
+var CourseSubscript = window.CourseSubscript;
+var subHtml;
+if (typeof subHtml !== 'function') { subHtml = window.subHtml || function (s) { return s; }; }
+var CourseCircuit = window.CourseCircuit;
+/* === COURSE-CIRCUIT-END === */
+
+/* 教材图3-13～3-18，端口坐标一律取自标准元件返回值。 */
+function drawFeed(){
+ const svg=document.getElementById('svgFeed'),isS=FEED_MODE==='series';CourseCircuit.clear(svg,'0 0 1000 430');
+ const c=new CourseCircuit.Scene(svg,isS?'feed-series':'feed-parallel'),P=(x,y,n)=>c.p(x,y,n),W=(n,...ps)=>c.wire(n,ps);
+ const vt=c.transistor('VT',200,150,{b:'base',c:'collector',e:'0'});
+ c.port(P(130,150,'base'),'u_i',{dy:-18});W('base',P(130,150,'base'),vt.B);
+ W('0',vt.E,[260,370]);c.ground(P(260,370,'0'));
+ if(isS){
+  const L=c.ind('L',P(540,70,'collector'),P(540,220,'tank-return'),{at:[567,149],color:CourseCircuit.colors.tank});
+  const C=c.cap('C',P(410,70,'collector'),P(410,220,'tank-return'),{at:[383,149],color:CourseCircuit.colors.tank});
+  W('collector',vt.C,[260,70],L.a);W('collector',C.a,L.a);
+  W('tank-return',C.b,L.b);W('tank-return',[350,220],L.b);
+  const cp=c.cap('C_p',P(350,220,'tank-return'),P(350,370,'0'),{at:[325,298],color:CourseCircuit.colors.feed});
+  const zl=c.ind('Z_L',P(420,300,'vcc'),P(540,300,'tank-return'),{at:[480,279],color:CourseCircuit.colors.feed});
+  W('tank-return',L.b,zl.b);
+  const v=c.battery('V_CC',P(420,300,'vcc'),P(420,370,'0'),{at:[470,345],color:CourseCircuit.colors.feed});
+  W('0',P(260,370,'0'),cp.b,v.b);
+  c.text(760,92,'图3-13(a) 串馈',{bold:true,color:'#b91c1c',size:17});
+  c.text(760,135,'L、C 两端均处于直流高电位');c.text(760,168,'回路电容 C 不能直接接地');
+  c.text(760,233,'直流：V_CC → Z_L → L → VT');
+  c.text(760,266,'高频：C_p 为回路下端提供交流回路');
+ }else{
+  const zl=c.ind('Z_L',P(420,70,'collector'),P(420,280,'vcc'),{at:[391,179],color:CourseCircuit.colors.feed});
+  W('collector',vt.C,[260,70],zl.a);
+  const cc=c.cap('C_c',P(500,70,'collector'),P(630,70,'tank'),{at:[565,46],color:CourseCircuit.colors.feed});
+  W('collector',zl.a,cc.a);
+  const L=c.ind('L',P(660,70,'tank'),P(660,250,'0'),{at:[634,164],color:CourseCircuit.colors.tank});
+  const C=c.cap('C',P(790,70,'tank'),P(790,250,'0'),{at:[818,164],color:CourseCircuit.colors.tank});
+  W('tank',cc.b,L.a,C.a);W('0',L.b,C.b);W('0',L.b,[660,370]);
+  const v=c.battery('V_CC',P(420,280,'vcc'),P(420,370,'0'),{at:[390,331],color:CourseCircuit.colors.feed});
+  const cp=c.cap('C_p',P(520,280,'vcc'),P(520,370,'0'),{at:[551,330],color:CourseCircuit.colors.feed});
+  W('vcc',v.a,cp.a);W('0',P(260,370,'0'),v.b,cp.b,[660,370]);
+  c.text(805,295,'图3-13(b) 并馈',{bold:true,color:'#0d7a3c',size:17});
+  c.text(805,327,'C_c 隔直；回路下端接地');c.text(805,358,'C_p 只跨电源端，不接集电极');
+ }
+ updateFeedReadouts();
+}
+
+function drawBase14(){
+ const svg=document.getElementById('svgBase14');CourseCircuit.clear(svg,'0 0 960 395');
+ for(const series of [true,false]){
+  const key=series?'series':'parallel',c=new CourseCircuit.Scene(svg,'base14-'+key,series?0:480),P=(x,y,n)=>c.p(x,y,n),W=(n,...ps)=>c.wire(n,ps);
+  c.text(225,27,series?'(a) 串馈：次级与偏置电源串联':'(b) 并馈：信号、偏置两条支路',{bold:true,color:'#1a46b5',size:15});
+  const t=c.transformer('T',120,150,{p1:'in+',p2:'in-',s1:series?'base':'signal',s2:series?'bias':'0'});
+  const cin=c.cap('C_in',P(65,102,'in+'),P(65,198,'in-'),{label:''});
+  c.port(P(28,102,'in+'),'u_i',{dx:-6,dy:55});c.port(P(28,198,'in-'),'');W('in+',P(28,102,'in+'),cin.a,t.p1);W('in-',P(28,198,'in-'),cin.b,t.p2);
+  const v=c.transistor('VT',330,150,{b:'base',c:'collector',e:'0'});
+  c.port(P(390,70,'collector'),'集电极',{dy:-12});W('collector',v.C,[390,70]);W('0',v.E,[390,320]);c.ground(P(390,320,'0'));
+  if(series){
+   W('base',t.s1,[210,102],[210,150],v.B);W('bias',t.s2,[170,240]);
+   const src=c.battery('V_BB',P(170,240,'bias'),P(170,320,'0'),{positive:'b',at:[126,283],color:CourseCircuit.colors.feed});
+   const cp=c.cap('C_p',P(270,240,'bias'),P(270,320,'0'),{at:[300,285],color:CourseCircuit.colors.feed});
+   W('bias',src.a,cp.a);W('0',src.b,cp.b,[390,320]);
+  }else{
+   W('signal',t.s1,[190,102],[190,150],[210,150]);
+   const cb=c.cap('C_b',P(210,150,'signal'),P(260,150,'base'),{at:[235,126],color:CourseCircuit.colors.feed});
+   W('base',cb.b,v.B);W('0',t.s2,[170,320],[390,320]);
+   const zl=c.ind('Z_L',P(285,150,'base'),P(285,240,'bias'),{at:[255,202],color:CourseCircuit.colors.feed});
+   const src=c.battery('V_BB',P(285,240,'bias'),P(285,320,'0'),{positive:'b',at:[243,286],color:CourseCircuit.colors.feed});
+   const cp=c.cap('C_p',P(340,240,'bias'),P(340,320,'0'),{at:[363,288],color:CourseCircuit.colors.feed});
+   W('bias',src.a,cp.a);W('0',src.b,cp.b,[390,320]);
+  }
+  c.text(225,368,series?'C_p 跨电源；负偏置端经次级到基极':'C_b 隔直；Z_L 扼流；C_p 跨偏置电源',{size:12});
+ }
+}
+
+function drawBase15(){
+ const svg=document.getElementById('svgBase15');CourseCircuit.clear(svg,'0 0 960 405');
+ for(const emitterBias of [false,true]){
+  const c=new CourseCircuit.Scene(svg,emitterBias?'base15-e':'base15-b',emitterBias?480:0),P=(x,y,n)=>c.p(x,y,n),W=(n,...ps)=>c.wire(n,ps);
+  c.text(225,27,emitterBias?'(b) 发射极电流产生偏置':'(a) 基极电流产生偏置',{bold:true,size:16,color:'#1a46b5'});
+  const v=c.transistor('VT',330,150,{b:'base',c:'collector',e:emitterBias?'emitter':'0'});
+  c.port(P(28,150,'input'),'输入',{dy:-16});const cin=c.cap('C_in',P(65,150,'input'),P(125,150,'base'),{label:''});W('input',P(28,150,'input'),cin.a);W('base',cin.b,v.B);
+  c.port(P(390,70,'collector'),'集电极',{dy:-12});W('collector',v.C,[390,70]);
+  const zl=c.ind('Z_L',P(190,150,'base'),P(190,240,emitterBias?'0':'bias'),{at:[162,205],color:CourseCircuit.colors.feed});
+  if(!emitterBias){
+   const r=c.res('R_b',P(190,240,'bias'),P(190,330,'0'),{at:[161,287],color:CourseCircuit.colors.feed});
+   const cap=c.cap('C_b',P(280,240,'bias'),P(280,330,'0'),{at:[307,290],color:CourseCircuit.colors.feed});
+   W('bias',r.a,cap.a);W('0',r.b,cap.b,[390,330],v.E);c.ground(P(390,330,'0'));
+   /* 教材 图 3-15(a)：R_b 旁标出**向上**的 I_B0 电流箭头（直流分量自基极经 ZL 灌入 R_b） */
+   c.arrow(150,318,150,252,{color:CourseCircuit.colors.feed,width:1.8});
+   c.text(140,289,'I_B0',{size:14,color:CourseCircuit.colors.feed,anchor:'end'});
+   c.text(225,378,'U_BEQ = −I_B0 R_b',{color:'#1a46b5',size:15});
+  }else{
+   const r=c.res('R_e',P(390,240,'emitter'),P(390,340,'0'),{at:[421,293],color:CourseCircuit.colors.feed});
+   const cap=c.cap('C_e',P(285,240,'emitter'),P(285,340,'0'),{at:[258,293],color:CourseCircuit.colors.feed});
+   W('emitter',v.E,r.a,cap.a);W('0',zl.b,[190,340],cap.b,r.b);c.ground(r.b);
+   /* 教材 图 3-15(b)：发射极引线旁标出**向下**的 I_E0 电流箭头 */
+   c.arrow(434,208,434,266,{color:CourseCircuit.colors.feed,width:1.8});
+   c.text(434,198,'I_E0',{size:14,color:CourseCircuit.colors.feed,anchor:'middle'});
+   c.text(225,378,'U_BEQ = −I_E0 R_e',{color:'#1a46b5',size:15});
+  }
+ }
+}
+
+function drawMatch(){
+ const svg=document.getElementById('svgMatch');CourseCircuit.clear(svg,'0 0 960 310');
+ const c=new CourseCircuit.Scene(svg,'match-'+MATCH_MODE),P=(x,y,n)=>c.p(x,y,n),W=(n,...ps)=>c.wire(n,ps);
+ c.port(P(60,110,'in'),'端口1');c.port(P(900,110,'out'),'端口2');c.port(P(60,240,'0'),'');c.port(P(900,240,'0'),'');W('0',P(60,240,'0'),[900,240]);
+ const h=(id,x1,x2,a,b)=>c.imp(id,P(x1,110,a),P(x2,110,b),{at:[(x1+x2)/2,86],color:CourseCircuit.colors.signal});
+ const v=(id,x,net)=>{c.imp(id,P(x,110,net),P(x,240,'0'),{at:[x+32,181],color:CourseCircuit.colors.feed});};
+ if(MATCH_MODE==='l1'){
+  W('in',P(60,110,'in'),[330,110]);v('X₂',240,'in');h('X₁',330,540,'in','out');W('out',P(540,110,'out'),[900,110]);
+ }else if(MATCH_MODE==='l2'){
+  W('in',P(60,110,'in'),[330,110]);h('X₁',330,540,'in','out');W('out',P(540,110,'out'),[900,110]);v('X₂',720,'out');
+ }else if(MATCH_MODE==='t'){
+  W('in',P(60,110,'in'),[180,110]);h('X₁',180,360,'in','mid');W('mid',P(360,110,'mid'),[600,110]);h('X₃',600,780,'mid','out');W('out',P(780,110,'out'),[900,110]);v('X₂',480,'mid');
+ }else{
+  W('in',P(60,110,'in'),[90,110]);h('X₁',90,240,'in','left');W('left',P(240,110,'left'),[390,110]);h('X₃',390,570,'left','right');W('right',P(570,110,'right'),[720,110]);h('X₅',720,870,'right','out');W('out',P(870,110,'out'),[900,110]);v('X₂',310,'left');v('X₄',650,'right');
+ }
+ c.text(480,288,'接法与元件编号按教材图3-16；“高低阻变换”题注保留教材口径',{size:13});
+ updateMatchReadouts();
+}
+
+function drawCard17(){
+ const svg=document.getElementById('svgCard17');CourseCircuit.clear(svg,'0 0 1050 440');
+ const c=new CourseCircuit.Scene(svg,'actual17'),P=(x,y,n)=>c.p(x,y,n),W=(n,...ps)=>c.wire(n,ps);
+ c.text(525,27,'图3-17 · 50 MHz / 25 W · 3DK208B',{bold:true,size:18});
+ c.port(P(40,160,'input'),'50 Ω',{dy:-16});const c1=c.cap('C₁',P(80,160,'input'),P(160,160,'match'),{variable:true,at:[120,133],value:'14～150 pF',valueAt:[120,98]});W('input',P(40,160,'input'),c1.a);
+ const c2=c.cap('C₂',P(190,160,'match'),P(190,360,'0'),{variable:true,at:[153,250],value:'90～400 pF',valueAt:[128,282]});W('match',c1.b,c2.a,[250,160]);
+ const l1=c.ind('L₁',P(250,160,'match'),P(330,160,'base'),{at:[290,132]});const vt=c.transistor('VT',380,160,{b:'base',c:'collector',e:'0'},{label:'3DK208B'});W('base',l1.b,vt.B);
+ const zl=c.ind('Z_L',P(350,160,'base'),P(350,360,'0'),{at:[320,263],color:CourseCircuit.colors.feed});c.ground(zl.b);c.ground(c2.b);W('0',vt.E,[440,360]);c.ground(P(440,360,'0'));
+ const l2=c.ind('L₂',P(570,110,'collector'),P(570,320,'vcc'),{at:[602,218],color:CourseCircuit.colors.feed});W('collector',vt.C,l2.a);
+ const cc=c.cap('C_c',P(440,320,'0'),P(570,320,'vcc'),{at:[503,297],color:CourseCircuit.colors.feed});W('vcc',cc.b,[570,385]);c.port(P(570,385,'vcc'),'+V_CC (+13.5 V)',{dy:32});
+ const l3=c.ind('L₃',P(630,110,'collector'),P(790,110,'output-series'),{at:[710,80]});W('collector',l2.a,l3.a);
+ const c3=c.cap('C₃',P(790,110,'output-series'),P(790,240,'output'),{variable:true,at:[835,181],value:'32～250 pF',valueAt:[886,206]});
+ const c4=c.cap('C₄',P(790,240,'output'),P(790,370,'0'),{variable:true,at:[835,305],value:'32～250 pF',valueAt:[886,331]});c.ground(c4.b);W('output',c4.a,[930,240]);c.port(P(930,240,'output'),'50 Ω',{dx:30,dy:5,anchor:'start'});
+}
+
+function drawCard18(){
+ const svg=document.getElementById('svgCard18');CourseCircuit.clear(svg,'0 0 1200 485');
+ const c=new CourseCircuit.Scene(svg,'actual18'),P=(x,y,n)=>c.p(x,y,n),W=(n,...ps)=>c.wire(n,ps);
+ c.text(600,27,'图3-18 · 175 MHz / 10 W · VMOS DV1210',{bold:true,size:18});
+ c.port(P(40,160,'input'),'50 Ω');const c1=c.cap('C₁',P(80,160,'input'),P(160,160,'match'),{variable:true,at:[120,133],value:'5～33 pF',valueAt:[120,98]});W('input',P(40,160,'input'),c1.a);
+ const c2=c.cap('C₂',P(170,160,'match'),P(170,400,'0'),{variable:true,at:[131,255],value:'5～33 pF',valueAt:[121,282]});
+ const c3=c.cap('C₃',P(245,160,'match'),P(245,400,'0'),{at:[220,320],value:'15 pF',valueAt:[218,347]});W('match',c1.b,c2.a,c3.a,[270,160]);c.ground(c2.b);c.ground(c3.b);
+ const l1=c.ind('L₁',P(270,160,'match'),P(360,160,'gate'),{at:[315,130]});
+ const vt=c.transistor('DV1210',440,160,{b:'gate',c:'drain',e:'0'},{mos:true});W('gate',l1.b,vt.B);W('0',vt.E,[500,400]);c.ground(P(500,400,'0'));
+ const r1=c.res('R_g1',P(380,160,'gate'),P(380,285,'bias'),{at:[412,221],value:'100 kΩ',valueAt:[426,246]});
+ const r2=c.res('R_g2',P(380,285,'bias'),P(380,405,'vgg'),{at:[417,346],value:'110 kΩ',valueAt:[429,371]});W('vgg',r2.b,[380,450]);c.port(P(380,450,'vgg'),'V_GG',{dy:24});
+ const cg=c.cap('C_g',P(305,285,'bias'),P(305,400,'0'),{at:[276,351],value:'0.1 μF',valueAt:[276,376]});W('bias',r1.b,cg.a);c.ground(cg.b);
+ const l2=c.ind('L₂',P(610,110,'drain'),P(610,320,'vdd'),{at:[641,218],color:CourseCircuit.colors.feed});W('drain',vt.C,l2.a);
+ const cs=c.cap('C_s',P(500,320,'0'),P(610,320,'vdd'),{at:[555,294],value:'0.1 μF',valueAt:[555,352],color:CourseCircuit.colors.feed});W('vdd',cs.b,[610,415]);c.port(P(610,415,'vdd'),'+V_DD (+13.5 V)',{dy:26});
+ const l3=c.ind('L₃',P(655,110,'drain'),P(775,110,'out-match'),{at:[715,81]});W('drain',l2.a,l3.a);
+ const c4=c.cap('C₄',P(795,110,'out-match'),P(795,370,'0'),{variable:true,at:[758,253],value:'5～33 pF',valueAt:[743,278]});c.ground(c4.b);
+ const c5=c.cap('C₅',P(875,110,'out-match'),P(875,255,'0'),{at:[905,184],value:'15 pF',valueAt:[905,211]});c.ground(c5.b);W('out-match',l3.b,c4.a,c5.a,[935,110]);
+ const c6=c.cap('C₆',P(935,110,'out-match'),P(1020,110,'output'),{variable:true,at:[978,83],value:'5～33 pF',valueAt:[978,57]});W('output',c6.b,[1100,110]);c.port(P(1100,110,'output'),'50 Ω',{dx:25,dy:5,anchor:'start'});
+}
+
+/* ============================================================================
+ * readouts_34.js —— 原理讲解 3.4「谐振功率放大电路」页的**交互状态与读数**
+ *
+ * 与 figures_34.js 配套：figures_34.js 负责画图，本文件负责
+ *   ① 三个交互态的全局开关（FEED_MODE / MATCH_MODE / CARD_MODE）
+ *   ② 把教材结论写进页面的读数面板（ro* 元素）
+ *   ③ 页面按钮的 onclick 入口
+ *
+ * 读数一律**照教材**填写：
+ *   · 图 3-13 串/并馈的差别在「谐振回路的直流电位」→ 回路电容能否直接接地
+ *   · 图 3-15 的两条负偏压关系式：U_BEQ = −I_B0·R_b / U_BEQ = −I_E0·R_e
+ *   · 图 3-16 四种基本型匹配网络的**元件数与串/并臂**
+ *   · 图 3-17 / 3-18 的教材指标与输入/输出匹配网络
+ * ==========================================================================*/
+
+/* 用 var 而非 let：这三个开关被页末断言块（fix_34_dots.js 注入）直接读写，
+ * var 的全局属性语义最稳，跨脚本与内联 onclick 都能取到。 */
+var FEED_MODE = 'series';   /* 'series' | 'parallel'  → 图 3-13 */
+var MATCH_MODE = 'l1';      /* 'l1' | 'l2' | 't' | 'pi' → 图 3-16 */
+var CARD_MODE  = 'c17';     /* 'c17' | 'c18'           → 图 3-17 / 3-18 */
+
+/* ---------- 小工具：只写 textContent，不塞 HTML ---------- */
+function setText(id, s) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = s;
+}
+
+/* ===================== ① 图 3-13　集电极馈电（串馈 / 并馈） ===================== */
+var FEED_INFO = {
+  series: {
+    pot:  '高（≈ V_CC）',
+    cap:  '不能直接接地',
+    parts:'Z_L、C_p',
+    stab: '较困难',
+    capTxt:'图 3-13(a)　集电极串馈：V_CC、匹配网络（谐振回路）与功率管三者**串联**，谐振回路处于直流高电位',
+    cap2Txt:'图 3-13(a)　串馈：三者串联；谐振回路处于直流高电位',
+    live : '直流路径：V_CC → Z_L → 谐振回路（L、C）→ 功率管集电极。Z_L 对交流开路、对直流短路；C_p 对交流短路，把电源端的交流分量旁路到地。回路电容 C 不能直接接地。'
+  },
+  parallel: {
+    pot:  '低（≈ 地）',
+    cap:  '可直接接地',
+    parts:'C_c、Z_L、C_p',
+    stab: '方便、稳定',
+    capTxt:'图 3-13(b)　集电极并馈：V_CC、匹配网络（谐振回路）与功率管三者**并联**，谐振回路处于直流低电位，回路电容 C 可直接接地',
+    cap2Txt:'图 3-13(b)　并馈：三者并联；谐振回路处于直流低电位',
+    live : '直流路径与串馈完全相同：V_CC 仍全部加到集电极，电源一端仍接地。不同点只在匹配网络的接入方式 —— C_c 把集电极与回路隔开，回路下端直接接地，回路电容 C 可以一端接地。'
+  }
+};
+function updateFeedReadouts(){
+  var isS = FEED_MODE === 'series';
+  var d = isS ? FEED_INFO.series : FEED_INFO.parallel;
+  var o = isS ? FEED_INFO.parallel : FEED_INFO.series;   /* 对照：另一种方式 */
+  setText('roFeedPot',  d.pot);
+  setText('roFeedCap',  d.cap);
+  setText('roFeedParts',d.parts);
+  setText('roFeedStab', d.stab);
+  /* 第二组 = 另一种馈电方式的结论（对照用） */
+  setText('roFeedPot2', o.pot);
+  setText('roFeedCap2', o.cap);
+  setText('roFeedParts2',o.parts);
+  setText('roFeedOther',isS ? '并馈' : '串馈');
+  setText('capFeed',   d.capTxt);
+  setText('capFeed2',  d.cap2Txt);
+  setText('liveFeed',  d.live);
+}
+
+/* ===================== ② 图 3-16　基本型匹配网络 ===================== */
+var MATCH_INFO = {
+  l1: {
+    n: 2, s: 'X₁', p: 'X₂', dir: '低阻 → 高阻',
+    name:'(a) 低阻变高阻 L 型',
+    cap :'图 3-16(a)　低阻变高阻 L 型匹配网络：串臂 X₁、并臂 X₂，共 2 个电抗元件',
+    live:'低阻变高阻：X₁ 串联在信号通路里，X₂ 由输入端并到公共端（地）。元件数 2 → 匹配方程组有唯一解。'
+  },
+  l2: {
+    n: 2, s: 'X₁', p: 'X₂', dir: '高阻 → 低阻',
+    name:'(b) 高阻变低阻 L 型',
+    cap :'图 3-16(b)　高阻变低阻 L 型匹配网络：串臂 X₁、并臂 X₂，共 2 个电抗元件',
+    live:'高阻变低阻：与 (a) 只是并臂 X₂ 挪到了输出端一侧。元件数 2 → 匹配方程组有唯一解。'
+  },
+  t: {
+    n: 3, s: 'X₁、X₃', p: 'X₂', dir: '阻抗变换（双向）',
+    name:'(c) T 型',
+    cap :'图 3-16(c)　T 型匹配网络：串臂 X₁、X₃，并臂 X₂，共 3 个电抗元件',
+    live:'T 型：X₁、X₃ 串联，X₂ 从中间节点并到公共端。元件数 3 → 需先给其中一个元件定值（或选固定值元件），再解方程组。'
+  },
+  pi:{
+    n: 5, s: 'X₁、X₃、X₅', p: 'X₂、X₄', dir: '阻抗变换（双向）',
+    name:'(d) π 型',
+    cap :'图 3-16(d)　π 型匹配网络：串臂 X₁、X₃、X₅，并臂 X₂、X₄，共 5 个电抗元件',
+    live:'π 型：X₁、X₃、X₅ 串联，X₂、X₄ 分别并到公共端。元件数 5 → 先把多余元件选成固定值（固定电阻/电感/电容），再解方程组。'
+  }
+};
+function updateMatchReadouts(){
+  var d = MATCH_INFO[MATCH_MODE];
+  setText('roMatchN',  String(d.n));
+  setText('roMatchS',  d.s);
+  setText('roMatchP',  d.p);
+  setText('roMatchDir',d.dir);
+  setText('capMatch',  d.cap);
+  setText('liveMatch', d.live);
+}
+
+/* ===================== ③ 图 3-17 / 3-18　实际电路 ===================== */
+var CARD_INFO = {
+  c17: {
+    name:'图 3-17', rl:'50 Ω', po:'25 W', gp:'7 dB',
+    in :'T 型（C₁、C₂、L₁）',
+    out:'图示网络（L₂、L₃、C₃、C₄）',
+    feed:'并馈',
+    freq:'50 MHz', dev:'3DK208B', devType:'双极型晶体管',
+    cap :'图 3-17　50 MHz、25 W 谐振功率放大器电路：T 型输入匹配 + π 型输出匹配 + 并馈',
+    live:'图 3-17：50 MHz / 25 W / 3DK208B。输入匹配 C₁（14～150 pF）、C₂（90～400 pF）与 L₁ 组成 T 型；输出匹配 L₂、L₃、C₃、C₄（32～250 pF）；集电极采用并联馈电，V_CC = +13.5 V。'
+  },
+  c18: {
+    name:'图 3-18', rl:'50 Ω', po:'10 W', gp:'10 dB',
+    in :'T 型（C₁、C₂、C₃、L₁）',
+    out:'图示网络（L₂、L₃、C₄、C₅、C₆）',
+    feed:'并馈',
+    freq:'175 MHz', dev:'DV1210', devType:'VMOS（场效应管）',
+    cap :'图 3-18　175 MHz、VMOS 管谐振功率放大器电路：T 型输入匹配 + π 型输出匹配 + 并馈',
+    live:'图 3-18：175 MHz / 10 W / VMOS DV1210。输入匹配 C₁、C₂（5～33 pF）、C₃（15 pF）与 L₁ 组成 T 型；输出匹配 L₂、L₃、C₄、C₆（5～33 pF）与 C₅（15 pF）；栅极与漏极均采用并联馈电，V_DD = +13.5 V。'
+  }
+};
+function updateCardReadouts(){
+  var d = CARD_MODE === 'c17' ? CARD_INFO.c17 : CARD_INFO.c18;
+  setText('roCardName', d.name);
+  setText('roCardRL',   d.rl);
+  setText('roCardPo',   d.po);
+  setText('roCardGp',   d.gp);
+  setText('roCardIn',   d.in);
+  setText('roCardOut',  d.out);
+  setText('roCardFeed', d.feed);
+  setText('roCardFreq', d.freq);
+  setText('roCardDev',  d.dev);
+  setText('roCardType', d.devType);
+  setText('capCard',   d.cap);
+  setText('liveCard',  d.live);
+  /* 两张实际电路都画在同一页，用显示/隐藏切换，不删 DOM（页末断言要同时看到两个场景） */
+  var a = document.getElementById('card17Box'), b = document.getElementById('card18Box');
+  if (a) a.style.display = (CARD_MODE === 'c17') ? '' : 'none';
+  if (b) b.style.display = (CARD_MODE === 'c18') ? '' : 'none';
+}
+
+/* ===================== 按钮入口 ===================== */
+function setFeed(mode){
+  FEED_MODE = mode;
+  drawFeed();
+  var bs = document.querySelectorAll('#feedBtns button');
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].className = (bs[i].getAttribute('data-mode') === mode) ? 'on' : '';
+  }
+}
+function setMatch(mode){
+  MATCH_MODE = mode;
+  drawMatch();
+  var bs = document.querySelectorAll('#matchBtns button');
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].className = (bs[i].getAttribute('data-mode') === mode) ? 'on' : '';
+  }
+}
+function setCard(mode){
+  CARD_MODE = mode;
+  updateCardReadouts();
+  var bs = document.querySelectorAll('#cardBtns button');
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].className = (bs[i].getAttribute('data-mode') === mode) ? 'on' : '';
+  }
+}
+
+/* ===================== 初始化 =====================
+ * 页面加载时把 6 幅图全画出来、把读数填上。
+ * 两张实际电路都画进 DOM（图 3-18 先隐藏），页末断言要同时看到 actual17 / actual18 两个场景。 */
+function init34(){
+  drawFeed();
+  drawBase14();
+  drawBase15();
+  drawMatch();
+  drawCard17();
+  drawCard18();
+  updateFeedReadouts();
+  updateMatchReadouts();
+  updateCardReadouts();
+}
+init34();
+/* CIRCUIT34:END */
+</script>
+
+<script>
+/* ================= 3.4 页末自检（独立复算 + 教材数值对撞） =================
+   教材出处：3.4 谐振功率放大电路，书页 65 – 70（PDF 77 – 82）
+   （图 3-13 馈电、图 3-14 基极馈电、图 3-15 基极自给负偏压、
+     图 3-16 匹配网络、图 3-17 / 3-18 实际电路）
+   前半段完全独立于页面脚本：只读 DOM 文本与公式块，不引用页面内部任何函数。
+   后半段「电路图四类计数断言（R21 轮）」由 scratch/fix_34_dots.js 注入 ——
+   期望值（接地 / 实心结点 / 跨线桥 / 同名端）逐图核教材原图后写死。
+   ======================================================================== */
+(function(){
+  'use strict';
+  var ok=true, msg=[];
+  function chk(name,got,exp,tol){
+    var t=(tol===undefined)?Math.abs(exp)*1e-9+1e-12:tol;
+    var pass=Math.abs(got-exp)<=t; if(!pass) ok=false;
+    msg.push((pass?'PASS':'FAIL')+'  '+name+'   got='+got+'   exp='+exp);
+  }
+  function chkStr(name,got,exp){
+    var pass=(String(got)===String(exp)); if(!pass) ok=false;
+    msg.push((pass?'PASS':'FAIL')+'  '+name+'   got="'+got+'"   exp="'+exp+'"');
+  }
+  function chkTrue(name,cond,detail){
+    var pass=!!cond; if(!pass) ok=false;
+    msg.push((pass?'PASS':'FAIL')+'  '+name+(detail?('   '+detail):''));
+  }
+  function T(id){ var e=document.getElementById(id); return e?e.textContent:''; }
+
+  /* ---------- 图 3-15：基极自给反向偏压的两条关系式 ---------- */
+  var ftexts=[], fdivs=document.querySelectorAll('.formula');
+  for(var i=0;i<fdivs.length;i++){
+    ftexts.push(fdivs[i].textContent.replace(/[\s ]+/g,''));
+  }
+  var fall=ftexts.join('|');
+  chk('公式块数量 = 2（教材 图 3-15 的两条负偏压关系式）', fdivs.length, 2, 0);
+  chkTrue('页式 (a)：U_BEQ = −I_B0·R_b', fall.indexOf('UBEQ=')>=0 && fall.indexOf('IB0Rb')>=0, '');
+  chkTrue('页式 (b)：U_BEQ = −I_E0·R_e', fall.indexOf('UBEQ=')>=0 && fall.indexOf('IE0Re')>=0, '');
+  chkTrue('两条关系式的负号（U_BEQ < 0）保留', fall.indexOf('−')>=0, '');
+
+  /* ---------- 图 3-13：集电极串馈 / 并馈读数（默认串馈） ---------- */
+  chkStr('读数 roFeedPot（谐振回路直流电位）', T('roFeedPot'), '高（≈ V_CC）');
+  chkStr('读数 roFeedCap（回路电容能否接地）', T('roFeedCap'), '不能直接接地');
+  chkStr('读数 roFeedParts（串馈需配的元件）', T('roFeedParts'), 'Z_L、C_p');
+  chkStr('读数 roFeedStab（装调稳定性）', T('roFeedStab'), '较困难');
+  chkStr('读数 roFeedPot2（对照：并馈的直流电位）', T('roFeedPot2'), '低（≈ 地）');
+  chkStr('读数 roFeedCap2（对照：并馈时回路电容能否接地）', T('roFeedCap2'), '可直接接地');
+  chkStr('读数 roFeedParts2（对照：并馈需配的元件）', T('roFeedParts2'), 'C_c、Z_L、C_p');
+  chkStr('读数 roFeedOther（对照的是哪一种）', T('roFeedOther'), '并馈');
+
+  /* ---------- 图 3-16：匹配网络的元件数 ---------- */
+  chk('读数 roMatchN（L 型元件数 = 2）', parseFloat(T('roMatchN')), 2, 0);
+  chkStr('读数 roMatchS（L 型串臂）', T('roMatchS'), 'X₁');
+  chkStr('读数 roMatchP（L 型并臂）', T('roMatchP'), 'X₂');
+  chkStr('读数 roMatchDir（L 型接法方向）', T('roMatchDir'), '低阻 → 高阻');
+  chkTrue('教材规则：元件数 = 2 时有唯一解，> 2 时先定多余元件再解',
+          (document.body.textContent.indexOf('唯一解')>=0), '');
+
+  /* ---------- 图 3-17：50 MHz / 25 W / 3DK208B / 7 dB / 50 Ω ---------- */
+  chkStr('读数 roCardName（默认电路）', T('roCardName'), '图 3-17');
+  chkStr('读数 roCardFreq（默认电路频率）', T('roCardFreq'), '50 MHz');
+  chkStr('读数 roCardDev（默认电路器件）', T('roCardDev'), '3DK208B');
+  chkStr('读数 roCardRL（图 3-17 负载）', T('roCardRL'), '50 Ω');
+  chkStr('读数 roCardPo（图 3-17 输出功率）', T('roCardPo'), '25 W');
+  chkStr('读数 roCardGp（图 3-17 功率增益）', T('roCardGp'), '7 dB');
+  chkStr('读数 roCardIn（图 3-17 输入匹配）', T('roCardIn'), 'T 型（C₁、C₂、L₁）');
+  chkStr('读数 roCardOut（图 3-17 输出匹配，按教材图标注）', T('roCardOut'), '图示网络（L₂、L₃、C₃、C₄）');
+  chkStr('读数 roCardFeed（图 3-17 馈电方式）', T('roCardFeed'), '并馈');
+  chkTrue('图 3-17 有源器件 3DK208B、50 MHz / 25 W',
+          (document.body.textContent.indexOf('3DK208B')>=0), '');
+
+  /* ---------- 图 3-18：175 MHz / 10 W / DV1210 / 10 dB / 50 Ω ---------- */
+  chkTrue('图 3-18 有源器件 DV1210、175 MHz / 10 W',
+          (document.body.textContent.indexOf('DV1210')>=0), '');
+  chkTrue('图 3-18 的输出匹配与馈电方式已按教材给出（正文写明栅极与漏极均并馈）',
+          (document.body.textContent.indexOf('漏极的馈电电路都采用')>=0), '');
+  chkTrue('教材正文与图 3-17 的 C 编号不一致已并列说明',
+          (document.body.textContent.indexOf('编号不一致')>=0), '');
+
+  /* ---------- 由教材指标复算（教材只给指标，比值与有效值由指标导出） ---------- */
+  chk('图 3-17：25 W / 50 Ω → U_rms = √(P·R) = 35.36 V', Math.sqrt(25*50), 35.36, 1e-2);
+  chk('图 3-17：增益 7 dB → 功率比 10^(7/10) = 5.012 倍', Math.pow(10,7/10), 5.012, 1e-3);
+  chk('图 3-17：增益 7 dB → 电压比 10^(7/20) = 2.2387 倍', Math.pow(10,7/20), 2.2387, 1e-3);
+  chk('图 3-18：10 W / 50 Ω → U_rms = √(P·R) = 22.36 V', Math.sqrt(10*50), 22.36, 1e-2);
+  chk('图 3-18：增益 10 dB → 功率比 10^(10/10) = 10 倍', Math.pow(10,10/10), 10, 1e-9);
+  chk('图 3-18：增益 10 dB → 电压比 10^(10/20) = 3.162 倍', Math.pow(10,10/20), 3.162, 1e-3);
+
+  /* ---------- 3.4.2：中间级的耦合效率 ---------- */
+  chkTrue('中间级过压、耦合效率取 0.1～0.5（教材 3.4.2）',
+          (document.body.textContent.indexOf('0.1～0.5')>=0 ||
+           document.body.textContent.indexOf('0.1 ~ 0.5')>=0 ||
+           document.body.textContent.indexOf('0.1~0.5')>=0), '');
+  chkTrue('中间级输出功率应为下一级所需功率的 2～10 倍',
+          (document.body.textContent.indexOf('2～10 倍')>=0), '');
+
+  /* ---------- 交互态逐个切换核对（核完恢复默认状态） ---------- */
+  try{
+    var sf=FEED_MODE;
+    setFeed('parallel');
+    chkStr('切到并馈：roFeedPot', T('roFeedPot'), '低（≈ 地）');
+    chkStr('切到并馈：roFeedCap', T('roFeedCap'), '可直接接地');
+    chkStr('切到并馈：roFeedParts', T('roFeedParts'), 'C_c、Z_L、C_p');
+    chkStr('切到并馈：roFeedStab', T('roFeedStab'), '方便、稳定');
+    setFeed('series');
+    chkStr('切回串馈：roFeedPot', T('roFeedPot'), '高（≈ V_CC）');
+
+    var sm=MATCH_MODE;
+    setMatch('t');
+    chk('切到 T 型：roMatchN', parseFloat(T('roMatchN')), 3, 0);
+    setMatch('pi');
+    chk('切到 π 型：roMatchN', parseFloat(T('roMatchN')), 5, 0);
+    setMatch('l1');
+    chk('切回 L 型：roMatchN', parseFloat(T('roMatchN')), 2, 0);
+
+    var sc=CARD_MODE;
+    setCard('c18');
+    chkStr('切到图 3-18：roCardName', T('roCardName'), '图 3-18');
+    chkStr('切到图 3-18：roCardPo', T('roCardPo'), '10 W');
+    chkStr('切到图 3-18：roCardGp', T('roCardGp'), '10 dB');
+    chkStr('切到图 3-18：roCardDev', T('roCardDev'), 'DV1210');
+    chkStr('切到图 3-18：roCardIn', T('roCardIn'), 'T 型（C₁、C₂、C₃、L₁）');
+    setCard('c17');
+    chkStr('切回图 3-17：roCardPo', T('roCardPo'), '25 W');
+    FEED_MODE=sf; MATCH_MODE=sm; CARD_MODE=sc;
+    setFeed(sf); setMatch(sm); setCard(sc);
+  }catch(e){
+    msg.push('FAIL  交互态切换核对执行异常：'+e.message); ok=false;
+  }
+
+/* ===== 电路图计数断言（R21）：接地符号数 / 实心结点数 / 非连接交叉（跨线桥）数 / 同名端数
+ *     期望值**逐图核教材原图**后写死（教材 书页 66–69 / PDF 78–81）——
+ *     不能从页面自己的画法反推，否则等于「用页面证明页面」。
+ *     教材这 12 幅子图的 T 接点一律裸接、**不画结点圆点** → 实心结点数全为 0。
+ *     图 3-13(a)(b) 集电极引线与回路横线的那处几何交叉：教材未画结点圆点，
+ *     而集电极必须接回路顶端 → 判为「教材省略结点圆点的 T 接」而非不相连交叉
+ *     → 跨线桥数 0（此为已声明的画法差异，不是画错）。 */
+(function(){
+  var good=true;
+  function scOf(svgId,sid){
+    var el=document.getElementById(svgId); if(!el||!el.__circuits) return null;
+    var hit=el.__circuits.filter(function(x){return x.id===sid;});
+    return hit.length?hit[0]:null;
+  }
+  function cnt(label,svgId,sid,exp){
+    var sc=scOf(svgId,sid);
+    if(!sc){ msg.push("  SKIP  "+label+"  —— 当前环境未执行绘图脚本（离线检查器无运行时图形）"); return; }
+    var g=(sc.grounds||[]).length,d=(sc.dots||[]).length,
+        h=(sc.hops||[]).length,p=(sc.polarity||[]).length;
+    var goodc=(g===exp.g&&d===exp.d&&h===exp.h&&p===exp.p);
+    msg.push((goodc?"  PASS  ":"  FAIL  ")+label+"  接地="+g+" 实心结点="+d+" 跨线桥="+h+
+             " 同名端="+p+"   期望 接地="+exp.g+" 实心结点="+exp.d+" 跨线桥="+exp.h+
+             " 同名端="+exp.p);
+    if(!goodc) good=false;
+  }
+  try{
+    /* 静态场景（两态同图 / 参数卡） */
+    cnt("图 3-14(a) 串馈计数（教材 书页 67 / PDF 79：1 个接地符号；T 接裸接无 ●）","svgBase14","base14-series",{g:1,d:0,h:0,p:0});
+    cnt("图 3-14(b) 并馈计数（教材 书页 67 / PDF 79：1 个接地符号；T 接裸接无 ●）","svgBase14","base14-parallel",{g:1,d:0,h:0,p:0});
+    cnt("图 3-15(a) 基极偏置计数（教材 书页 67 / PDF 79：1 个接地符号；T 接裸接无 ●）","svgBase15","base15-b",{g:1,d:0,h:0,p:0});
+    cnt("图 3-15(b) 发射极偏置计数（教材 书页 67 / PDF 79：1 个接地符号；T 接裸接无 ●）","svgBase15","base15-e",{g:1,d:0,h:0,p:0});
+    cnt("图 3-17 计数（教材 书页 69 / PDF 81：4 个接地符号；实心块全是箭头非结点）","svgCard17","actual17",{g:4,d:0,h:0,p:0});
+    cnt("图 3-18 计数（教材 书页 69 / PDF 81：6 个接地符号；实心块全是箭头非结点）","svgCard18","actual18",{g:6,d:0,h:0,p:0});
+    /* 交互切换出来的场景：逐态核，审完恢复原状态 */
+    var sf=FEED_MODE;
+    FEED_MODE="series"; drawFeed();
+    cnt("图 3-13(a) 串馈计数（教材 书页 66 / PDF 78：1 个接地符号；T 接裸接无 ●；几何交叉按教材省略圆点的 T 接处理）","svgFeed","feed-series",{g:1,d:0,h:0,p:0});
+    FEED_MODE="parallel"; drawFeed();
+    cnt("图 3-13(b) 并馈计数（教材 书页 66 / PDF 78：1 个接地符号；T 接裸接无 ●）","svgFeed","feed-parallel",{g:1,d:0,h:0,p:0});
+    FEED_MODE=sf; drawFeed();
+    var sm=MATCH_MODE,mc={l1:"(a) L 型",l2:"(b) 高阻变低阻 L 型",t:"(c) T 型",pi:"(d) π 型"};
+    ["l1","l2","t","pi"].forEach(function(m){
+      MATCH_MODE=m; drawMatch();
+      cnt("图 3-16"+mc[m]+" 匹配网络计数（教材 书页 68 / PDF 80：4 个空心端子 ○；无接地符号、无实心结点、无跨线桥）","svgMatch","match-"+m,{g:0,d:0,h:0,p:0});
+    });
+    MATCH_MODE=sm; drawMatch();
+  }catch(e){
+    msg.push("  FAIL  电路图计数断言执行异常："+e.message);
+    good=false;
+  }
+  if(!good) ok=false;
+})();
+  console.log(msg.join('\n'));
+  if(ok) document.title=(document.title||'')+' ✓';
+  else console.error('3.4 自检未通过');
+  /* 结果同时写进 DOM（供离线抓取脚本统计） */
+  try{
+    var box=document.getElementById('ch3Selfcheck');
+    if(!box){box=document.createElement('pre');box.id='ch3Selfcheck';box.style.display='none';document.body.appendChild(box);}
+    box.textContent=msg.join('\n');
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>

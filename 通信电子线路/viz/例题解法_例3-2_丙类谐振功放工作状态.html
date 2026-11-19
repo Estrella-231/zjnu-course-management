@@ -1,0 +1,648 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>例题解法 · 例 3-2 · 丙类谐振功放工作状态</title>
+<style>
+:root{
+  --ink:#1a1a1a; --mut:#6b6b6b; --line:#1f1f1f; --soft:#e9ecef;
+  --blue:#1a46b5; --red:#c02020; --green:#0d7a3c; --amber:#c07a00; --violet:#7a3fb0;
+  --bg:#fbfbf9; --card:#fff; --bd:#d8d8d2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC","Source Han Sans SC",sans-serif;
+  line-height:1.75;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px}
+header{background:linear-gradient(135deg,#12233f,#2a4a7d);color:#fff;padding:52px 0 44px;margin-bottom:36px}
+header .wrap{padding-bottom:0}
+.kicker{font-size:13px;letter-spacing:.22em;opacity:.72;margin:0 0 10px}
+h1{font-size:34px;margin:0 0 12px;line-height:1.3;font-weight:700}
+.sub{font-size:16px;opacity:.85;max-width:860px;margin:0}
+.meta{margin-top:22px;font-size:13px;opacity:.7;display:flex;gap:22px;flex-wrap:wrap}
+h2{font-size:23px;margin:52px 0 6px;padding-bottom:10px;border-bottom:2px solid var(--ink);font-weight:700}
+h2 .num{color:var(--blue);margin-right:10px}
+h3{font-size:17px;margin:28px 0 10px;color:#234}
+h4{font-size:15px;margin:18px 0 8px;color:#333}
+p{margin:10px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px 24px;margin:18px 0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card.pad0{padding:14px 18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid21{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.grid12{display:grid;grid-template-columns:1fr 2fr;gap:20px}
+@media(max-width:900px){.grid2,.grid3,.grid21,.grid12{grid-template-columns:1fr}}
+svg{width:100%;height:auto;display:block;background:#fff;border-radius:6px}
+.cap{font-size:13px;color:var(--mut);text-align:center;margin-top:8px}
+svg text{font-family:"Microsoft YaHei",sans-serif}
+.badge{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;background:#eef2f8;color:#234;margin-right:6px}
+.formula{background:#f6f7f5;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;
+  font-family:"Cambria Math","Times New Roman",serif;font-size:17px;overflow-x:auto}
+.formula .no{float:right;color:var(--mut);font-size:14px;font-family:"Microsoft YaHei",sans-serif}
+.ctrls{display:flex;flex-wrap:wrap;gap:22px;background:#f2f4f7;border:1px solid var(--bd);
+  border-radius:8px;padding:16px 20px;margin:16px 0}
+.ctrl{flex:1 1 200px}
+.ctrl label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.ctrl .row{display:flex;align-items:center;gap:10px}
+.ctrl input[type=range]{flex:1;accent-color:var(--blue);height:20px}
+.ctrl .val{font-family:Consolas,monospace;font-size:14px;font-weight:700;color:var(--blue);min-width:70px;text-align:right}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:16px 0}
+.ro{background:#fff;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:6px;padding:10px 14px}
+.ro .k{font-size:12px;color:var(--mut)}
+.ro .v{font-family:Consolas,monospace;font-size:19px;font-weight:700;color:var(--ink)}
+.ro.g{border-left-color:var(--green)} .ro.g .v{color:var(--green)}
+.ro.r{border-left-color:var(--red)} .ro.r .v{color:var(--red)}
+.ro.a{border-left-color:var(--amber)} .ro.a .v{color:var(--amber)}
+.ro.v{border-left-color:var(--violet)} .ro.v .v{color:var(--violet)}
+canvas{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--bd);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th,td{border:1px solid var(--bd);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:#f2f4f7;font-weight:700}
+td.n{font-family:Consolas,monospace;white-space:nowrap}
+ul,ol{padding-left:24px}li{margin:7px 0}
+.hl{background:#fff6d8;padding:1px 4px;border-radius:3px;font-weight:600}
+.warn{background:#fff4f4;border-left:3px solid var(--red);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.steps{display:grid;gap:9px;margin:14px 0}
+.st{background:#f7f9fc;border-left:3px solid var(--blue);padding:10px 15px;border-radius:0 6px 6px 0;font-size:14.5px}
+.st b{color:var(--blue);margin-right:6px}
+.mono{font-family:Consolas,"Microsoft YaHei",monospace;background:#eef2f8;color:#12306e;
+      padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px;font-size:14px}
+.note{background:#f4f8ff;border-left:3px solid var(--blue);padding:12px 18px;margin:14px 0;font-size:14.5px}
+.sym{font-size:14px;margin:12px 0}
+.sym td:first-child{width:130px}
+.why{display:block;margin-top:8px;font-size:13.5px;color:#444;line-height:1.72}
+.why::before{content:"↳ ";color:var(--amber);font-weight:700}
+.live{background:#fffaf0;border:1px dashed var(--amber);border-radius:8px;padding:13px 18px;margin:16px 0;font-size:14.5px}
+.live b{color:#9a5c00}
+.kv{font-family:Consolas,monospace;background:#eef2f8;color:#12306e;padding:1px 7px;border-radius:4px;font-size:14px}
+.eqno{color:var(--mut);font-size:12.5px;margin-left:6px;white-space:nowrap}
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);font-size:13px;color:var(--mut)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:8px 0 2px;align-items:center}
+.legend i{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:6px}
+button{font-family:inherit;font-size:14px;padding:7px 16px;border:1px solid var(--bd);background:#fff;
+  border-radius:6px;cursor:pointer;margin-right:8px}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btns{margin:12px 0 4px}
+.ex{background:#fffdf2;border:1px solid #e3d9a8;border-left:4px solid var(--amber);border-radius:8px;
+  padding:16px 20px;margin:18px 0}
+.ex .ttl{font-weight:700;color:#8a5c00;margin-bottom:6px}
+.ex .ans{background:#fff;border:1px solid #e8e2c8;border-radius:6px;padding:10px 14px;margin-top:10px;font-size:14.5px}
+.figno{font-size:12.5px;color:var(--mut);float:right;font-family:"Microsoft YaHei",sans-serif}
+.tag{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:4px;background:#eef2f8;color:#234;
+  border:1px solid #d5dcea;font-family:"Microsoft YaHei",sans-serif}
+.subh{font-size:15.5px;font-weight:700;color:#234;margin:20px 0 8px;padding-left:9px;border-left:4px solid var(--blue)}
+.small{font-size:13.5px;color:#555}
+.center{text-align:center}
+.irow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.irow .tag{margin-right:2px}
+</style>
+</head><body>
+<script>
+/* ---------------- 基础 ---------------- */
+const SVGNS='http://www.w3.org/2000/svg';
+const $=function(id){return document.getElementById(id);};
+function S(tag,attrs,parent){
+  var e=document.createElementNS(SVGNS,tag);
+  if(attrs) for(var k in attrs) e.setAttribute(k,attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function TXT(parent,x,y,str,attrs){
+  var a={x:x,y:y}; if(attrs) for(var k in attrs) a[k]=attrs[k];
+  /* halo:true → 给文字加一圈白色描边（paint-order:stroke 保证描边在字形之下），
+     用于「标签位置随滑块动态变化、无法保证与线条错开」的场景：
+     白圈会把穿过文字的线条遮断，文字始终清晰可读。 */
+  if(a.halo){
+    delete a.halo;
+    a.stroke='#fff';
+    a['stroke-width']=a['stroke-width']||4;
+    a['paint-order']='stroke';
+    a['stroke-linejoin']='round';
+  }
+  var t=S('text',a,parent); t.textContent=(str===undefined||str===null)?'':String(str); return t;
+}
+function LINE(parent,x1,y1,x2,y2,attrs){
+  var a={x1:x1,y1:y1,x2:x2,y2:y2}; if(attrs) for(var k in attrs) a[k]=attrs[k];
+  return S('line',a,parent);
+}
+function PATH(parent,d,attrs){
+  var a={d:d}; if(attrs) for(var k in attrs) a[k]=attrs[k];
+  return S('path',a,parent);
+}
+function CIRC(parent,cx,cy,r,attrs){
+  var a={cx:cx,cy:cy,r:r}; if(attrs) for(var k in attrs) a[k]=attrs[k];
+  return S('circle',a,parent);
+}
+function RECT(parent,x,y,w,h,attrs){
+  var a={x:x,y:y,width:w,height:h}; if(attrs) for(var k in attrs) a[k]=attrs[k];
+  return S('rect',a,parent);
+}
+function ARROW(parent,x1,y1,x2,y2,attrs){
+  var o=attrs||{}, col=o.stroke||'#1a46b5';
+  var g=S('g',null,parent);
+  LINE(g,x1,y1,x2,y2,{stroke:col,'stroke-width':o.w||1.6,fill:'none'});
+  var a=5.2, ang=Math.atan2(y2-y1,x2-x1);
+  var p1=x2-a*Math.cos(ang-Math.PI/7), q1=y2-a*Math.sin(ang-Math.PI/7);
+  var p2=x2-a*Math.cos(ang+Math.PI/7), q2=y2-a*Math.sin(ang+Math.PI/7);
+  PATH(g,'M'+x2+','+y2+' L'+p1+','+q1+' L'+p2+','+q2+' Z',{fill:col,stroke:'none'});
+  return g;
+}
+/* ---------------- 电路元件（水平摆放，SVG 单位 px） ---------------- */
+function cWire(parent,d,attrs){
+  return PATH(parent,d,Object.assign({fill:'none',stroke:'#1f1f1f','stroke-width':1.6},attrs||{}));
+}
+function cResH(parent,x1,x2,y,o){
+  o=o||{};
+  var len=x2-x1, n=6, amp=(o.amp||7), body=Math.min(len*0.6,36);
+  var x0=x1+(len-body)/2, step=body/n, pts=[];
+  for(var i=0;i<=n;i++){
+    var xx=x0+step*i;
+    var yy=(i===0||i===n)?y:(i%2?y-amp:y+amp);
+    pts.push(xx.toFixed(2)+','+yy.toFixed(2));
+  }
+  var g=S('g',null,parent);
+  cWire(g,'M'+x1+','+y+' L'+x0+','+y+' L'+pts.join(' L')+' L'+x2+','+y);
+  if(o.label) TXT(g,(x0+x0+body)/2,y-amp-7,o.label,{'text-anchor':'middle','font-size':13,fill:o.lc||'#333'});
+  return g;
+}
+function cCapH(parent,x1,x2,y,o){
+  o=o||{};
+  var xm=(x1+x2)/2, h=o.h||13, gap=o.gap||7;
+  var g=S('g',null,parent);
+  cWire(g,'M'+x1+','+y+' L'+(xm-gap)+','+y);
+  cWire(g,'M'+(xm-gap)+','+(y-h)+' L'+(xm-gap)+','+(y+h));
+  cWire(g,'M'+(xm+gap)+','+(y-h)+' L'+(xm+gap)+','+(y+h));
+  cWire(g,'M'+(xm+gap)+','+y+' L'+x2+','+y);
+  if(o.label) TXT(g,xm,y-h-6,o.label,{'text-anchor':'middle','font-size':13,fill:o.lc||'#333'});
+  return g;
+}
+function cIndH(parent,x1,x2,y,o){
+  o=o||{};
+  var len=x2-x1, n=o.n||4, r=o.r||9;
+  var body=Math.min(len*0.62,n*r*2), x0=x1+(len-body)/2, step=body/n;
+  var d='M'+x1+','+y+' L'+x0+','+y, i, xx;
+  for(i=0;i<n;i++){ xx=x0+step*i; d+=' A'+r+','+r+' 0 0 1 '+(xx+step).toFixed(2)+','+y; }
+  d+=' L'+x2+','+y;
+  var g=S('g',null,parent);
+  cWire(g,d);
+  if(o.label) TXT(g,x0+body/2,y-r-6,o.label,{'text-anchor':'middle','font-size':13,fill:o.lc||'#333'});
+  return g;
+}
+function cGnd(parent,x,y,o){
+  o=o||{};
+  var g=S('g',null,parent);
+  var w=o.w||15, gap=o.gap||4;
+  cWire(g,'M'+x+','+y+' L'+x+','+(y+gap));
+  cWire(g,'M'+(x-w)+','+(y+gap)+' L'+(x+w)+','+(y+gap));
+  cWire(g,'M'+(x-w*0.62)+','+(y+gap+4)+' L'+(x+w*0.62)+','+(y+gap+4));
+  cWire(g,'M'+(x-w*0.28)+','+(y+gap+8)+' L'+(x+w*0.28)+','+(y+gap+8));
+  return g;
+}
+function cSrcV(parent,x,y,r,o){
+  o=o||{};
+  var g=S('g',null,parent);
+  CIRC(g,x,y,r,{fill:'#fff',stroke:'#1f1f1f','stroke-width':1.6});
+  if(o.type==='i'){
+    LINE(g,x,y-r+5,x,y+r-5,{stroke:'#1f1f1f','stroke-width':1.5});
+    ARROW(g,x,y+r-11,x,y-r+6,{stroke:'#1f1f1f',w:1.5});
+  }else{
+    LINE(g,x-4,y-r+3,x+4,y-r+3,{stroke:'#1f1f1f','stroke-width':1.6});
+    LINE(g,x,y-r+3,x,y-r+11,{stroke:'#1f1f1f','stroke-width':1.6});
+    LINE(g,x-4,y+r-3,x+4,y+r-3,{stroke:'#1f1f1f','stroke-width':1.6});
+  }
+  if(o.label) TXT(g,x,y-r-14,o.label,{'text-anchor':'middle','font-size':13,fill:o.lc||'#333'});
+  return g;
+}
+function cDot(parent,x,y,attrs){ return CIRC(parent,x,y,2.6,Object.assign({fill:'#1f1f1f'},attrs||{})); }
+function cLab(parent,x,y,str,attrs){
+  var a={'font-size':13,fill:'#333'}; if(attrs) for(var k in attrs) a[k]=attrs[k];
+  return TXT(parent,x,y,str,a);
+}
+function vert(g,cx,cy){ g.setAttribute('transform','rotate(90 '+cx+' '+cy+')'); return g; }
+/* ---------------- 数值 ---------------- */
+function LCG(seed){ this.s=(seed>>>0)||1; }
+LCG.prototype.next=function(){ this.s=(this.s*1664525+1013904223)>>>0; return this.s/4294967296; };
+LCG.prototype.normal=function(){
+  var u=this.next(); while(u<=1e-12) u=this.next();
+  var v=this.next(); while(v<=1e-12) v=this.next();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+};
+function fx(x,d){ if(!isFinite(x)) return '—';
+  var p=Math.pow(10,d); return (Math.round(x*p)/p).toFixed(d); }
+function sig(x,d){ if(x===0) return '0'; if(!isFinite(x)) return '—';
+  var a=Math.abs(x), e=Math.floor(Math.log10(a));
+  var m=a/Math.pow(10,e);
+  return m.toFixed(d===undefined?3:d)+'×10'+sup(e);
+}
+function sup(n){
+  var map={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+  return String(n).split('').map(function(c){return map[c]||c;}).join('');
+}
+function eng(x,d){ // 工程计数：1.23 k / 4.56 M
+  if(x===0) return '0'; if(!isFinite(x)) return '—';
+  var a=Math.abs(x), e=Math.floor(Math.log10(a)/3)*3;
+  var u={'0':'','3':'k','6':'M','9':'G','-3':'m','-6':'µ','-9':'n'}[String(e)];
+  if(u===undefined) u='10^'+e;   // 不能用 ||：e=0 时单位是空串 ''，属有效值
+  return (x/Math.pow(10,e)).toFixed(d===undefined?3:d)+' '+u;
+}
+function dB(x){ return 20*Math.log10(Math.abs(x)); }
+function ticks(a,b,n){
+  if(a===b){a-=1;b+=1;}
+  var span=b-a, raw=span/Math.max(1,n), mag=Math.pow(10,Math.floor(Math.log10(raw))), norm=raw/mag, step;
+  if(norm<1.5) step=1*mag; else if(norm<3) step=2*mag; else if(norm<7) step=5*mag; else step=10*mag;
+  // 用整数倍 k*step 累加以避免浮点漂移（如 0.2 累加得到 0.6000000000000001）
+  var dec=Math.max(0,-Math.floor(Math.log10(step))+2);
+  var out=[], k=Math.ceil(a/step-1e-9);
+  for(var i=0;i<400;i++,k++){
+    var v=k*step;
+    if(v>b+step*1e-6) break;
+    out.push(Math.abs(v)<step*1e-9?0:+v.toFixed(dec));
+  }
+  return out;
+}
+/* ---------------- Canvas 绘图 ---------------- */
+function mkPlot(id,o){
+  var cv=$(id); if(!cv) return null;
+  var dpr=window.devicePixelRatio||1;
+  var W=o.w||780, H=o.h||400;
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  var P=Object.assign({l:64,r:22,t:24,b:48},o.pad||{});
+  var pw=W-P.l-P.r, ph=H-P.t-P.b;
+  var xmin=o.xmin,xmax=o.xmax,ymin=o.ymin,ymax=o.ymax;
+  var logx=!!o.logx;
+  var ax0=logx?Math.log(xmin):xmin, ax1=logx?Math.log(xmax):xmax;
+  var X=function(x){
+    var t=logx?Math.log(x):x;
+    return P.l+(t-ax0)/(ax1-ax0)*pw;
+  };
+  var Y=function(y){return P.t+ph-(y-ymin)/(ymax-ymin)*ph;};
+  var api={ctx:ctx,cv:cv,W:W,H:H,P:P,pw:pw,ph:ph,X:X,Y:Y,o:o};
+  api.frame=function(){
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+    var xt=o.xticks||ticks(xmin,xmax,8), yt=o.yticks||ticks(ymin,ymax,6);
+    ctx.strokeStyle='#e8e8e2'; ctx.lineWidth=1; ctx.beginPath();
+    xt.forEach(function(v){ ctx.moveTo(Math.round(X(v))+0.5,P.t); ctx.lineTo(Math.round(X(v))+0.5,P.t+ph); });
+    yt.forEach(function(v){ ctx.moveTo(P.l,Math.round(Y(v))+0.5); ctx.lineTo(P.l+pw,Math.round(Y(v))+0.5); });
+    ctx.stroke();
+    ctx.strokeStyle='#333'; ctx.lineWidth=1.3; ctx.beginPath();
+    ctx.moveTo(P.l,P.t); ctx.lineTo(P.l,P.t+ph); ctx.lineTo(P.l+pw,P.t+ph); ctx.stroke();
+    ctx.fillStyle='#555'; ctx.font='12px Consolas,monospace';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    xt.forEach(function(v){ ctx.fillText(o.xfmt?o.xfmt(v):String(v), X(v), P.t+ph+7); });
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    yt.forEach(function(v){ ctx.fillText(o.yfmt?o.yfmt(v):String(v), P.l-9, Y(v)); });
+    ctx.fillStyle='#333'; ctx.font='13px "Microsoft YaHei",sans-serif';
+    if(o.xlabel){ ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText(o.xlabel, P.l+pw/2, H-5); }
+    if(o.ylabel){ ctx.save(); ctx.translate(15,P.t+ph/2); ctx.rotate(-Math.PI/2);
+      ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillText(o.ylabel,0,0); ctx.restore(); }
+    api.xt=xt; api.yt=yt;
+  };
+  api.curve=function(fn,color,opts){
+    var o2=opts||{}, N=o2.n||600, started=false;
+    ctx.strokeStyle=color||'#1a46b5'; ctx.lineWidth=o2.w||2;
+    ctx.setLineDash(o2.dash||[]); ctx.beginPath();
+    for(var i=0;i<=N;i++){
+      var x=logx ? xmin*Math.pow(xmax/xmin,i/N) : xmin+(xmax-xmin)*i/N, y=fn(x);
+      if(y===null||y===undefined||!isFinite(y)){ started=false; continue; }
+      var px=X(x), py=Y(y);
+      if(!started){ ctx.moveTo(px,py); started=true; } else { ctx.lineTo(px,py); }
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  };
+  api.hline=function(y,color,dash,label){
+    ctx.strokeStyle=color||'#999'; ctx.lineWidth=1.2; ctx.setLineDash(dash||[4,4]);
+    ctx.beginPath(); ctx.moveTo(P.l,Math.round(Y(y))+0.5); ctx.lineTo(P.l+pw,Math.round(Y(y))+0.5); ctx.stroke(); ctx.setLineDash([]);
+    if(label){ ctx.fillStyle=color||'#666'; ctx.font='12px "Microsoft YaHei",sans-serif';
+      ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillText(label, P.l+4, Y(y)-3); }
+  };
+  api.vline=function(x,color,dash,label){
+    ctx.strokeStyle=color||'#999'; ctx.lineWidth=1.2; ctx.setLineDash(dash||[4,4]);
+    ctx.beginPath(); ctx.moveTo(Math.round(X(x))+0.5,P.t); ctx.lineTo(Math.round(X(x))+0.5,P.t+ph); ctx.stroke(); ctx.setLineDash([]);
+    if(label){ ctx.fillStyle=color||'#666'; ctx.font='12px "Microsoft YaHei",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillText(label, X(x), P.t+2); }
+  };
+  api.dot=function(x,y,color,r){
+    ctx.fillStyle=color||'#c02020'; ctx.beginPath(); ctx.arc(X(x),Y(y),r||3.5,0,2*Math.PI); ctx.fill();
+  };
+  api.text=function(x,y,str,attrs){
+    var a=Object.assign({x:X(x),y:Y(y),fill:'#333','font-size':12},attrs||{});
+    ctx.fillStyle=a.fill; ctx.font=(a['font-size']||12)+'px '+(a.font||'"Microsoft YaHei",sans-serif');
+    ctx.textAlign=a.align||'left'; ctx.textBaseline=a.base||'alphabetic';
+    ctx.fillText(str,a.x,a.y);
+  };
+  api.shadeX=function(x1,x2,color){
+    ctx.fillStyle=color||'rgba(26,70,181,.09)';
+    ctx.fillRect(X(Math.min(x1,x2)),P.t,Math.abs(X(x2)-X(x1)),ph);
+  };
+  api.shadeY=function(y1,y2,color){
+    ctx.fillStyle=color||'rgba(26,70,181,.09)';
+    var ya=Y(Math.max(y1,y2)), yb=Y(Math.min(y1,y2));
+    ctx.fillRect(P.l,ya,pw,Math.abs(yb-ya));
+  };
+  api.area=function(fn,x1,x2,color){
+    ctx.fillStyle=color||'rgba(192,32,32,.16)'; ctx.beginPath();
+    ctx.moveTo(X(x1),Y(ymin));
+    var N=400, started=false;
+    for(var i=0;i<=N;i++){
+      var x=x1+(x2-x1)*i/N, y=fn(x);
+      if(y===null||y===undefined||!isFinite(y)) continue;
+      var px=X(x),py=Y(y);
+      if(!started){ ctx.lineTo(px,py); started=true; } else ctx.lineTo(px,py);
+    }
+    ctx.lineTo(X(x2),Y(ymin)); ctx.closePath(); ctx.fill();
+  };
+  api.legend=function(items,x,y){
+    ctx.font='12.5px "Microsoft YaHei",sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    var px=x===undefined?P.l+12:x, py=y===undefined?P.t+14:y;
+    items.forEach(function(it,i){
+      ctx.strokeStyle=it.c; ctx.lineWidth=it.w||2.5; ctx.setLineDash(it.dash||[]);
+      ctx.beginPath(); ctx.moveTo(px,py+i*19); ctx.lineTo(px+22,py+i*19); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#333'; ctx.fillText(it.t,px+28,py+i*19);
+    });
+  };
+  return api;
+}
+function bindRange(id,cb,fmtf){
+  var el=$(id); if(!el) return;
+  var out=$(id+'_v');
+  function upd(){ var v=parseFloat(el.value); if(out) out.textContent=fmtf?fmtf(v):v; if(cb) cb(v); }
+  el.addEventListener('input',upd); upd();
+}
+function setText(id,v){ var e=$(id); if(e) e.textContent=v; }
+</script>
+<header><div class="wrap">
+  <p class="kicker">通信电子线路（第 3 版 · 陈启兴）　第 3 章 3.3 节　例 3-2</p>
+  <h1>例题解法 · 例 3-2 · 由输出功率与电压振幅求效率、谐振电阻、基波电流与导通角</h1>
+  <p class="sub">教材书页 64–65（PDF 76–77）的完整解法：五步不跳步推导，每步给出依据与教材公式号 (3-17)(3-18)(3-22)(3-23)(3-25)；下面可拖动滑块改 V_CC / P_o / U_cm / I_C0 实时复算，并回读页面读数与教材答案逐项对撞。</p>
+</div></header>
+<main class="wrap">
+<nav class="note"><a href="00_学习入口.html">学习入口</a>　｜　<span title="本次公开版未收录"> 例 3-1（未收录）</span>　｜　<a href="例题解法_例3-3_临界状态功率与效率.html">例 3-3</a>　｜　<span title="本次公开版未收录"> 例 4-1（未收录）</span>　｜　<a href="习题解法_3_高频功率放大器章末习题.html">第 3 章习题</a>　｜　<a href="习题解法_4_反馈型LC正弦波振荡器章末习题.html">第 4 章习题</a></nav>
+<p><a href="原理讲解_3.3_谐振功率放大器的折线分析法_可视化.html">需要复习？转到独立的原理讲解页面</a></p>
+
+<!-- ============ ① 教材原题（照抄题干，含全部数值与插图说明） ============ -->
+<div class="ex">
+  <div class="ttl">例 3-2　由输出功率与电压振幅求集电极效率、谐振电阻、基波电流振幅与导通角　<span class="figno">教材 书页 64（PDF 76）</span></div>
+  <p><b>题干：</b>某谐振高频功率放大器如图 3-2 所示，集电极直流电源 V_CC = 30V，输出功率 P_o = 10W，晶体管集电极电流中的直流分量 I_C0 = 400mA，输出电压振幅 U_cm = 28V。试求：直流电源 V_CC 提供的功率 P_=、集电极效率 η_c、谐振回路谐振电阻 R_p、基波电流振幅 I_c1m 和导通角 θ_c。</p>
+  <div class="card qfig"><svg id="fig32" viewBox="0 0 680 400"></svg><div class="cap">图 3-2　高频功率放大器的原理电路（交流等效，按教材图 3-2 重绘；旁路电容 C_b、C_c 与输入/输出耦合变压器从略）</div></div>
+  <p class="small">教材位置：题干 书页 64（PDF 页 76），解答 书页 64–65（PDF 页 76–77）。图 3-2 在 书页 54（PDF 页 66）。答案册《通信电子线路要点分析及习题详解》（第 2 版，2009）第 3 章 3.1–3.38 中<b>没有收录本例</b>，因此本页全部数值由题干独立复算并与教材印刷值比对。</p>
+</div>
+
+<!-- ============ ② 不跳步的解题路线（教材解答逐条照抄 + 关键公式） ============ -->
+<section id="book-solution" aria-label="逐步解法">
+  <h3>教材解答：不跳步的五步推导</h3>
+  <p><b>教材位置：</b>教材《通信电子线路（第 3 版，陈启兴）》第 3 章 3.3 节 例 3-2 —— 题干 书页 64（PDF 页 76），解答 书页 64–65（PDF 页 76–77）。答案册（第 2 版）未收录本例。</p>
+  <div class="note"><b>先想清楚：</b>先把「直流」「基波」「回路」三件事分开：直流侧只出现 V_CC 与 I_C0；交流侧只出现 U_cm 与 I_c1m；谐振回路把两者用 R_p 联系起来；θ_c 最后由波形系数 g₁ 反查。</div>
+  <details class="card"><summary>卡住了先看提示，不看完整答案</summary><ol><li>直流电源提供的功率：P_= = V_CC · I_C0（式 3-22）。</li><li>效率：η_c = P_o / P_=（式 3-25），注意分子是输出到负载的功率，不是直流输入功率。</li><li>谐振电阻：由 P_o = U_cm²/(2R_p) 反解 R_p（式 3-23）。</li><li>基波电流振幅：由 P_o = ½U_cm I_c1m 反解 I_c1m（式 3-23）。</li><li>导通角：先算电压利用系数 ξ = U_cm/V_CC 与波形系数 g₁ = I_c1m/I_C0，再查附录 A 的表。</li></ol></details>
+  <details open class="card"><summary style="cursor:pointer;font-weight:bold">展开 / 收起完整解法</summary>
+    <div class="st"><b>① 求直流电源 V_CC 提供的功率 P_=</b><p>集电极电源供给的是直流功率，等于电源电压与集电极电流直流分量之积（式 3-22）。</p><div class="formula">P_= = V_CC · I_C0<span class="no">(3-22)</span><br>= 30 V × 400 mA = 30 × 0.4 = 12 (W)</div></div><div class="st"><b>② 求集电极效率 η_c</b><p>集电极效率是输出功率与直流电源提供的功率之比（式 3-25）。</p><div class="formula">η_c = P_o / P_= = 10 / 12 × 100% ≈ 83.3%<span class="no">(3-25)</span></div></div><div class="st"><b>③ 求谐振回路谐振电阻 R_p</b><p>谐振回路只把集电极电流的<b>基波</b>分量变换成回路两端的电压，直流分量与谐波分量都被滤掉，因此输出功率满足式 (3-23)。由它反解 R_p：</p><div class="formula">P_o = U_cm² / (2R_p) = ½ U_cm I_c1m<span class="no">(3-23)</span><br>R_p = U_cm² / (2P_o) = 28² / (2 × 10) = 784 / 20 = 39.2 (Ω)</div></div><div class="st"><b>④ 求基波电流振幅 I_c1m</b><p>仍用式 (3-23)，由输出功率与电压振幅求电流振幅。</p><div class="formula">I_c1m = 2P_o / U_cm = 2 × 10 / 28 = 0.714 286… ≈ 0.72 (A)<span class="no">(3-23)</span></div><div class="st"><b>⑤ 求导通角 θ_c</b><p>式 (3-25) 还有另一形式 η_c = ½ξg₁(θ_c)。其中电压利用系数 ξ = U_cm/V_CC，波形系数 g₁(θ_c) = I_c1m/I_C0 = α₁(θ_c)/α₀(θ_c)（式 3-17、3-18 的定义）。先算出 ξ 与 g₁，再查附录 A 的分解系数表得通角。</p><div class="formula">ξ = U_cm / V_CC = 28 / 30 = 0.933 3<br>g₁(θ_c) = I_c1m / I_C0 = 0.714 286 / 0.4 = 1.785 7 ≈ 1.79<br>η_c = ½ ξ g₁(θ_c) = ½ × 0.933 3 × 1.785 7 = 0.833 3 = 83.3%<span class="no">(3-25)</span><br>查表 g₁(θ_c) = 1.79 → θ_c ≈ 60°</div><p class="why">教材第 (5) 步的写法是 η_c = 0.5 ξ g₁(θ_c) = 0.5 U_CM g₁(θ_c)/V_cc = 0.5 × 28 × g₁(θ_c)/30 = 83.3%，反解 g₁(θ_c) = 1.79 —— 与上面的分步写法完全等价，只是把 ξ 提前并进了式子。</p></div><div class="qans"><b>教材答案汇总：</b>P_= = 12 W；η_c ≈ 83.3%；R_p = 39.2 Ω；I_c1m ≈ 0.72 A；θ_c ≈ 60°。</div><div class="warn"><b>教材存疑并列说明（照教材原样排印，不擅自改教材结论）：</b><br>① <b>I_c1m 的取位</b>：教材印「I_c1m = 2P_o/U_cm = 20/28 ≈ 0.72(A)」；20/28 的精确值是 0.714 286… A，严格按两位有效数字四舍五入应为 <b>0.71 A</b>，教材取 0.72。页面按教材印 0.72 A 展示，同时给出精确值 0.714 286 A；两种取法在 1% 以内。<br>② <b>θ_c 的取表口径</b>：教材由 g₁ = 1.79 查附录 A 表得 θ_c ≈ 60°。用式 (3-17)(3-18) 的连续公式反查 g₁(θ_c) = 1.785 7 对应 θ_c ≈ 61.2°（g₁(60°) = 1.794 3，g₁(61.2°) = 1.785 8）。差异来自表格分辨率，<b>教材结论 θ_c ≈ 60° 保留</b>，页面读数给出连续解 61.2° 并在此说明。<br>③ <b>无答案册可对撞</b>：答案册（第 2 版）第 3 章未收录例 3-2，本页数值全部为按题干的独立复算结果，与教材印刷值的偏差列在下方对撞表里。</div>
+    <details><summary>核对教材扫描页（点击加载后可放大）</summary><p><span>教材 书页 64（PDF 76）：题干（请查纸质或自备教材）</span>　<span>教材 书页 65（PDF 77）：解答（请查纸质或自备教材）</span>　<span>教材 书页 54（PDF 66）：图 3-2（请查纸质或自备教材）</span></p></details>
+  </details>
+  <!-- 做题区：输入答案后核对（data-ex-answer / data-ex-tol 由填空生成） -->
+  <details class="card" data-book-quiz="e32">
+    <summary style="cursor:pointer;font-weight:bold">先自己算：输入答案后核对（不改变上面的教材解法）</summary>
+    <label style="display:block;margin:10px 0">P_= / W：<input type="number" step="any" data-ex-answer="12" data-ex-tol="0.05" aria-label="直流电源提供的功率 P_=（W）" style="width:120px"> </label><label style="display:block;margin:10px 0">η_c / %：<input type="number" step="any" data-ex-answer="83.3" data-ex-tol="0.3" aria-label="集电极效率 η_c（%）" style="width:120px"> </label><label style="display:block;margin:10px 0">R_p / Ω：<input type="number" step="any" data-ex-answer="39.2" data-ex-tol="0.15" aria-label="谐振电阻 R_p（Ω）" style="width:120px"> </label><label style="display:block;margin:10px 0">I_c1m / A：<input type="number" step="any" data-ex-answer="0.72" data-ex-tol="0.02" aria-label="基波电流振幅 I_c1m（A）" style="width:120px"> </label><label style="display:block;margin:10px 0">θ_c / °：<input type="number" step="any" data-ex-answer="60" data-ex-tol="2.5" aria-label="导通角 θ_c（度）" style="width:120px"> </label>
+    <button type="button" data-ex-check>核对我的答案</button>
+    <p data-ex-feedback role="status" aria-live="polite">允许教材末位取舍造成的小误差；先统一单位再填写。</p>
+  </details>
+  <button type="button" data-book-reset="{"e32_vcc":30,"e32_po":10,"e32_ucm":28,"e32_ic0":0.4}">恢复教材原题参数</button>
+  <p class="small">下面原有计算面板可用于复算和探索。改变滑块后，下方动态结果随之变化；上面的原题解法保持不变。</p>
+</section>
+
+<!-- ============ ③ 可交互复算面板 ============ -->
+<div class="ctrls">
+  <div class="ctrl"><label>V_CC / V</label><div class="row"><input type="range" id="e32_vcc" min="5" max="60" step="0.1" value="30"><span class="val" id="e32_vcc_v">30.0</span></div></div><div class="ctrl"><label>P_o / W</label><div class="row"><input type="range" id="e32_po" min="0.5" max="40" step="0.1" value="10"><span class="val" id="e32_po_v">10.0</span></div></div><div class="ctrl"><label>U_cm / V</label><div class="row"><input type="range" id="e32_ucm" min="2" max="45" step="0.1" value="28"><span class="val" id="e32_ucm_v">28.0</span></div></div><div class="ctrl"><label>I_C0 / A</label><div class="row"><input type="range" id="e32_ic0" min="0.05" max="1.2" step="0.01" value="0.4"><span class="val" id="e32_ic0_v">0.40</span></div></div>
+</div>
+<div class="readout">
+  <div class="ro"><div class="k">P_= / W</div><div class="v" id="ro_pdc">—</div></div><div class="ro g"><div class="k">η_c / %</div><div class="v" id="ro_eta">—</div></div><div class="ro"><div class="k">R_p / Ω</div><div class="v" id="ro_rp">—</div></div><div class="ro"><div class="k">I_c1m / A</div><div class="v" id="ro_ic1m">—</div></div><div class="ro v"><div class="k">ξ = U_cm/V_CC</div><div class="v" id="ro_xi">—</div></div><div class="ro a"><div class="k">g₁(θ_c)</div><div class="v" id="ro_g1">—</div></div><div class="ro a"><div class="k">θ_c / °</div><div class="v" id="ro_th">—</div></div>
+</div>
+<canvas id="e32_cvs" width="760" height="360"></canvas><div class="cap">图 E32-1　η_c = ½ξg₁(θ_c) 随通角 θ_c 的变化（ξ 取当前滑块值），红点为本题工作点</div>
+<h3>逐项对撞表（页面复算 vs 教材印刷值）</h3><table><tr><th>物理量</th><th>页面复算</th><th>教材印刷值</th><th>相对偏差</th><th>说明</th></tr><tr><td>P_= / W</td><td class="n" id="tb_pdc">—</td><td class="n">12</td><td class="n" id="tb_pdc_d">—</td><td>式 (3-22)，教材取两位有效数字</td></tr><tr><td>η_c / %</td><td class="n" id="tb_eta">—</td><td class="n">83.3</td><td class="n" id="tb_eta_d">—</td><td>式 (3-25)</td></tr><tr><td>R_p / Ω</td><td class="n" id="tb_rp">—</td><td class="n">39.2</td><td class="n" id="tb_rp_d">—</td><td>式 (3-23)，教材取两位有效数字</td></tr><tr><td>I_c1m / A</td><td class="n" id="tb_ic1m">—</td><td class="n">0.72</td><td class="n" id="tb_ic1m_d">—</td><td>式 (3-23)，精确值 0.714 286</td></tr><tr><td>θ_c / °</td><td class="n" id="tb_th">—</td><td class="n">60</td><td class="n" id="tb_th_d">—</td><td>查表口径差异，教材结论保留</td></tr></table><p class="note"><b>口径说明：</b>教材对 P_= 与 R_p 取两位有效数字，故容差给 1%；I_c1m 教材印 0.72（精确 0.714 286），容差给 2%；θ_c 由查表得到，容差给 2.5°（连续解 61.2° 与查表 60° 的差）。</p>
+
+<!-- ============ ④ 页面主脚本（绘图 + 滑块联动 + 读数） ============ -->
+<script>(function(){
+  /* ---------- 图 3-2 重绘（交流等效） ---------- */
+  function vCap(g,x,y1,y2){
+    var ym=(y1+y2)/2, gg=S("g",null,g);
+    cCapH(gg,x-22,x+22,ym,{});
+    vert(gg,x,ym);
+    cWire(gg,"M"+x+","+y1+" L"+x+","+(ym-22));
+    cWire(gg,"M"+x+","+(ym+22)+" L"+x+","+y2);
+    return gg;
+  }
+  function vInd(g,x,y1,y2){
+    var ym=(y1+y2)/2, gg=S("g",null,g);
+    cIndH(gg,x-30,x+30,ym,{});
+    vert(gg,x,ym);
+    cWire(gg,"M"+x+","+y1+" L"+x+","+(ym-19));
+    cWire(gg,"M"+x+","+(ym+19)+" L"+x+","+y2);
+    return gg;
+  }
+  function vRes(g,x,y1,y2){
+    var ym=(y1+y2)/2, gg=S("g",null,g);
+    cResH(gg,x-30,x+30,ym,{});
+    vert(gg,x,ym);
+    cWire(gg,"M"+x+","+y1+" L"+x+","+(ym-18));
+    cWire(gg,"M"+x+","+(ym+18)+" L"+x+","+y2);
+    return gg;
+  }
+  function drawFig(){
+    var svg=document.getElementById("fig32"); if(!svg) return;
+    svg.innerHTML="";
+    var g=S("g",null,svg);
+    var YG=340;                                   /* 公共地线 */
+    cWire(g,"M60,"+YG+" L620,"+YG);
+    /* 晶体管 VT：基极在左，集电极朝上，发射极朝下 */
+    cWire(g,"M300,180 L300,240");
+    cWire(g,"M300,180 L322,152 L322,110");
+    cWire(g,"M300,240 L322,268 L322,"+YG);
+    cWire(g,"M300,210 L170,210");
+    cWire(g,"M170,210 L170,"+YG);
+    cWire(g,"M322,110 L600,110");                 /* 集电极节点横线 */
+    cWire(g,"M322,110 L322,56");                  /* 集电极电源引出 */
+    /* 并联谐振回路 C / L / R_L */
+    cWire(g,"M400,110 L400,170");
+    cWire(g,"M400,250 L400,"+YG);
+    cWire(g,"M480,110 L480,165");
+    cWire(g,"M480,255 L480,"+YG);
+    cWire(g,"M560,110 L560,172");
+    cWire(g,"M560,248 L560,"+YG);
+    vCap(g,400,170,250);
+    vInd(g,480,165,255);
+    vRes(g,560,172,248);
+    /* 输入信号源与基极偏置 */
+    cSrcV(g,120,210,16,{"type":"v"});
+    cWire(g,"M136,210 L170,210");
+    cGnd(g,170,YG,{});
+    cGnd(g,322,YG,{});
+    cGnd(g,560,YG,{});
+    /* 标注（放在最后，统一加白描边光晕，避免压线） */
+    var A={"font-size":13,fill:"#333",halo:true};
+    TXT(g,322,44,"V_CC",{"text-anchor":"middle","font-size":13,fill:"#c02020",halo:true});
+    TXT(g,120,182,"u_b(t)",{"text-anchor":"middle","font-size":13,fill:"#1a46b5",halo:true});
+    TXT(g,470,96,"u_c(t)",{"text-anchor":"middle","font-size":13,fill:"#1a46b5",halo:true});
+    TXT(g,306,222,"VT",{"font-size":13,fill:"#0d7a3c",halo:true});
+    TXT(g,178,262,"V_BB",{"font-size":13,fill:"#c02020",halo:true});
+    TXT(g,400,300,"C",{"text-anchor":"middle","font-size":13,fill:"#333",halo:true});
+    TXT(g,480,300,"L",{"text-anchor":"middle","font-size":13,fill:"#333",halo:true});
+    TXT(g,560,300,"R_L",{"text-anchor":"middle","font-size":13,fill:"#333",halo:true});
+    TXT(g,340,60,"",A);
+  }
+  /* ---------- 分解系数（式 3-17 / 3-18） ---------- */
+  function a0(th){var c=Math.cos(th);return (Math.sin(th)-th*c)/(Math.PI*(1-c));}
+  function a1(th){var c=Math.cos(th);return (th-Math.sin(th)*c)/(Math.PI*(1-c));}
+  function g1(th){return a1(th)/a0(th);}
+  /* g1(θ) 在 (0°,180°) 上单调下降：2 → 1，用二分反查 θ */
+  function solveTheta(target){
+    if(!(target>1&&target<2)) return null;
+    var lo=0.02,hi=Math.PI-0.02;
+    for(var k=0;k<80;k++){var mid=(lo+hi)/2; if(g1(mid)>target) lo=mid; else hi=mid;}
+    return (lo+hi)/2*180/Math.PI;
+  }
+  /* ---------- 复算 ---------- */
+  function readVals(){
+    var vcc=parseFloat(document.getElementById("e32_vcc").value);
+    var po=parseFloat(document.getElementById("e32_po").value);
+    var ucm=parseFloat(document.getElementById("e32_ucm").value);
+    var ic0=parseFloat(document.getElementById("e32_ic0").value);
+    return {vcc:vcc,po:po,ucm:ucm,ic0:ic0};
+  }
+  function compute(v){
+    var pdc=v.vcc*v.ic0;
+    var eta=v.po/pdc;
+    var rp=v.ucm*v.ucm/(2*v.po);
+    var ic1m=2*v.po/v.ucm;
+    var xi=v.ucm/v.vcc;
+    var g=ic1m/v.ic0;
+    var th=solveTheta(g);
+    return {pdc:pdc,eta:eta,rp:rp,ic1m:ic1m,xi:xi,g:g,th:th};
+  }
+  function drawCurve(r){
+    var P=mkPlot("e32_cvs",{w:760,h:360,xmin:20,xmax:170,ymin:0,ymax:100,
+      xlabel:"通角 θ_c / °",ylabel:"集电极效率 η_c / %"});
+    if(!P) return;
+    P.frame();
+    P.curve(function(x){return 50*r.xi*g1(x*Math.PI/180);},"#1a46b5",{w:2.2});
+    if(r.th!==null&&r.th>=20&&r.th<=170){
+      P.dot(r.th,50*r.xi*r.g,"#c02020",4.5);
+      P.text(r.th+3,50*r.xi*r.g+14,"θ_c = "+r.th.toFixed(1)+"°，η_c = "+(50*r.xi*r.g).toFixed(1)+"%",{"font-size":12.5,fill:"#c02020"});
+    }
+    P.legend([{c:"#1a46b5",t:"η_c = ½ ξ g₁(θ_c)（当前 ξ = "+r.xi.toFixed(3)+"）"},{c:"#c02020",t:"本题工作点"}],P.P.l+14,P.P.t+16);
+  }
+  function update(){
+    var v=readVals(), r=compute(v);
+    setText("e32_vcc_v",v.vcc.toFixed(1));
+    setText("e32_po_v",v.po.toFixed(1));
+    setText("e32_ucm_v",v.ucm.toFixed(1));
+    setText("e32_ic0_v",v.ic0.toFixed(2));
+    setText("ro_pdc",r.pdc.toFixed(3)+" W");
+    setText("ro_eta",(100*r.eta).toFixed(2)+" %");
+    setText("ro_rp",r.rp.toFixed(3)+" Ω");
+    setText("ro_ic1m",r.ic1m.toFixed(4)+" A");
+    setText("ro_xi",r.xi.toFixed(4));
+    setText("ro_g1",r.g.toFixed(4));
+    setText("ro_th",r.th===null?"无解":(r.th.toFixed(2)+" °"));
+    setText("tb_pdc",r.pdc.toFixed(3));
+    setText("tb_pdc_d",(100*Math.abs(r.pdc-12)/12).toFixed(2)+" %");
+    setText("tb_eta",(100*r.eta).toFixed(3));
+    setText("tb_eta_d",(100*Math.abs(100*r.eta-83.3)/83.3).toFixed(2)+" %");
+    setText("tb_rp",r.rp.toFixed(3));
+    setText("tb_rp_d",(100*Math.abs(r.rp-39.2)/39.2).toFixed(2)+" %");
+    setText("tb_ic1m",r.ic1m.toFixed(4));
+    setText("tb_ic1m_d",(100*Math.abs(r.ic1m-0.72)/0.72).toFixed(2)+" %");
+    setText("tb_th",r.th===null?"无解":r.th.toFixed(2));
+    setText("tb_th_d",r.th===null?"—":(r.th-60).toFixed(2)+" °");
+    drawCurve(r);
+  }
+  function bind(id,cb){var el=document.getElementById(id); if(el&&el.addEventListener) el.addEventListener("input",cb);}
+  bind("e32_vcc",update); bind("e32_po",update); bind("e32_ucm",update); bind("e32_ic0",update);
+  drawFig(); update();
+})();</script>
+
+<!-- ============ ⑤ 页末自检：独立复算 + 与教材数值对撞 ============ -->
+<script>(function(){
+var out=[],all=true;
+function P(v,d){if(!isFinite(v))return "—";return Number(v).toFixed(d===undefined?4:d);}
+function chk(name,got,book,tol,unit){
+  var ok=isFinite(got)&&isFinite(book)&&Math.abs(got-book)/Math.abs(book)<=tol;
+  out.push((ok?"  PASS  ":"  FAIL  ")+name+"  复算="+P(got,5)+"  期望="+P(book,5)+(unit||""));
+  if(!ok)all=false;
+}
+function rdback(name,id,expect,rel){
+  var el=document.getElementById(id); var t=el?(el.textContent||""):"";
+  var num=parseFloat(String(t).replace(/[^0-9eE+\-.]/g,""));
+  var ok=isFinite(num)&&Math.abs(num-expect)/Math.abs(expect)<=rel;
+  out.push((ok?"  PASS  ":"  FAIL  ")+name+"  页面读数="+t+"  期望="+P(expect,5));
+  if(!ok)all=false;
+}
+function txtguard(name,needle){
+  var body=document.body?(document.body.innerText||document.body.textContent||""):"";
+  var ok=body.indexOf(needle)>=0;
+  out.push((ok?"  PASS  ":"  FAIL  ")+name+"  页面含「"+needle+"」"); if(!ok)all=false;
+}
+/* —— 独立复算：只从题干出发，不读页面自己的中间变量 —— */
+var VCC=30, PO=10, IC0=0.4, UCM=28;
+var Pdc=VCC*IC0;
+var Eta=PO/Pdc;
+var Rp=UCM*UCM/(2*PO);
+var Ic1m=2*PO/UCM;
+var Xi=UCM/VCC;
+var G1=Ic1m/IC0;
+function a0(t){var c=Math.cos(t);return (Math.sin(t)-t*c)/(Math.PI*(1-c));}
+function a1(t){var c=Math.cos(t);return (t-Math.sin(t)*c)/(Math.PI*(1-c));}
+function g1(t){return a1(t)/a0(t);}
+var lo=0.02,hi=Math.PI-0.02,k;
+for(k=0;k<80;k++){var mid=(lo+hi)/2; if(g1(mid)>G1) lo=mid; else hi=mid;}
+var Th=(lo+hi)/2*180/Math.PI;
+chk("P_= = V_CC·I_C0（式 3-22）",Pdc,12,0.001," W");
+chk("η_c = P_o/P_=（式 3-25）",100*Eta,83.3,0.002," %");
+chk("R_p = U_cm²/(2P_o)（式 3-23）",Rp,39.2,0.001," Ω");
+chk("I_c1m = 2P_o/U_cm（式 3-23，教材取两位有效数字）",Ic1m,0.72,0.01," A");
+chk("ξ = U_cm/V_CC",Xi,28/30,0.0005,"");
+chk("g₁(θ_c) = I_c1m/I_C0",G1,1.79,0.006,"");
+chk("η_c = ½ξg₁(θ_c)（式 3-25）",50*Xi*G1,83.3,0.002," %");
+chk("查表 θ_c ≈ 60°（连续反查 61.2°，按教材结论给容差）",Th,60,0.035," °");
+chk("g₁(60°) 精确值（附录 A 表值 1.79）",g1(60*Math.PI/180),1.79,0.003,"");
+rdback("页面读数回读 P_=","ro_pdc",12,0.001);
+rdback("页面读数回读 η_c","ro_eta",83.3,0.002);
+rdback("页面读数回读 R_p","ro_rp",39.2,0.001);
+rdback("页面读数回读 I_c1m","ro_ic1m",0.714286,0.001);
+rdback("页面读数回读 g₁","ro_g1",1.785714,0.001);
+rdback("页面读数回读 θ_c","ro_th",61.2,0.005);
+var fig=document.getElementById("fig32");
+var nFig=0;
+if(fig){ if(fig.children) nFig+=fig.children.length;
+  if(fig.querySelectorAll) nFig+=fig.querySelectorAll("path,line,rect,circle,text").length; }
+chk("图 3-2 已绘制（元素数）",(nFig>0)?1:0,1,0,"");
+console.log("[例3-2] ===== 页末自检：独立复算 vs 教材 =====");
+out.forEach(function(l){console.log(l);});
+console.log("[例3-2] 自检结果："+(all?"全部通过":"存在 FAIL"));
+if(all){document.title=(document.title||"")+" ✓";}
+})();</script>
+</main>
+
+<!-- 共享「做题区 / 恢复参数」脚本 -->
+<script data-book-quiz-script>
+(function(){
+document.querySelectorAll('[data-book-quiz]').forEach(function(box){
+  box.querySelector('[data-ex-check]').addEventListener('click',function(){
+    var fields=Array.from(box.querySelectorAll('[data-ex-answer]'));
+    var feedback=box.querySelector('[data-ex-feedback]');
+    if(fields.some(function(f){return f.value.trim()===''||!Number.isFinite(Number(f.value));})){
+     feedback.textContent='请先填写所有答案（数字），注意题目要求的单位。';return;
+    }
+    var results=fields.map(function(f){var pass=Math.abs(Number(f.value)-Number(f.dataset.exAnswer))<=Number(f.dataset.exTol);return f.getAttribute('aria-label')+'：'+(pass?'✓ 正确':'需复查公式、折算系数或单位');});
+    feedback.textContent=results.join('；');
+  });
+});
+document.querySelectorAll('[data-book-reset]').forEach(function(button){
+  button.addEventListener('click',function(){
+    var values=JSON.parse(button.getAttribute('data-book-reset'));
+    Object.keys(values).forEach(function(id){var e=document.getElementById(id);if(e){e.value=values[id];e.dispatchEvent(new Event('input',{bubbles:true}));}});
+  });
+});
+})();
+</script>
+</body></html>
